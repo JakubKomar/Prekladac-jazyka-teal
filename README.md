@@ -1,2 +1,3 @@
 # IFJ-2021
-Miluju ifj
+Miluju IFJ.
+13 hodin projekty 100% legit
