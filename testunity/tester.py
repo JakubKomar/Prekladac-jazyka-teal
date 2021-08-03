@@ -6,11 +6,11 @@
 
 import os
 
-testFolder="./tests/"
-testTypeEnd="go"
-programToTest="./../program.exe"
-ifjCode="./ifjCode"
-ifj21="./ifj21"
+testFolder="./tests/"   
+testTypeEnd="go"        #koncovka testovaných souborů
+programToTest="./../ifj21"
+ifjCode="./programs/ifjCode"     #strojový interpret cílového jazyka
+ifj21="./programs/ifj21interpret"         #interpret počátečního jazyka  
 makefile="./../makefile"
 
 tests=[]
@@ -19,16 +19,18 @@ def main():
     programInit()
     initTests()
 def programInit():
-    if( not os.path.exists(ifjCode) ):
+    if(not os.path.exists(ifjCode) ):
         error("ifjCode interpret is not existing")
     if(not os.path.exists(ifj21)):
         error("ifj21 interpret is not existing")
-    if(os.path.exists(ifj21)):
-        print("testing program is not existing, trying makefile")
-        None
-    os.path.exists(ifj21)
-    os.path.exists(programToTest)
-    return
+    if(not os.path.exists(programToTest)):
+        if(not os.path.exists(makefile)):
+            error("program not existing and cant be made by makefile")
+        else:
+            print("testing program is not existing, trying makefile")
+            os.system("cd .. && make")
+            if(not os.path.exists(programToTest)):
+                error("testing program cant be made")
 def initTests():
     fname = []
     for root,d_names,f_names in os.walk(testFolder):
@@ -36,7 +38,6 @@ def initTests():
            tests.append(test(os.path.join(root, f),f))
 
     print(tests)
-    return
 def error(text="Unknown error",retCode=-1):
     print(text)
     exit(retCode)
