@@ -5,9 +5,9 @@
 #tester překladače IFJ-2021
 
 import os
-
+import re
 testFolder="./tests/"   
-testTypeEnd="go"        #koncovka testovaných souborů
+testTypeRegex=r"\.go$"       #koncovka testovaných souborů
 programToTest="./../ifj21"
 ifjCode="./programs/ifjCode"     #strojový interpret cílového jazyka
 ifj21="./programs/ifj21interpret"         #interpret počátečního jazyka  
@@ -18,6 +18,7 @@ tests=[]
 def main():
     programInit()
     initTests()
+    startTesting()
 def programInit():
     if(not os.path.exists(ifjCode) ):
         error("ifjCode interpret is not existing")
@@ -31,12 +32,14 @@ def programInit():
             os.system("cd .. && make")
             if(not os.path.exists(programToTest)):
                 error("testing program cant be made")
+def startTesting():
+    None
 def initTests():
     fname = []
     for root,d_names,f_names in os.walk(testFolder):
        for f in f_names:
-           tests.append(test(os.path.join(root, f),f))
-
+           if(re.search(testTypeRegex,f, re.IGNORECASE)):
+                tests.append(test(os.path.join(root, f),f))
     print(tests)
 def error(text="Unknown error",retCode=-1):
     print(text)
@@ -44,17 +47,18 @@ def error(text="Unknown error",retCode=-1):
 class test(object):
     name=None
     path=None
+    pased=None
     exRetCode=0
     RetCode=0
     def __init__(self,Path,Name):
         self.path=Path
         self.name=Name
-
+        self.pased=False
     def startTest(self):
 
         return
     def __repr__(self):
-        return "<Test - name: %-15s, path: %-60s ,expected return code: %-3d,return code: %-3d>\n" % (self.name, self.path, self.exRetCode,self.RetCode)
+        return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d>\n" % (self.name, self.path, self.exRetCode,self.RetCode)
 
 
 
