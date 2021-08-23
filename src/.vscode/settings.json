@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "parser.h": "c",
-        "scaner.h": "c"
+        "scaner.h": "c",
+        "basedeclarations.h": "c",
+        "dstring.h": "c"
     }
 }
