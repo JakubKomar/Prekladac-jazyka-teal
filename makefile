@@ -1,10 +1,11 @@
 CFLAGS=-std=c99 -Wall -pedantic -g
-SRC=../src/main.c
+
 BIN=ifj21
 ZIP=project.zip
 CC=gcc
 RM=rm -f
-
+SRC=$(wildcard src/**/*.c) $(wildcard src/*.c)
+PATHS=$(addprefix ../, $(SRC))
 .PHONY: all build doxygen run pack clean
 
 all: build
@@ -13,7 +14,7 @@ build:
 	if [ -d "build" ]; then rm -r build; fi && \
 	mkdir build && \
 	cd build && \
-	$(CC) $(CFLAGS) -o $(BIN) $(SRC) && \
+	$(CC) $(CFLAGS) -o $(BIN) $(PATHS) && \
 	cp $(BIN) ../
 
 pack: clean
