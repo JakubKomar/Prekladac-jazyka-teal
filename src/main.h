@@ -1,6 +1,7 @@
 /**
- * @brief   Structure 2way list
+ * @brief   main
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#include "list.h"
+#pragma once
+#include "parser.h"

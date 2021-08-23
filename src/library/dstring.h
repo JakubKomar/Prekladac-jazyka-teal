@@ -1,11 +1,9 @@
 /**
- * Dynamic string 
  * @brief   Dynamic string libary
  *
  * @authors Jakub Komárek (xkomar33)
- * @date    28-07-2021
- * @version 1.0
  */
+#pragma once
 #include <string.h>
 #include <malloc.h>
 typedef struct

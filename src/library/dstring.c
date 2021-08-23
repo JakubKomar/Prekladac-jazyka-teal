@@ -1,10 +1,7 @@
 /**
- * Dynamic string 
- * @brief   Dynamic string libary
+ * @brief   Dynamic string 
  *
  * @authors Jakub Komárek (xkomar33)
- * @date    28-07-2021
- * @version 1.0
  */
 #include "dstring.h"
 
