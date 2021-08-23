@@ -6,6 +6,7 @@
 
 import os
 import re
+import subprocess 
 testFolder="./tests/"   
 testTypeRegex=r"\.go$"       #koncovka testovaných souborů
 programToTest="./../ifj21"
@@ -73,10 +74,12 @@ class test(object):
     pased=None
     exRetCode=0
     RetCode=0
+    failReson=0
     def __init__(self,path,Name):
         self.path=path
-        f = open(path, "r")
-        if f==None:
+        try:
+            f = open(path, "r")
+        except:
             raise FileExistsError
         info=f.readline()
         f.close()
@@ -87,10 +90,30 @@ class test(object):
         self.name=Name
         self.pased=False
     def startTest(self):
-        #to do - spuštění testu a vyhodnocení
-        return
+        try:
+            output = subprocess.check_output(programToTest,stderr=subprocess.DEVNULL,timeout=1)
+            if(self.exRetCode!=0):
+                self.pased=False
+                return
+            #print(output)
+            self.RetCode=0
+            #to do-porovnání výstupů od vzorového interpretu
+            expectedOutput=output
+            if output==expectedOutput :
+                self.pased=True
+            else:
+                self.pased=False
+        except subprocess.CalledProcessError as grepexc:
+            self.RetCode=grepexc.returncode
+            if self.RetCode==self.exRetCode:
+                self.pased=True
+            else:
+                self.pased=False
+        except subprocess.TimeoutExpired:
+            self.failReson=1
+
     def __repr__(self):
-        return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d>" % (self.name, self.path, self.exRetCode,self.RetCode)
+        return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
 
 
 

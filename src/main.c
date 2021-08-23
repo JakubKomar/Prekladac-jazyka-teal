@@ -4,6 +4,7 @@
 
 int main(int argc, char** argv)
 {
-    printf("hallo word\n");
+    fprintf(stdout,"hallo word\n");
+    fprintf(stderr,"error\n");
     return 0;
 }
