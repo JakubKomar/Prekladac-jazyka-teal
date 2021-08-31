@@ -7,6 +7,7 @@
 import os
 import re
 import subprocess 
+import argparse
 testFolder="./tests/"   
 testTypeRegex=r"\.go$"       #koncovka testovaných souborů
 programToTest="./../ifj21"
@@ -115,6 +116,9 @@ class test(object):
     def __repr__(self):
         return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
 
-
-
+parser = argparse.ArgumentParser(description='Tester pro ifj překaldač.')
+parser.add_argument("-p", "--path",type=str,default=testFolder,
+                    help="Path to tests")                   
+args = parser.parse_args()
+testFolder=args.path
 main()
