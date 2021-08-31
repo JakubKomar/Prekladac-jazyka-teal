@@ -35,15 +35,15 @@ void StackPush(pStack S, tokenType type)
 
 tokenType StackPop(pStack S)
 {
-    if(S->last <= -1)
+    if(S->last < 0)
         errorD(99,"stack underflow");
     else
         S->last--;  
     return(S->array[ S->last+1]);
 }
-tokenType StackPop(pStack S)
+tokenType StackHead(pStack S)
 {
-    if(S->last>0)       
+    if(S->last<0)       
         errorD(99,"reading from empty stack");
     return(S->array[S->last]);
 }

@@ -57,5 +57,4 @@ void strCopyString(string *s1, string *s2)
    }
    strcpy(s1->str, s2->str);
    s1->length = newLength;
-   return 0;
 }

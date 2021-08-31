@@ -8,11 +8,10 @@
 #include <malloc.h>
 #include "./../baseDeclarations.h"
 
-typedef struct {                    /* prvek dvousměrně vázaného seznamu */                                  
-    struct Token *lptr;             /* ukazatel na předchozí prvek seznamu */
-    struct Token *rptr;             /* ukazatel na následující prvek seznamu */
-    int numberOfLine;
-    int numberOfChar;
+typedef struct item{                    /* prvek dvousměrně vázaného seznamu */                                  
+    struct item *lptr;             /* ukazatel na předchozí prvek seznamu */
+    struct item *rptr;             /* ukazatel na následující prvek seznamu */
+    int data; //to do
 }*listItem;
 
 typedef struct {                      /* dvousměrně vázaný seznam */
