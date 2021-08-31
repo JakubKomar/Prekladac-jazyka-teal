@@ -17,7 +17,6 @@ typedef struct bData{
     int data;
 } *bDataPtr;
 
-
 /**
  * binary tree inicialization
  * @param *tree-tree to incializate
@@ -39,12 +38,10 @@ bDataPtr bSearch(bNodePtr *tree, char *key);
  * @param *tree-tree to insert,* key-key from inserted node, data-iformation to insert
  */ 
 void bInsert(bNodePtr *tree, char *key, bDataPtr data);
-
 /**
  * binary tree auxiliary function
  */ 
 void replaceByRightmost (bNodePtr ReplacedPtr, bNodePtr *tree);
-
 /**
  * remove node from binary tree 
  * @param *tree-tree where is node for removing,* key-key from deleted node
