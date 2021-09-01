@@ -61,3 +61,6 @@ void printStack(pStack *s)
         fprintf(stderr,"%-4d. %d\n",i,(*s)->array[i]);
     fprintf(stderr,"Head of stack is here.");
 }
+bool emptyStack(pStack *s){
+    return ((*s)->last<0);
+}

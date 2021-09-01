@@ -8,7 +8,6 @@
 
 #include <stdbool.h>
 #include <malloc.h>
-#include "./../scaner.h"
 #include "./../baseDeclarations.h"
 
 #define STACK_SIZE 200  //počateční velkost zásobníku
@@ -46,6 +45,12 @@ tokenType StackPop(pStack S);
  * @return head of stack
  */
 tokenType StackHead(pStack S);
+/**
+ * is stack empty function
+ * @param *S- stack to check
+ * @return TRUE-stack is empty, FALSE-stack is not empty
+ */
+bool emptyStack(pStack *s);
 /**
  * printing stack for debug
  * @param *S- stack to print

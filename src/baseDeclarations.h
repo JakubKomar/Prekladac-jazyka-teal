@@ -9,10 +9,8 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include "library/dstring.h"
+#include "tokens.h"
 #define INPUT stdin
-
-
-
 
 void error(int code);
 void errorD(int code,char * description);
