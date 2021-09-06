@@ -27,6 +27,6 @@ const char precTable[14][14] =
 	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// val
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
-void expresionParse(tokenType actual);
+void expresionParse(tokenType actual,scanerData *sData);
 char getSomething(tokenType actual, tokenType head);
 int getOrderInTable(tokenType toDecode);

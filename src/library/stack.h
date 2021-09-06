@@ -50,9 +50,9 @@ tokenType StackHead(pStack S);
  * @param *S- stack to check
  * @return TRUE-stack is empty, FALSE-stack is not empty
  */
-bool emptyStack(pStack *s);
+bool emptyStack(pStack s);
 /**
  * printing stack for debug
  * @param *S- stack to print
  */
-void printStack(pStack *s);
+void printStack(pStack s);

@@ -6,7 +6,7 @@
 #include "expresionParser.h"
 
 
-void expresionParse(tokenType actual)
+void expresionParse(tokenType actual,scanerData *sData)
 {
     pStack stack;
     StackInit(&stack);
@@ -17,13 +17,21 @@ void expresionParse(tokenType actual)
         switch (getSomething(actual,StackHead(stack)))
         {
         case '=':
-            /* code */
+            StackPush(stack,actual);
+            actual=getNextToken(sData);
             break;
         case '<':
-            /* code */
-            break;
+            StackPush(stack,O_HANDLE);
+            StackPush(stack,actual);
+            actual=getNextToken(sData);
+            break; 
         case '>':
-            /* code */
+            //reduction
+            while (StackHead(stack)!=O_HANDLE)
+            {
+                StackPop(stack);
+            }
+            
             break;
         case ' ':
             errorD(99,"syntax error");
@@ -40,9 +48,9 @@ void expresionParse(tokenType actual)
 } 
 char getSomething(tokenType actual, tokenType head)
 {
-    int colm=getOrderInTable(actual);
-    int row=getOrderInTable(head);
-    return precTable[row][colm];
+    int colum=getOrderInTable(head);
+    int row=getOrderInTable(actual);
+    return precTable[row][colum];
 
 }
 
