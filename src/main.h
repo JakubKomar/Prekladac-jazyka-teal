@@ -5,3 +5,5 @@
  */
 #pragma once
 #include "parser.h"
+
+void debug(bool scanerOnly);

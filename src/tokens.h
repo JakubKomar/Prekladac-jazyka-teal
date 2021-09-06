@@ -20,6 +20,8 @@ typedef enum{   //typy tokenů
     T_MUL,      //násobení *
     T_SUB,      //odčítání -
     T_ADD,      //sčítání    +
+    T_EOL,
+    T_EOF,
     //neterminály
     N_START,
     //ostatní

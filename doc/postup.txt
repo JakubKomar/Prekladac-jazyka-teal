@@ -1,0 +1,11 @@
+1)udělat scaner-ez (žravá metoda)
+2)parser ll tabulka - umí sežrat vše, kromě expresions
+3)parser expresions
+4)tabulka symbolů-detekce deklarace, ověřit typy proměných, ...
+-----parser----
+5)generování kódu podle použitých pravidel
+
+-----deadline - pokusné odevzdání------
+6)dokumentace
+7)prezentace
+ 
