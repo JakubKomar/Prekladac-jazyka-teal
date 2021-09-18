@@ -11,20 +11,20 @@ void parserMain(){
     initScanerData(&scData);
     
     pStack stack;
-    StackInit(&stack);
-    StackPush(stack,N_START);
+    stackInit(&stack);
+    stackPush(stack,N_START);
 
-    while (emptyStack(stack))
+    while (stackEmpty(stack))
     {
-        if(StackHead(stack)==N_START)//pokud neterminál
+        if(stackHead(stack)==N_START)//pokud neterminál
         {
             useLLtable(actualToken,stack);
         }
         else
         {
-            if(StackHead(stack)==actualToken)
+            if(stackHead(stack)==actualToken)
             {
-                StackPop(stack);
+                stackPop(stack);
                 getNextToken(&scData);
             }
             else
@@ -37,13 +37,13 @@ void parserMain(){
 
 void useLLtable(tokenType actualToken,pStack stack) 
 {
-    switch (StackPop(stack))
+    switch (stackPop(stack))
     {
     case N_START:
         switch (actualToken)
         {
         case T_ASSIGEN:
-            StackPush(stack,T_ASSIGEN);   //použití pravidla
+            stackPush(stack,T_ASSIGEN);   //použití pravidla
             break;
         
         default:

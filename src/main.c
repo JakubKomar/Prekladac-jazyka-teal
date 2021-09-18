@@ -9,9 +9,9 @@
 
 int main(int argc, char** argv)
 {
-    bool debugF=false;
-    bool scanerOnlyF=false;
 
+    bool scanerOnlyF=false;
+    bool debugF=false;
     for(int i=1;i<argc;i++)
     {
         if(!strcmp(argv[i],"-d"))
@@ -34,12 +34,13 @@ int main(int argc, char** argv)
         }
     }
     if(debugF)
-        debug(scanerOnlyF);
+        debugRun(scanerOnlyF);
 
     parserMain();
     return 0;
 }
-void debug(bool scanerOnlyF)
+
+void debugRun(bool scanerOnlyF)
 {
     if(scanerOnlyF)
     {

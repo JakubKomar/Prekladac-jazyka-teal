@@ -16,6 +16,12 @@ build:
 	cd build && \
 	$(CC) $(CFLAGS) -o $(BIN) $(PATHS) && \
 	cp $(BIN) ../
+d:
+	if [ -d "build" ]; then rm -r build; fi && \
+	mkdir build && \
+	cd build && \
+	$(CC) -DDEBUG $(CFLAGS) -o $(BIN) $(PATHS) && \
+	cp $(BIN) ../
 
 pack: clean
 	zip -r $(ZIP) src/ makefile README.txt 

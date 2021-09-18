@@ -9,27 +9,27 @@
 void expresionParse(tokenType actual,scanerData *sData)
 {
     pStack stack;
-    StackInit(&stack);
-    StackPush(stack,O_DOLAR);
+    stackInit(&stack);
+    stackPush(stack,O_DOLAR);
 
-    while (StackHead(stack)==O_DOLAR&&actual==O_DOLAR)
+    while (stackHead(stack)==O_DOLAR&&actual==O_DOLAR)
     {
-        switch (getSomething(actual,StackHead(stack)))
+        switch (getSomething(actual,stackHead(stack)))
         {
         case '=':
-            StackPush(stack,actual);
+            stackPush(stack,actual);
             actual=getNextToken(sData);
             break;
         case '<':
-            StackPush(stack,O_HANDLE);
-            StackPush(stack,actual);
+            stackPush(stack,O_HANDLE);
+            stackPush(stack,actual);
             actual=getNextToken(sData);
             break; 
         case '>':
             //reduction
-            while (StackHead(stack)!=O_HANDLE)
+            while (stackHead(stack)!=O_HANDLE)
             {
-                StackPop(stack);
+                stackPop(stack);
             }
             
             break;
@@ -44,7 +44,7 @@ void expresionParse(tokenType actual,scanerData *sData)
     
 
 
-    StackDestruct(&stack);
+    stackDestruct(&stack);
 } 
 char getSomething(tokenType actual, tokenType head)
 {
