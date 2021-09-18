@@ -28,6 +28,8 @@ pack: clean
 
 run:
 	test -f ifj21 && ./ifj21
+valgrind:
+	test -f ifj21 && valgrind ./ifj21
 
 doxygen:
 	if [ -d "doc" ]; then rm -r doc; fi && \

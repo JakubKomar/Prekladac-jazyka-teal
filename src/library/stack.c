@@ -17,8 +17,8 @@ void stackInit(stack *s)
 
 void stackRealoc(stack *s)
 {
-    s->capacity=STACK_BASE_SIZE*2;
-    s->array=realloc(s->array,sizeof(tokenType)*STACK_BASE_SIZE);
+    s->capacity=s->capacity*2;
+    s->array=realloc(s->array,sizeof(tokenType)* s->capacity);
     if(!s->array)
         errorD(99,"Stack realoc error");
 }
@@ -28,8 +28,7 @@ void stackPush(stack *s, tokenType type)
     if(stackFull(s))
         stackRealoc(s);
     s->last++;
-    s->array[s->last]=type;
-
+    s->array[s->last-1]=type;
 }
 
 tokenType stackPop(stack *s)
@@ -37,14 +36,14 @@ tokenType stackPop(stack *s)
     if(stackEmpty(s))
         errorD(99,"Stack owerflow");
     s->last--;
-    return s->array[s->last+1];
+    return s->array[s->last];
 }
 
 tokenType stackHead(stack *s)
 {
     if(stackEmpty(s))
         errorD(99,"Stack is empty");
-    return s->array[s->last];
+    return s->array[s->last-1];
 }
 
 void stackDestruct(stack *s)
@@ -54,10 +53,10 @@ void stackDestruct(stack *s)
 
 void stackPrint(stack *s)
 {
-    debugS("Stack debug extract:");
-    for (int i =1; i <=s->last ; i++)
+    debugS("Stack debug extract:\n");
+    for (int i =0; i <s->last ; i++)
         debug("%-4d. %d\n",i,s->array[i]);
-    debugS("Head of stack is here.↑");
+    debugS("↑Head of stack is here.↑");
 }
 
 bool stackFull(stack *s)

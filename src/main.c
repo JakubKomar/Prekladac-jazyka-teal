@@ -9,7 +9,6 @@
 
 int main(int argc, char** argv)
 {
-
     bool scanerOnlyF=false;
     bool debugF=false;
     for(int i=1;i<argc;i++){
@@ -43,5 +42,18 @@ void debugRun(bool scanerOnlyF)
         while(actualToken!=T_EOF)
             actualToken=getNextToken(&scData);
     }
+    
+    stack stack;
+    stackInit(&stack);
+    for(int i=0;i<20;i++){
+        stackPush(&stack,i);
+    }
+    stackPrint(&stack);
+    for(int i=0;i<30;i++){
+        stackPop(&stack);
+    }
+    stackPrint(&stack);
+    debug("ha-%d",stackPop(&stack));
+    stackDestruct(&stack);
     exit(0);
 }
