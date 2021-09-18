@@ -5,56 +5,67 @@
  */
 #include "dstring.h"
 
-void strInit(string *s)
+void stringInit(string *s)
 {
-   if ((s->str = (char*) malloc(STR_BASE_LEN)) == NULL)
-      errorD(99,"String alocation error");
-   s->str[0] = '\0';
-   s->length = 0;
-   s->allocSize = STR_BASE_LEN;
+   s->capacity=STRING_BASE_SIZE;
+   s->str=malloc(sizeof(char)*s->capacity);
+   if(!s->str)
+      errorD(99,"Dynamic string alocation error");
+   stringClear(s);
 }
 
-void strFree(string *s)
+void stringDestruct(string *s)
 {
    free(s->str);
 }
 
-void strClear(string *s)
+void stringClear(string *s)
 {
-   s->str[0] = '\0';
-   s->length = 0;
+   s->str[0]='\0';
+   s->length=0;
 }
 
-void strAddChar(string *s1, char c)
+void stringAddChar(string *s, char c)
 {
-   if (s1->length + 1 >= s1->allocSize)
-   {
-      if(realocate(s1))
-         errorD(99,"String alocation error");
-   }
-   s1->str[s1->length] = c;
-   s1->length++;
-   s1->str[s1->length] = '\0';
+   if(stringFull(s))
+      stringRealoc(s);
+   s->str[s->length]=c;
+   s->length++;
+   addEnd(s);
 }
 
-int realocate(string *s)
+void stringRealoc(string *s)
 {
-   s->str = realloc(s->str, s->length*2);
-   if((s->str)==NULL)
-      return -1;
-   s->allocSize = s->length*2;
-   return 0;
+   s->capacity=s->capacity*2;
+   s->str=realloc(s->str,sizeof(char)*s->capacity);
+   if(!s->str)
+      errorD(99,"Dynamic string realocation error");
 }
 
-void strCopyString(string *s1, string *s2)
+void stringRealocToSize(string *s,int newSize)
 {
-   int newLength = s2->length;
-   if (newLength >= s1->allocSize)
-   {
-      if ((s1->str = (char*) realloc(s1->str, newLength + 1)) == NULL)
-         errorD(99,"String alocation error");
-      s1->allocSize = newLength + 1;
-   }
-   strcpy(s1->str, s2->str);
-   s1->length = newLength;
+   s->capacity=newSize;
+   s->str=realloc(s->str,sizeof(char)*s->capacity);
+   if(!s->str)
+      errorD(99,"Dynamic string realocation error");
+}
+
+void stringCopy(string *s1, string *s2)
+{
+   if(s1->length>s2->capacity)
+      stringRealocToSize(s2,s1->length+1);
+   s2->length=s1->length;
+   for(int i=0;i<s1->length;i++)
+      s2->str[i]=s1->str[i];
+   addEnd(s2);
+
+}
+void addEnd(string *s)
+{
+   s->str[s->length]='\0';
+}
+
+bool stringFull(string *s)
+{
+   return (s->length+1)>=s->capacity;
 }

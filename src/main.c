@@ -42,18 +42,6 @@ void debugRun(bool scanerOnlyF)
         while(actualToken!=T_EOF)
             actualToken=getNextToken(&scData);
     }
-    
-    stack stack;
-    stackInit(&stack);
-    for(int i=0;i<20;i++){
-        stackPush(&stack,i);
-    }
-    stackPrint(&stack);
-    for(int i=0;i<30;i++){
-        stackPop(&stack);
-    }
-    stackPrint(&stack);
-    debug("ha-%d",stackPop(&stack));
-    stackDestruct(&stack);
+
     exit(0);
 }

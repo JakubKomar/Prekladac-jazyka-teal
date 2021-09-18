@@ -1,5 +1,5 @@
 /**
- * @brief   Dynamic string libary
+ * @brief   Dynamic string
  *
  * @authors Jakub Komárek (xkomar33)
  */
@@ -7,51 +7,56 @@
 
 #include "./../baseDeclarations.h"
 
-#define STR_BASE_LEN 8   //base size memory alocation of string
-
+#define STRING_BASE_SIZE 16   //base size memory alocation of string
 
 typedef struct
 {
+  unsigned int length;		// skutecna delka retezce
+  unsigned int capacity;	// velikost alokovane pameti
   char* str;		// misto pro dany retezec ukonceny znakem '\0'
-  int length;		// skutecna delka retezce
-  int allocSize;	// velikost alokovane pameti
 } string;
 
 /**
  * string creation
- * @return 0-success,1-error
+ * @param *s string to init
  */
-void strInit(string *s);
+void stringInit(string *s);
 /**
  * string destruction
+ * @param *s string to destruction
  */
-void strFree(string *s);
+void stringDestruct(string *s);
 /**
  * realocating string 2 size of previus
- * @param *s-string to realocate
- * @return 0-success,1-error
+ * @param *s string to realocate
  */ 
-int realocate(string *s);
+void stringRealoc(string *s);
 /**
  * hardcopy of string
- * @param string to clearing
+ * @param *s1 string to copy
+ * @param *s2 target string
  */ 
-void strCopyString(string *s1, string *s2);
+void stringCopy(string *s1, string *s2);
 /**
  * clear string
- * @param string to clearing
+ * @param *s1 to clearing
  */ 
-void strClear(string *s);
+void stringClear(string *s);
 /**
  * add one charakter to end of string
- * @param *s1-string for clearing
- * @param c-charakter to add
+ * @param *s1 string for clearing
+ * @param c charakter to add
  */ 
-void strAddChar(string *s1, char c);
+void stringAddChar(string *s1, char c);
 /**
- * add string to end of string
- * @param *s1-string for modification
- * @param *s2-string which will be added to end
+ * add end character to string
+ * @param *s string to end
  */ 
-void strAddString(string *s1, char *s2);
+void addEnd(string *s);
+/**
+ * checking if string is full
+ * @param *s string to check
+ * @return true-is full false-not full
+ */ 
+bool stringFull(string *s1);
 

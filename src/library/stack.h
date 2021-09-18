@@ -7,7 +7,7 @@
 
 #include "./../baseDeclarations.h"
 
-#define STACK_BASE_SIZE 5  //počateční velkost zásobníku
+#define STACK_BASE_SIZE 100  //počateční velkost zásobníku
 
 typedef struct {
     unsigned int capacity;   //Velikost zásobníku

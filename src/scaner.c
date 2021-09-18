@@ -5,10 +5,11 @@
  */
 #include "scaner.h"
 
-tokenType getNextToken(scanerData * data){
+tokenType getNextToken(scanerData * data)
+{
     state curentState=S_START;
     state prevState=S_UNDEFINATED;
-    strClear(&(data->fullToken));
+    stringClear(&(data->fullToken));
    
     while(curentState!=S_ERROR || curentState!=S_EOF){
         prevState=curentState;
@@ -17,36 +18,44 @@ tokenType getNextToken(scanerData * data){
     }
     return prevState;
 }
-state nextState(scanerData*data, state curentState){
+
+state nextState(scanerData*data, state curentState)
+{
     char aux=data->curentSymbol;
     state next;
     switch (curentState)
     {
-    case S_START:
-        if(aux==EOF){
-            next=S_EOF;
-        }
+        case S_START:
+            if(aux==EOF){
+                next=S_EOF;
+            }
         break;
     
-    default:
-        break;
+        default:
+            break;
     }
     return next;
 }
-void initScanerData(scanerData * data){
+
+void initScanerData(scanerData * data)
+{
     data->charCounter=0;
     data->colum=0;
     data->line=0;
+    stringInit(&(data->fullToken));
     loadChar(data);
 } 
-void loadChar(scanerData * data){
+
+void loadChar(scanerData * data)
+{
     data->curentSymbol=fgetc(INPUT);
     data->charCounter++;
-    if(data->curentSymbol=='\n'){
+    if(data->curentSymbol=='\n')
+    {
         data->colum=0;
         data->line++;
     }
     else
         data->colum++;
-    strInit(&(data->fullToken));
+    stringAddChar(&(data->fullToken),data->curentSymbol);
 }
