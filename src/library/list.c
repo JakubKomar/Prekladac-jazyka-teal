@@ -1,5 +1,5 @@
 /**
- * @brief   Structure 2way list
+ * @brief   Structure 2way list-možná nebude potřeba
  *
  * @authors Jakub Komárek (xkomar33)
  */
@@ -43,11 +43,11 @@ void insertFirst(list *l, listItem new)
 }
 void printList(list *l)
 {
-    fprintf(stderr,"list extract:");
+    debugS("list extract:");
     listItem aux=l->first;
     int i=0;
     while(aux){
-        fprintf(stderr,"%-4d: %d ",i,aux->data);
+        debug(stderr,"%-4d: %d ",i,aux->data);
         aux=aux->rptr;
         i++;
     }

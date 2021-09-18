@@ -33,10 +33,10 @@ void stackDestruct(pStack *S)
 
 void stackPrint(pStack s)
 {
-    fprintf(stderr,"Stack debug extract:");
-    for (int i =0; i <=s->last ; i++)
-        fprintf(stderr,"%-4d. %d\n",i,s->array[i]);
-    fprintf(stderr,"Head of stack is here.");
+    debugS("Stack debug extract:");
+    for (int i =1; i <=s->last ; i++)
+        debug("%-4d. %d\n",i,s->array[i]);
+    debugS("Head of stack is here.↑");
 }
 
 bool stackEmpty(pStack s)

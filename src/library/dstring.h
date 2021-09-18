@@ -4,8 +4,6 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
-#include <string.h>
-#include <malloc.h>
 
 #include "./../baseDeclarations.h"
 

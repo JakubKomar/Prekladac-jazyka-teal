@@ -1,5 +1,5 @@
 /**
- * @brief  basic declaration 
+ * @brief  basic declaration for all part of program
  *
  * @authors Jakub Komárek (xkomar33)
  */
@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <malloc.h>
+#include <string.h>
+
 #include "library/dstring.h"
 #include "tokens.h"
 #define INPUT stdin

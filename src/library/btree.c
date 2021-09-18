@@ -114,5 +114,5 @@ void bPrint(bNodePtr *tree)
 
 void nodePrint(bNodePtr *tree)
 {
-    fprintf(stderr,"bin tree data...");
+    debugS("bin tree data...");
 }

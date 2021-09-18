@@ -5,9 +5,6 @@
  */
 #pragma once
 
-
-#include <stdbool.h>
-#include <malloc.h>
 #include "./../baseDeclarations.h"
 
 #define STACK_BASE_SIZE 200  //počateční velkost zásobníku

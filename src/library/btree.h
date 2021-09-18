@@ -4,6 +4,7 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
+
 #include "./../baseDeclarations.h"
 
 typedef struct bNode {

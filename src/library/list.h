@@ -5,7 +5,6 @@
  */
 #pragma once
 
-#include <malloc.h>
 #include "./../baseDeclarations.h"
 
 typedef struct item{                    /* prvek dvousměrně vázaného seznamu */                                  
