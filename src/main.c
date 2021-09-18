@@ -43,5 +43,11 @@ void debugRun(bool scanerOnlyF)
             actualToken=getNextToken(&scData);
     }
 
+    hashTable test;
+    htInit(&test);
+    htInsert(&test,"ahoj",12);
+    htInsert(&test,"bleh",15);
+    htInsert(&test,"bleh",16);
+    htDebug(&test);
     exit(0);
 }

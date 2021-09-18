@@ -2,6 +2,7 @@
     "files.associations": {
         "scaner.h": "c",
         "basedeclarations.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "btree.h": "c"
     }
 }

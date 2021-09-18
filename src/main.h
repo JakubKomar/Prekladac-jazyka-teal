@@ -5,5 +5,5 @@
  */
 #pragma once
 #include "parser.h"
-
+#include "library/hashTable.h"
 void debugRun(bool scanerOnly);
