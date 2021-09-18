@@ -47,7 +47,7 @@ void printList(list *l)
     listItem aux=l->first;
     int i=0;
     while(aux){
-        debug(stderr,"%-4d: %d ",i,aux->data);
+        debug("%-4d: %d ",i,aux->data);
         aux=aux->rptr;
         i++;
     }

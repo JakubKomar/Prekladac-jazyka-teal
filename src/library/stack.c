@@ -6,32 +6,53 @@
 #include "stack.h"
 
 
-void stackInit(pStack *S)
+void stackInit(stack *s)
 {
+    s->capacity=STACK_BASE_SIZE;
+    s->last=0;
+    s->array=malloc(sizeof(tokenType)*STACK_BASE_SIZE);
+    if(!s->array)
+        errorD(99,"Stack initialization error");
+}
+
+void stackRealoc(stack *s)
+{
+    s->capacity=STACK_BASE_SIZE*2;
+    s->array=realloc(s->array,sizeof(tokenType)*STACK_BASE_SIZE);
+    if(!s->array)
+        errorD(99,"Stack realoc error");
+}
+
+void stackPush(stack *s, tokenType type)
+{
+    if(stackFull(s))
+        stackRealoc(s);
+    s->last++;
+    s->array[s->last]=type;
 
 }
 
-void stackPush(pStack S, tokenType type)
+tokenType stackPop(stack *s)
 {
-
+    if(stackEmpty(s))
+        errorD(99,"Stack owerflow");
+    s->last--;
+    return s->array[s->last+1];
 }
 
-tokenType stackPop(pStack S)
+tokenType stackHead(stack *s)
 {
-    return T_ADD;
+    if(stackEmpty(s))
+        errorD(99,"Stack is empty");
+    return s->array[s->last];
 }
 
-tokenType stackHead(pStack S)
+void stackDestruct(stack *s)
 {
-     return T_ADD;
+    free(s->array);
 }
 
-void stackDestruct(pStack *S)
-{
-
-}
-
-void stackPrint(pStack s)
+void stackPrint(stack *s)
 {
     debugS("Stack debug extract:");
     for (int i =1; i <=s->last ; i++)
@@ -39,7 +60,12 @@ void stackPrint(pStack s)
     debugS("Head of stack is here.↑");
 }
 
-bool stackEmpty(pStack s)
+bool stackFull(stack *s)
 {
-    return true;
+    return s->capacity<=s->last;
+}
+
+bool stackEmpty(stack *s)
+{
+    return s->last==0;
 }

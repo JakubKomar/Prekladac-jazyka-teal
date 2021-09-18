@@ -9,4 +9,4 @@
 #include "library/stack.h"
 
 void parserMain();
-void useLLtable(tokenType actualToken,pStack stack);
+void useLLtable(tokenType actualToken,stack *stack);

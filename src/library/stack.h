@@ -9,47 +9,53 @@
 
 #define STACK_BASE_SIZE 200  //počateční velkost zásobníku
 
-typedef struct Stack {
-    int size;   //Velikost zásobníku
-    int last;    //Spodek zásobníku
+typedef struct {
+    unsigned int capacity;   //Velikost zásobníku
+    unsigned int last;    //Spodek zásobníku
     tokenType *array;   //Pole pro zásobník
-}*pStack;
+}stack;
 
 /**
  * stack constructor
- * @param *S- stack to init
+ * @param *s- stack to init
  */
-void stackInit(pStack *S);
+void stackInit(stack *s);
 /**
  * string destructor
- * @param *S- stack to init
+ * @param *s- stack to init
  */
-void stackDestruct(pStack* S);
+void stackDestruct(stack *s);
 /**
  * stack push operation
- * @param *S- stack to pushm type-token to push
+ * @param *s- stack to pushm type-token to push
  */
-void stackPush(pStack S, tokenType type);
+void stackPush(stack *s, tokenType type);
 /**
  * stack pop operation
- * @param *S- stack to pop
+ * @param *s- stack to pop
  * @return poped token
  */
-tokenType stackPop(pStack S);
+tokenType stackPop(stack *s);
 /**
  * return head of stack
- * @param *S- stack to operate whith
+ * @param *s- stack to operate whith
  * @return head of stack
  */
-tokenType stackHead(pStack S);
+tokenType stackHead(stack *s);
 /**
- * is stack empty function
- * @param *S- stack to check
+ * checking if stack is empty
+ * @param *s- stack to check
  * @return TRUE-stack is empty, FALSE-stack is not empty
  */
-bool stackEmpty(pStack s);
+bool stackEmpty(stack *s);
+/**
+ * checking if stack is full
+ * @param *s- stack to check
+ * @return TRUE-stack is FULL, FALSE-stack is not full
+ */
+bool stackFull(stack *s);
 /**
  * printing stack for debug
- * @param *S- stack to print
+ * @param *s- stack to print
  */
-void stackPrint(pStack s);
+void stackPrint(stack *s);
