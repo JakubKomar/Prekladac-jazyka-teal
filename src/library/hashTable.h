@@ -19,7 +19,7 @@ typedef struct {
 }htData;
 
 typedef struct htItem {
-    char *key;
+    string key;
     struct htItem *next;
     htData data;
 } *htItemPtr;

@@ -42,12 +42,11 @@ void debugRun(bool scanerOnlyF)
         while(actualToken!=T_EOF)
             actualToken=getNextToken(&scData);
     }
-
     hashTable test;
     htInit(&test);
-    htInsert(&test,"ahoj",12);
+    htInsert(&test,"ahojdddddddddddddwaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadd",12);
     htInsert(&test,"bleh",15);
-    htInsert(&test,"bleh",16);
+    htInsert(&test,"bleh2",16);
     htDebug(&test);
     exit(0);
 }

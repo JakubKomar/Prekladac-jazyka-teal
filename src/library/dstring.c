@@ -34,6 +34,16 @@ void stringAddChar(string *s, char c)
    addEnd(s);
 }
 
+void stringAddString(string *s1, char *s2)
+{
+   int i=0;
+   while(s2[i]!='\0')
+   {
+      stringAddChar(s1,s2[i]);
+      i++;
+   }
+}
+
 void stringRealoc(string *s)
 {
    s->capacity=s->capacity*2;

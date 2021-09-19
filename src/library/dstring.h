@@ -60,3 +60,4 @@ void addEnd(string *s);
  */ 
 bool stringFull(string *s1);
 
+void stringAddString(string *s1, char *s2);
