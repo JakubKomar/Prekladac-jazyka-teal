@@ -25,7 +25,7 @@ tokenType getNextToken(scanerData * data)
 state nextState(scanerData*data, state curentState)
 {
     char sym=data->curentSymbol;
-    state next;
+    state next=S_UNDEFINATED;
     switch (curentState)
     {
         case S_START:
@@ -203,7 +203,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_EXP3;}
         break;
         default:
-            break;
+        break;
     }
     return next;
 }
