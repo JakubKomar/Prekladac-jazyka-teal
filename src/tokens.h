@@ -29,6 +29,21 @@ typedef enum{   //typy tokenů
     T_STR,
     T_INT,
     T_DOUBLE,
+    //keywords
+    K_DO,
+    K_ELSE,
+    K_END,
+    K_FUNCTION,
+    K_GLOBAL,
+    K_IF,
+    K_LOCAL,
+    K_NIL,
+    K_READ,
+    K_REQUIRE,
+    K_RETURN,
+    K_THEN,
+    K_WHILE,
+    K_WRITE,
     //neterminály
     N_START,
     //ostatní

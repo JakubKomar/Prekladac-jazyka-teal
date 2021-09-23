@@ -27,14 +27,55 @@ tokenType getNextToken(scanerData * data)
         prevState=curentState;
         curentState=nextState(data,curentState);
         
-        if(curentState==S_ERROR||curentState==S_EOF)
+        if(curentState==S_ERROR)
             break;
+        else if(curentState==S_EOF)
+            return T_EOF;
         stringAddChar(&(data->fullToken),data->curentSymbol);
         loadChar(data);
     }
     tokenType token= getTokenFromState(prevState);
     if(token==O_ERR)
-        errorD(1,"není koncový stav");
+        errorD(1,"není koncový stav");  //zatím provizorní
+    else if(token==T_ID)
+        token=checkKeywords(data);
+    return token;
+}
+
+tokenType checkKeywords(scanerData *data)
+{
+    char *s=data->fullToken.str;
+    tokenType token;
+    if(!strcmp(s,"do"))
+        token=K_DO;
+    else if(!strcmp(s,"else"))
+        token=K_ELSE;
+    else if(!strcmp(s,"end"))
+        token=K_END;
+    else if(!strcmp(s,"function"))
+        token=K_FUNCTION;
+    else if(!strcmp(s,"global"))
+        token=K_GLOBAL;
+    else if(!strcmp(s,"if"))
+        token=K_IF;
+    else if(!strcmp(s,"local"))
+        token=K_LOCAL;
+    else if(!strcmp(s,"nil"))
+        token=K_NIL;
+    else if(!strcmp(s,"read"))
+        token=K_READ;
+    else if(!strcmp(s,"require"))
+        token=K_REQUIRE;
+    else if(!strcmp(s,"return"))
+        token=K_RETURN;
+    else if(!strcmp(s,"then"))
+        token=K_THEN;
+    else if(!strcmp(s,"while"))
+        token=K_WHILE;
+    else if(!strcmp(s,"write"))
+        token=K_WRITE;
+    else
+        token=T_ID;
     return token;
 }
 

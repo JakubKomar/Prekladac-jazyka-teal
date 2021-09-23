@@ -61,6 +61,7 @@ typedef enum{       //stavy automatu laxikální analýzy
     S_ERROR,
     S_UNDEFINATED,
 }state;
+tokenType checkKeywords(scanerData *data);
 tokenType getNextUsefullToken(scanerData * data);
 tokenType getTokenFromState(state state);
 bool isLetter(char toCompare);

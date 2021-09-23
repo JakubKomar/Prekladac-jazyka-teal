@@ -11,6 +11,9 @@ char * tokenStr(tokenType type)
     case T_ADD:
         str="T_ADD";
     break;
+    case T_SUB:
+        str="T_SUB";
+    break;
     case T_DIV:
         str="T_DIV";
     break;
@@ -67,6 +70,48 @@ char * tokenStr(tokenType type)
     break;
     case T_DOUBLE:
         str="T_DOUBLE";
+    break;
+    case K_DO:
+        str="K_DO";
+    break;
+    case K_ELSE:
+        str="K_ELSE";
+    break;
+    case K_END:
+        str="K_END";
+    break;
+    case K_FUNCTION:
+        str="K_FUNCTION";
+    break;
+    case K_GLOBAL:
+        str="K_GLOBAL";
+    break;
+    case K_IF:
+        str="K_IF";
+    break;
+    case K_LOCAL:
+        str="K_LOCAL";
+    break;
+    case K_NIL:
+        str="K_NIL";
+    break;
+    case K_READ:
+        str="K_READ";
+    break;
+    case K_REQUIRE:
+        str="K_REQUIRE";
+    break;
+    case K_RETURN:
+        str="K_RETURN";
+    break;
+    case K_THEN:
+        str="K_THEN";
+    break;
+    case K_WHILE:
+        str="K_WHILE";
+    break;
+    case K_WRITE:
+        str="K_WRITE";
     break;
     default:
         str="UNDEFINED";
