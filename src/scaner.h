@@ -8,10 +8,10 @@
 
 typedef struct {
     char curentSymbol;
-    string fullToken;
     int line;
     int colum;
     int charCounter;
+    string fullToken;
 }scanerData;
 
 typedef enum{       //stavy automatu laxikální analýzy 
@@ -41,7 +41,6 @@ typedef enum{       //stavy automatu laxikální analýzy
     S_LBR,
     S_COLON,
     S_COMMA,
-    S_EOL,
     S_EOF,
     S_SPACE,
     S_STR1,
@@ -62,6 +61,8 @@ typedef enum{       //stavy automatu laxikální analýzy
     S_ERROR,
     S_UNDEFINATED,
 }state;
+tokenType getNextUsefullToken(scanerData * data);
+tokenType getTokenFromState(state state);
 bool isLetter(char toCompare);
 bool isDecimal(char toCompare);
 tokenType getNextToken(scanerData * data);

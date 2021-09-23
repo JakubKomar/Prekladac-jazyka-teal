@@ -5,27 +5,130 @@
  */
 #include "scaner.h"
 
+tokenType getNextUsefullToken(scanerData * data)
+{
+    tokenType token;
+    do
+    {
+       token=getNextToken(data);
+    } while (token==O_UNIMPORTANT||token==O_ERR);
+    
+    return token;
+}
+
 tokenType getNextToken(scanerData * data)
 {
     state curentState=S_START;
-    state prevState=S_UNDEFINATED;
+    state prevState;
     stringClear(&(data->fullToken));
    
-    while(curentState!=S_ERROR){
-
+    while(true)
+    {
         prevState=curentState;
         curentState=nextState(data,curentState);
-        if(curentState==S_EOF)
+        
+        if(curentState==S_ERROR||curentState==S_EOF)
             break;
+        stringAddChar(&(data->fullToken),data->curentSymbol);
         loadChar(data);
     }
-    return prevState;
+    tokenType token= getTokenFromState(prevState);
+    if(token==O_ERR)
+        errorD(1,"není koncový stav");
+    return token;
+}
+
+tokenType getTokenFromState(state state)
+{
+    tokenType token;
+    switch (state)
+    {
+    case S_ID:
+        token=T_ID;
+        break;
+    case S_SUB:
+        token=T_SUB;
+        break;
+    case S_LINE_COM:
+    case S_LINE_COM_2:
+    case S_LINE_COM_PER:
+    case S_BLOCK_COM3:
+    case S_SPACE:
+        token=O_UNIMPORTANT;
+        break;
+    case S_ADD:
+        token=T_ADD;
+        break;
+    case S_DIV:
+        token=T_DIV;
+        break;
+    case S_DIV2:
+        token=T_DIV2;
+        break;
+    case S_MUL:
+        token=T_MUL;
+        break;
+    case S_STR_LEN:
+        token=T_STR_LEN;
+        break;  
+    case S_ASSIGEN:
+        token=T_ASSIGEN;
+        break; 
+    case S_EQ:
+        token=T_EQ;
+        break;
+    case S_NOT_EQ2:
+        token=T_NOT_EQ;
+        break; 
+    case S_LT:
+        token=T_LT;
+        break; 
+    case S_LTE:
+        token=T_LTE;
+        break; 
+    case S_GT:
+        token=T_GT;
+        break; 
+    case S_GTE:
+        token=T_GTE;
+        break; 
+    case S_RBR:
+        token=T_RBR;
+        break;
+    case S_LBR:
+        token=T_LBR;
+        break;   
+    case S_COLON:
+        token=T_COLON;
+        break; 
+    case S_COMMA:
+        token=T_COMMA;
+        break;
+    case S_EOF:
+        token=T_EOF;
+        break;
+    case S_STR2:
+        token=T_STR;
+        break;
+    case S_INT:
+    case S_INT0:
+        token=T_INT;
+        break;   
+    case S_DOUBLE2:
+    case S_EXP3:
+        token=T_DOUBLE;
+        break; 
+    default:
+        token=O_ERR;
+        break;
+    }
+    return token;
 }
 
 state nextState(scanerData*data, state curentState)
 {
     char sym=data->curentSymbol;
-    state next=S_UNDEFINATED;
+    state next=S_ERROR;
     switch (curentState)
     {
         case S_START:
@@ -55,11 +158,9 @@ state nextState(scanerData*data, state curentState)
                 next=S_COLON;} 
             else if(sym==','){
                 next=S_COMMA;}
-            else if(sym=='\n'){
-                next=S_EOL;}  
             else if(sym==EOF){
                 next=S_EOF;} 
-            else if(sym==' '||sym=='\t'){
+            else if(sym==' '||sym=='\t'||sym=='\n'||sym==';'){
                 next=S_SPACE;} 
             else if(sym=='\"'){
                 next=S_STR1;} 
@@ -68,6 +169,10 @@ state nextState(scanerData*data, state curentState)
             else if(sym=='0'){
                 next=S_INT0;}
         break;
+        case S_ID:
+            if(isLetter(sym)||sym=='_'){
+                next=S_ID;}
+        break;
         case S_SUB:
             if(sym=='-'){
                 next=S_LINE_COM;}
@@ -75,17 +180,17 @@ state nextState(scanerData*data, state curentState)
         case S_LINE_COM:
             if(sym=='['){
                 next=S_LINE_COM_2;} 
-            else if(sym!='\n'||sym!=EOF){
+            else if(sym!='\n'&&sym!=EOF){
                 next=S_LINE_COM_PER;} 
         break;
         case S_LINE_COM_PER:
-            if(sym!='\n'||sym!=EOF){
+            if(sym!='\n'&&sym!=EOF){
                 next=S_LINE_COM_PER;} 
         break;
         case S_LINE_COM_2:
             if(sym=='['){
                 next=S_BLOCK_COM;} 
-            else if(sym!='\n'||sym!=EOF){
+            else if(sym!='\n'&&sym!=EOF){
                 next=S_LINE_COM_PER;} 
         break;
         case S_BLOCK_COM:
@@ -119,13 +224,9 @@ state nextState(scanerData*data, state curentState)
         case S_GT:
             if(sym=='='){
                 next=S_GTE;}
-        break;
-        case S_EOL:
-            if(sym=='\n'){
-                next=S_EOL;}
-        break;              
+        break;        
         case S_SPACE:
-            if(sym==' '||sym=='\t'){
+            if(sym==' '||sym=='\t'||sym=='\n'||sym==';'){
                 next=S_SPACE;}
         break;
         case S_STR1:
@@ -238,5 +339,4 @@ void loadChar(scanerData * data)
     }
     else
         data->colum++;
-    stringAddChar(&(data->fullToken),data->curentSymbol);
 }

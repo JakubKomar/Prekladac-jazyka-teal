@@ -72,9 +72,9 @@ int getOrderInTable(tokenType toDecode)
         return 6;  
     case T_GTE:
         return 7;    
-    case T_EQL:
+    case T_EQ:
         return 8;
-    case T_NEQ:
+    case T_NOT_EQ:
         return 9;
     case T_LBR:
         return 10;           

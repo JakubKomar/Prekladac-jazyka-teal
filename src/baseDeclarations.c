@@ -12,7 +12,7 @@ void errorD(int code,char * description)
 {
     if(code){
         printError(code);
-        fprintf(stderr,"More detailes: %s",description);
+        fprintf(stderr,"More detailes: %s\n",description);
         exit(code);
     } 
 }
