@@ -22,7 +22,7 @@ int main(int argc, char** argv)
         }
         else{
             fprintf(stderr,"Arg not recognize,try \"-h\"\n");
-            exit(-1);
+            exit(99);
         }
     }
     if(debugF)
@@ -37,16 +37,15 @@ void debugRun(bool scanerOnlyF)
     if(scanerOnlyF)
     {
         scanerData scData;
-        tokenType actualToken;
+        tokenType actualToken=O_UNIMPORTANT;
         initScanerData(&scData);
+        int i=0;
         while(actualToken!=T_EOF)
-            actualToken=getNextToken(&scData);
+        {
+            actualToken=getNextUsefullToken(&scData);
+            debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),scData.fullToken.str);
+            i++;
+        }
     }
-    hashTable test;
-    htInit(&test);
-    htInsert(&test,"ahojdddddddddddddwaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadd",12);
-    htInsert(&test,"bleh",15);
-    htInsert(&test,"bleh2",16);
-    htDebug(&test);
     exit(0);
 }

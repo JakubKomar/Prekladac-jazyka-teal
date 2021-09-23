@@ -5,23 +5,45 @@
  */
 #pragma once
 
+#include "baseDeclarations.h"
 typedef enum{   //typy tokenů
     T_ID,
-    T_RBR,      //pravá závorka
-    T_LBR,      //levá závorka
-    T_GT,       //>
-    T_GTE,      //>=
-    T_LT,       //>
-    T_LTE,      //<=
-    T_NEQ,      //   !=
-    T_ASSIGEN,  // =
-    T_EQL,      //  ==
-    T_DIV,      //dělení /
-    T_MUL,      //násobení *
-    T_SUB,      //odčítání -
-    T_ADD,      //sčítání    +
-    T_EOL,
+    T_SUB,
+    T_ADD,
+    T_DIV,
+    T_DIV2,
+    T_MUL,
+    T_STR_LEN,
+    T_ASSIGEN,
+    T_EQ,
+    T_NOT_EQ,
+    T_LT,
+    T_LTE,
+    T_GT,
+    T_GTE,
+    T_RBR,
+    T_LBR,
+    T_COLON,
+    T_COMMA,
     T_EOF,
+    T_STR,
+    T_INT,
+    T_DOUBLE,
+    //keywords
+    K_DO,
+    K_ELSE,
+    K_END,
+    K_FUNCTION,
+    K_GLOBAL,
+    K_IF,
+    K_LOCAL,
+    K_NIL,
+    K_READ,
+    K_REQUIRE,
+    K_RETURN,
+    K_THEN,
+    K_WHILE,
+    K_WRITE,
     //neterminály
     N_START,
     //ostatní
@@ -30,3 +52,5 @@ typedef enum{   //typy tokenů
     O_ERR,      //nesmí nastat // ze scenru se nevypíše
     O_UNIMPORTANT,//token nebude zapsán do listu-není důležitý // ze scenru se nevypíše
 }tokenType;
+
+char * tokenStr(tokenType type);

@@ -53,3 +53,5 @@ Mkfile.old
 dkms.conf
 
 ifj21
+.json
+.vscode/settings.json
