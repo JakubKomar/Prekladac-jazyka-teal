@@ -186,6 +186,8 @@ state nextState(scanerData*data, state curentState)
                 next=S_DIV;   
             else if(sym=='*')
                 next=S_MUL; 
+            else if(sym=='#')
+                next=S_STR_LEN;     
             else if(sym=='=')
                 next=S_ASSIGEN;  
             else if(sym=='~')
@@ -220,7 +222,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_DOT2;
         break;
         case S_ID:
-            if(isLetter(sym)||sym=='_')
+            if(isLetter(sym)||isdigit(sym)||sym=='_')
                 next=S_ID;
         break;
         case S_SUB:

@@ -9,7 +9,7 @@ import re
 import subprocess 
 import argparse
 testFolder="./tests/"   
-testTypeRegex=r"\.go$"       #koncovka testovaných souborů
+testTypeRegex=r"\.lua$"       #koncovka testovaných souborů
 programToTest="./../ifj21"
 ifjCode="./programs/ifjCode"     #strojový interpret cílového jazyka
 ifj21="./programs/ifj21interpret"         #interpret počátečního jazyka  
@@ -20,6 +20,8 @@ tests=[]
 def main():
     programInit()
     initTests()
+    for i in tests:
+        print(i)
     startTesting()
     printResults()
 def programInit():
@@ -84,7 +86,7 @@ class test(object):
             raise FileExistsError
         info=f.readline()
         f.close()
-        if re.match(r"^//.*\d{1,}$",info):
+        if re.match(r"^--.*\d{1,}$",info):
             self.exRetCode=int(re.findall(r"\d{1,}$",info)[0])
         else:
             self.exRetCode=0
@@ -92,7 +94,7 @@ class test(object):
         self.pased=False
     def startTest(self):
         try:
-            output = subprocess.check_output(programToTest,stderr=subprocess.DEVNULL,timeout=1)
+            output = subprocess.check_output(programToTest+" -d"+" -s"+" <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
             if(self.exRetCode!=0):
                 self.pased=False
                 return
