@@ -20,10 +20,9 @@ tests=[]
 def main():
     programInit()
     initTests()
-    for i in tests:
-        print(i)
     startTesting()
     printResults()
+
 def programInit():
     if(not os.path.exists(ifjCode) ):
         error("ifjCode interpret is not existing")
@@ -37,9 +36,11 @@ def programInit():
             os.system("cd .. && make")
             if(not os.path.exists(programToTest)):
                 error("testing program cant be made")
+
 def startTesting():
     for test in tests:
         test.startTest()
+
 def printResults():
     counterPassed=0
     counterFailed=0
@@ -68,9 +69,11 @@ def initTests():
                    tests.append(test(os.path.join(root, f),f))
                except:
                    pass
+
 def error(text="Unknown error",retCode=-1):
     print(text)
     exit(retCode)
+
 class test(object):
     name=None
     path=None
@@ -78,6 +81,7 @@ class test(object):
     exRetCode=0
     RetCode=0
     failReson=0
+
     def __init__(self,path,Name):
         self.path=path
         try:
@@ -92,6 +96,7 @@ class test(object):
             self.exRetCode=0
         self.name=Name
         self.pased=False
+
     def startTest(self):
         try:
             output = subprocess.check_output(programToTest+" -d"+" -s"+" <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
@@ -119,8 +124,7 @@ class test(object):
         return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
 
 parser = argparse.ArgumentParser(description='Tester pro ifj překaldač.')
-parser.add_argument("-p", "--path",type=str,default=testFolder,
-                    help="Path to tests")                   
+parser.add_argument("-p", "--path",type=str,default=testFolder,help="Path to tests")                   
 args = parser.parse_args()
 testFolder=args.path
 main()
