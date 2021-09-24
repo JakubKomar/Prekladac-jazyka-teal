@@ -86,82 +86,85 @@ tokenType getTokenFromState(state state)
     {
     case S_ID:
         token=T_ID;
-        break;
+    break;
     case S_SUB:
         token=T_SUB;
-        break;
+    break;
     case S_LINE_COM:
     case S_LINE_COM_2:
     case S_LINE_COM_PER:
     case S_BLOCK_COM3:
     case S_SPACE:
         token=O_UNIMPORTANT;
-        break;
+    break;
     case S_ADD:
         token=T_ADD;
-        break;
+    break;
     case S_DIV:
         token=T_DIV;
-        break;
+    break;
     case S_DIV2:
         token=T_DIV2;
-        break;
+    break;
     case S_MUL:
         token=T_MUL;
-        break;
+    break;
     case S_STR_LEN:
         token=T_STR_LEN;
-        break;  
+    break;  
     case S_ASSIGEN:
         token=T_ASSIGEN;
-        break; 
+    break; 
     case S_EQ:
         token=T_EQ;
-        break;
+    break;
     case S_NOT_EQ2:
         token=T_NOT_EQ;
-        break; 
+    break; 
     case S_LT:
         token=T_LT;
-        break; 
+    break; 
     case S_LTE:
         token=T_LTE;
-        break; 
+    break; 
     case S_GT:
         token=T_GT;
-        break; 
+    break; 
     case S_GTE:
         token=T_GTE;
-        break; 
+    break; 
     case S_RBR:
         token=T_RBR;
-        break;
+    break;
     case S_LBR:
         token=T_LBR;
-        break;   
+    break;   
     case S_COLON:
         token=T_COLON;
-        break; 
+    break; 
     case S_COMMA:
         token=T_COMMA;
-        break;
+    break;
     case S_EOF:
         token=T_EOF;
-        break;
+    break;
     case S_STR2:
         token=T_STR;
-        break;
+    break;
     case S_INT:
     case S_INT0:
         token=T_INT;
-        break;   
+    break;   
     case S_DOUBLE2:
     case S_EXP3:
         token=T_DOUBLE;
-        break; 
+    break; 
+    case S_DOT2:
+        token=T_DOT2;
+    break; 
     default:
         token=O_ERR;
-        break;
+    break;
     }
     return token;
 }
@@ -199,6 +202,8 @@ state nextState(scanerData*data, state curentState)
                 next=S_COLON; 
             else if(sym==',')
                 next=S_COMMA;
+            else if(sym=='.')
+                next=S_DOT1;
             else if(sym==EOF)
                 next=S_EOF; 
             else if(sym==' '||sym=='\t'||sym=='\n'||sym==';')
@@ -209,6 +214,10 @@ state nextState(scanerData*data, state curentState)
                 next=S_INT; 
             else if(sym=='0')
                 next=S_INT0;
+        break;
+        case S_DOT1:
+            if(sym=='.')
+                next=S_DOT2;
         break;
         case S_ID:
             if(isLetter(sym)||sym=='_')

@@ -31,6 +31,7 @@ typedef enum{
     T_STR,
     T_INT,
     T_DOUBLE,
+    T_DOT2,
     //keywords
     K_DO,
     K_ELSE,
