@@ -6,7 +6,9 @@
 #pragma once
 
 #include "baseDeclarations.h"
-typedef enum{   //typy tokenů
+
+//types of token
+typedef enum{   
     T_ID,
     T_SUB,
     T_ADD,
@@ -53,4 +55,10 @@ typedef enum{   //typy tokenů
     O_UNIMPORTANT,//token nebude zapsán do listu-není důležitý // ze scenru se nevypíše
 }tokenType;
 
+
+/**
+ * returning string name of token for debuging purpose
+ * @param type token type for string converzion
+ * @return string name of token
+*/
 char * tokenStr(tokenType type);

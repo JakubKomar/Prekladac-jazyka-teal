@@ -14,7 +14,8 @@ typedef struct {
     string fullToken;
 }scanerData;
 
-typedef enum{       //stavy automatu laxikální analýzy 
+//states of state machines
+typedef enum{       
     S_START,
     S_ID,
     S_SUB,
