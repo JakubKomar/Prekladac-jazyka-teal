@@ -1,0 +1,74 @@
+START->PROLOG PROG 
+
+PROLOG->require string
+
+//prog body
+    PROG->id ID_ACTION PROG
+    PROG->FUNCTION PROG
+    PROG->DECLARATION PROG
+    PROG->WHILE PROG
+    PROG->IF PROG
+    PROG->eof
+    PROG->eps
+//end prog body
+
+
+//operation whith id
+    ID_ACTION->comma id ID_NEXT assigen EXPRESION N_EXPRESIONS
+    ID_ACTION->assigen EXPRESION
+
+    ID_NEXT->comma id ID_NEXT
+
+    N_EXPRESIONS-> comma EXPRESION N_EXPRESIONS
+//end operation whith id
+
+//použití zatím nejisté
+    FUNCTION_CALL->lbr PARAM rbr
+    PARAM->EXPRESION,PARAM_N
+    PARAM_N->comma,EXPRESION PARAM
+//end
+WHILE-> while EXPRESION do prog end
+
+//if else
+    IF->if EXPRESION then prog ELSE_M end
+
+    ELSE_M-> else prog
+    ELSE_M->eps
+//end if else
+//functions
+    FUNCTION->function id lbr ARG ARGNEXT rbr PROG RETURN_D  RETURN end
+
+    ARG->eps
+    ARG->id colon TYPE
+
+    ARGNEXT->comma ARG ARGNEXT
+    ARGNEXT->eps
+
+    RETURN_D->TYPE RETURN_DN
+    RETURN_D->eps
+    RETURN_DN->comma RETURN_D RETURN_DN
+
+    RETURN->return RETURN_ARG 
+
+    RETURN_ARG->EXPRESION RETURN_ARG_N
+    RETURN_ARG->eps
+    RETURN_ARG_N->comma RETURN_ARG RETURN_ARG_N
+    RETURN_ARG_N->eps
+//end functions
+
+//declaration
+    DECLARATION-> RANGE id colon DECLARATION_T
+    DECLARATION_T->TYPE ASSIGEN_MAY
+    DECLARATION_T->function lbr ARG_D rbr colon RET_D
+
+    ASSIGEN_MAY->eps
+    ASSIGEN_MAY->assigen EXPRESION
+//end declaration
+
+TYPE->integer
+TYPE->nil
+TYPE->number
+TYPE->string
+
+RANGE->local
+RANGE->global

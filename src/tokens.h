@@ -47,6 +47,10 @@ typedef enum{
     K_THEN,
     K_WHILE,
     K_WRITE,
+
+    K_INTEGER,
+    K_STRING,
+    K_NUMBER,
     //neterminály
     N_START,
     //ostatní
