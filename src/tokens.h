@@ -51,13 +51,36 @@ typedef enum{
     K_INTEGER,
     K_STRING,
     K_NUMBER,
-    //neterminály
-    N_START,
     //ostatní
     O_HANDLE,   //začátek handle
     O_DOLAR,
     O_ERR,      //nesmí nastat // ze scenru se nevypíše
     O_UNIMPORTANT,//token nebude zapsán do listu-není důležitý // ze scenru se nevypíše
+    S_EXPRESION,
+    //neterminály
+    N_START,
+    N_PROLOG,
+    N_PROG,
+    N_ID_NEXT,
+    N_EXPRESIONS,
+    N_WHILE,
+    N_IF,
+    N_ELSE_M,
+    N_FUNCTION,
+    N_ARG,
+    N_ARGNEXT,
+    N_RETURN_D,
+    N_RETURN_DN,
+    N_RETURN,
+    N_RETURN_ARG,
+    N_RETURN_ARG_N,
+    N_DECLARATION,
+    N_DECLARATION_T,
+    N_ARG_D,
+    N_ARG_DN,
+    N_ASSIGEN_MAY,
+    N_TYPE,
+    N_RANGE,
 }tokenType;
 
 

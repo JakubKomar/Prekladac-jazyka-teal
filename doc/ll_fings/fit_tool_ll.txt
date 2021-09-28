@@ -25,7 +25,7 @@ RETURN_D:TYPE RETURN_DN
 |/*eps*/;
 RETURN_DN:comma RETURN_D
 |/*eps*/;
-RETURN:return RETURN_ARG 
+RETURN:return RETURN_ARG PROG
 |/*eps*/;
 RETURN_ARG:expresion RETURN_ARG_N
 |/*eps*/;
