@@ -9,12 +9,13 @@ import re
 import subprocess 
 import argparse
 testFolder="./tests/"   
-testTypeRegex=r"\.go$"       #koncovka testovaných souborů
+testTypeRegex=r"\.lua$"       #koncovka testovaných souborů
 programToTest="./../ifj21"
 ifjCode="./programs/ifjCode"     #strojový interpret cílového jazyka
 ifj21="./programs/ifj21interpret"         #interpret počátečního jazyka  
 makefile="./../makefile"
-
+f_noOut=False
+f_scannerOnly=False
 tests=[]
 
 def main():
@@ -22,6 +23,7 @@ def main():
     initTests()
     startTesting()
     printResults()
+
 def programInit():
     if(not os.path.exists(ifjCode) ):
         error("ifjCode interpret is not existing")
@@ -35,9 +37,11 @@ def programInit():
             os.system("cd .. && make")
             if(not os.path.exists(programToTest)):
                 error("testing program cant be made")
+
 def startTesting():
     for test in tests:
         test.startTest()
+
 def printResults():
     counterPassed=0
     counterFailed=0
@@ -66,9 +70,11 @@ def initTests():
                    tests.append(test(os.path.join(root, f),f))
                except:
                    pass
+
 def error(text="Unknown error",retCode=-1):
     print(text)
     exit(retCode)
+
 class test(object):
     name=None
     path=None
@@ -76,6 +82,7 @@ class test(object):
     exRetCode=0
     RetCode=0
     failReson=0
+
     def __init__(self,path,Name):
         self.path=path
         try:
@@ -84,26 +91,32 @@ class test(object):
             raise FileExistsError
         info=f.readline()
         f.close()
-        if re.match(r"^//.*\d{1,}$",info):
+        if re.match(r"^--.*\d{1,}$",info):
             self.exRetCode=int(re.findall(r"\d{1,}$",info)[0])
         else:
             self.exRetCode=0
         self.name=Name
         self.pased=False
+
     def startTest(self):
         try:
-            output = subprocess.check_output(programToTest,stderr=subprocess.DEVNULL,timeout=1)
+            if f_scannerOnly:
+                output = subprocess.check_output(programToTest+" -d"+" -s"+" 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+            else:
+                output = subprocess.check_output(programToTest+" 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
             if(self.exRetCode!=0):
                 self.pased=False
                 return
-            #print(output)
             self.RetCode=0
-            #to do-porovnání výstupů od vzorového interpretu
-            expectedOutput=output
-            if output==expectedOutput :
-                self.pased=True
+            if not f_noOut:
+                #to do-porovnání výstupů od vzorového interpretu
+                expectedOutput=output
+                if output==expectedOutput :
+                    self.pased=True
+                else:
+                    self.pased=False
             else:
-                self.pased=False
+                self.pased=True
         except subprocess.CalledProcessError as grepexc:
             self.RetCode=grepexc.returncode
             if self.RetCode==self.exRetCode:
@@ -111,14 +124,20 @@ class test(object):
             else:
                 self.pased=False
         except subprocess.TimeoutExpired:
+            self.pased=False
             self.failReson=1
 
     def __repr__(self):
         return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
 
 parser = argparse.ArgumentParser(description='Tester pro ifj překaldač.')
-parser.add_argument("-p", "--path",type=str,default=testFolder,
-                    help="Path to tests")                   
+parser.add_argument("-p", "--path",type=str,default=testFolder,help="Path to tests")    
+parser.add_argument("-s",action="store_true", help="Scanner only mod")   
+parser.add_argument("-o", action="store_true",help="Dont compere outputs") 
+
 args = parser.parse_args()
+f_noOut=args.o 
+f_scannerOnly=args.s 
+
 testFolder=args.path
 main()

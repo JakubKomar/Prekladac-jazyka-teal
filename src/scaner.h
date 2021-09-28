@@ -14,7 +14,8 @@ typedef struct {
     string fullToken;
 }scanerData;
 
-typedef enum{       //stavy automatu laxikální analýzy 
+//states of state machines
+typedef enum{       
     S_START,
     S_ID,
     S_SUB,
@@ -58,15 +59,62 @@ typedef enum{       //stavy automatu laxikální analýzy
     S_EXP1,
     S_EXP2,
     S_EXP3,
+    S_DOT1,
+    S_DOT2,
     S_ERROR,
     S_UNDEFINATED,
 }state;
+
+/**
+ * checking if ID is a keyword
+ * @param *data scanner data
+ * @return if ID-T_ID else keyword token
+*/
 tokenType checkKeywords(scanerData *data);
+/**
+ * geting next usefull token-ignoring commets, ...
+ * @param *data scanner data
+ * @return next usefull token
+ */
 tokenType getNextUsefullToken(scanerData * data);
-tokenType getTokenFromState(state state);
-bool isLetter(char toCompare);
-bool isDecimal(char toCompare);
+/**
+ * geting next token
+ * @param *data scanner data
+ * @return next token
+ */
 tokenType getNextToken(scanerData * data);
+/**
+ * geting token from state of state machine
+ * @param state actual state of state machine
+ * @return token from state
+ */
+tokenType getTokenFromState(state state);
+/**
+ * geting next state of state machine from actual charakter
+ * @param *data scanner data
+ * @param curentState actual state of state machine 
+ * @return next state
+*/
 state nextState(scanerData*data, state curentState);
+/**
+ * checking if charakter is letter
+ * @param toCompare char to compering
+ * @return true-is letter, false-isnt letter
+*/
+bool isLetter(char toCompare);
+/**
+ * checking if charakter is decimal 
+ * @param toCompare char to compering
+ * @return true-is decimal, false-isnt decimal
+*/
+bool isDecimal(char toCompare);
+/**
+ * inicialization function for scanner
+ * @param *data data to incializate
+*/ 
 void initScanerData(scanerData * data);
+/**
+ * loading next char from input, menwhile harvesting actual pozition in file for error masseges
+ * @param *data scanner data
+*/
 void loadChar(scanerData * data);

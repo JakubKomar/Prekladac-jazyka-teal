@@ -3,6 +3,8 @@
         "scaner.h": "c",
         "basedeclarations.h": "c",
         "stdbool.h": "c",
-        "btree.h": "c"
+        "btree.h": "c",
+        "tokens.h": "c"
     }
+ "files.eol": "\n",
 }

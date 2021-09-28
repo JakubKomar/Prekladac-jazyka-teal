@@ -6,6 +6,60 @@
 #include "expresionParser.h"
 
 
+void expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
+{
+    bool operatorFlag=false;
+    bool firstOperant=true;
+    bool instideBracked=false;
+    while(true)
+    {
+        if(firstOperant)
+        {
+            if(isId(actual))
+            {
+                firstOperant=false;
+            }
+            else
+                errorD(99,"šatný expression");
+        }
+        else if(operatorFlag)
+        {
+            if(isId(actual))
+            {
+                operatorFlag=false;
+            }
+            else
+                errorD(99,"šatný expression");
+        }
+        else if(isOperator(actual))
+        {
+            if(actual==T_LBR)
+                instideBracked=true;
+            else
+                operatorFlag=true;
+        }
+        else if(instideBracked)
+        {
+            if(actual==T_RBR)
+                instideBracked=false;
+        }
+        else
+        {
+            break;              
+        }
+        actual=getNextUsefullToken(sData);
+    }
+}
+bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
+{
+    return toCompere==T_STR||toCompere==T_INT||toCompere==K_NIL||toCompere==T_DOUBLE||toCompere==T_ID;
+}
+bool isOperator(tokenType toCompere)     //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
+{
+    return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_RBR||toCompere==T_LBR;
+}
+
+
 void expresionParse(tokenType actual,scanerData *sData)
 {
     stack stack;

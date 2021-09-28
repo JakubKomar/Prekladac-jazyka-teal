@@ -46,6 +46,8 @@ void debugRun(bool scanerOnlyF)
             debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),scData.fullToken.str);
             i++;
         }
+        stringDestruct(&(scData.fullToken));
+    
     }
     exit(0);
 }

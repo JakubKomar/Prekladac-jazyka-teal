@@ -71,6 +71,9 @@ char * tokenStr(tokenType type)
     case T_DOUBLE:
         str="T_DOUBLE";
     break;
+    case T_DOT2:
+        str="T_DOT2";
+    break;
     case K_DO:
         str="K_DO";
     break;

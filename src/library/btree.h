@@ -48,7 +48,6 @@ void replaceByRightmost (bNodePtr ReplacedPtr, bNodePtr *tree);
  * @param *tree-tree where is node for removing,* key-key from deleted node
  */ 
 void bDelete(bNodePtr *tree, char *key);
-
 /**
  * debug function- print data from tree
  * @param *tree-node to print

@@ -41,3 +41,6 @@ clean:
 test:
 	cd testunity && \
 	python3 tester.py 
+testScaner:
+	cd testunity && \
+	python3 tester.py -o -s

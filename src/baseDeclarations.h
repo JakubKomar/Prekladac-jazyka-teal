@@ -29,6 +29,20 @@
 //konec převzaté části
 
 
+
+/**
+ * bassic error massege-description from code, after report exit
+ * @param code error code
+*/
 void error(int code);
+/**
+ *  error massege whith additon description -description from code after report exit
+ * @param code error code
+ * @param *description aditional description of error
+*/
 void errorD(int code,char * description);
+/**
+ *  from code printing error massege
+ * @param code error code
+*/
 void printError(int code);
