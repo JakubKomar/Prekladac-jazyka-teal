@@ -72,8 +72,12 @@ tokenType checkKeywords(scanerData *data)
         token=K_THEN;
     else if(!strcmp(s,"while"))
         token=K_WHILE;
-    else if(!strcmp(s,"write"))
-        token=K_WRITE;
+    else if(!strcmp(s,"intiger"))
+        token=K_INTEGER;
+    else if(!strcmp(s,"string"))
+        token=K_STRING;
+    else if(!strcmp(s,"number"))
+        token=K_NUMBER;
     else
         token=T_ID;
     return token;
