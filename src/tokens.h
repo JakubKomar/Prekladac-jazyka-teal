@@ -32,6 +32,7 @@ typedef enum{
     T_INT,
     T_DOUBLE,
     T_DOT2,
+    T_FUNC_CALL,
     //keywords
     K_DO,
     K_ELSE,

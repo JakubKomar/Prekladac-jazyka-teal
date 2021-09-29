@@ -8,6 +8,9 @@ char * tokenStr(tokenType type)
     case T_ID:
         str="T_ID";
     break;
+    case T_FUNC_CALL:
+        str="T_FUNC_CALL";
+    break;
     case T_ADD:
         str="T_ADD";
     break;
@@ -115,6 +118,15 @@ char * tokenStr(tokenType type)
     break;
     case K_WRITE:
         str="K_WRITE";
+    break;
+    case K_STRING:
+        str="K_STRING";
+    break;
+    case K_NUMBER:
+        str="K_NUMBER";
+    break;
+    case K_INTEGER:
+        str="K_INTEGER";
     break;
     default:
         str="UNDEFINED";

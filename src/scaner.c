@@ -72,7 +72,7 @@ tokenType checkKeywords(scanerData *data)
         token=K_THEN;
     else if(!strcmp(s,"while"))
         token=K_WHILE;
-    else if(!strcmp(s,"intiger"))
+    else if(!strcmp(s,"integer"))
         token=K_INTEGER;
     else if(!strcmp(s,"string"))
         token=K_STRING;
@@ -90,6 +90,9 @@ tokenType getTokenFromState(state state)
     {
     case S_ID:
         token=T_ID;
+    break;
+    case S_FUNC_CALL:
+        token=T_FUNC_CALL;
     break;
     case S_SUB:
         token=T_SUB;
@@ -228,6 +231,8 @@ state nextState(scanerData*data, state curentState)
         case S_ID:
             if(isLetter(sym)||isdigit(sym)||sym=='_')
                 next=S_ID;
+            else if(sym=='(')
+                next=S_FUNC_CALL;
         break;
         case S_SUB:
             if(sym=='-')

@@ -1,51 +1,58 @@
-
-(1)	    START → PROLOG PROG
-(2)	    PROLOG → require string
-(3)	    PROG → id ID_NEXT assigen expresion N_EXPRESIONS PROG
-(4) 	PROG → FUNCTION PROG
-(5)	    PROG → DECLARATION PROG
-(6)	    PROG → WHILE PROG
-(7)	    PROG → IF PROG
-(8)	    PROG → RETURN PROG
-(9)	    PROG → ε
-(10)	ID_NEXT → comma id ID_NEXT
-(11)	ID_NEXT → ε
-(12)	N_EXPRESIONS → comma expresion N_EXPRESIONS
-(13)	N_EXPRESIONS → ε
-(14)	WHILE → while expresion do PROG end
-(15)	IF → if expresion then PROG ELSE_M end
-(16)	ELSE_M → else PROG
-(17)	ELSE_M → ε
-(18)	FUNCTION → function id lbr ARG ARGNEXT rbr RETURN_D PROG end
-(19)	ARG → ε
-(20)	ARG → id colon TYPE
-(21)	ARGNEXT → comma ARG ARGNEXT
-(22)	ARGNEXT → ε
-(23)	RETURN_D → TYPE RETURN_DN
-(24)	RETURN_D → ε
-(25)	RETURN_DN → comma RETURN_D
-(26)	RETURN_DN → ε
-(27)	RETURN → return RETURN_ARG
-(28)	RETURN_ARG → expresion RETURN_ARG_N
-(29)	RETURN_ARG → ε
-(30)	RETURN_ARG_N → comma RETURN_ARG
-(31)	RETURN_ARG_N → ε
-(32)	DECLARATION → RANGE id colon DECLARATION_T
-(33)	DECLARATION_T → TYPE ASSIGEN_MAY
-(34)	DECLARATION_T → function lbr ARG_D rbr colon ARG_D
-(35)	ARG_D → ε
-(36)	ARG_D → TYPE ARG_DN
-(37)	ARG_DN → colon ARG_D
-(38)	ARG_DN → ε
-(39)	RET_D → ε
-(40)	RET_D → TYPE RET_DN
-(41)	RET_DN → colon RET_D
-(42)	RET_DN → ε
-(43)	ASSIGEN_MAY → ε
-(44)	ASSIGEN_MAY → assigen expresion
-(45)	TYPE → integer
-(46)	TYPE → nil
-(47)	TYPE → number
-(48)	TYPE → string
-(49)	RANGE → local
-(50)	RANGE → global
+START → PROLOG PROG
+PROLOG → require string
+PROG → id ID_NEXT assigen EXP_OR_FUNC  PROG
+PROG → FUNCTION PROG
+PROG → DECLARATION PROG
+PROG → WHILE PROG
+PROG → IF PROG
+PROG → RETURN PROG
+PROG → FUNC_CALL PROG
+PROG → ε
+EXP_OR_FUNC → expresion N_EXPRESIONS
+EXP_OR_FUNC → FUNC_CALL
+FUNC_CALL →func_call F_ARG rbr
+F_ARG →ε
+F_ARG →experesion F_ARG_N
+F_ARG_N →ε
+F_ARG_N → comma experesion F_ARG_N
+ID_NEXT → comma id ID_NEXT
+ID_NEXT → ε
+N_EXPRESIONS → comma expresion N_EXPRESIONS
+N_EXPRESIONS → ε
+WHILE → while expresion do PROG end
+IF → if expresion then PROG ELSE_M end
+ELSE_M → else PROG
+ELSE_M → ε
+FUNCTION → function id lbr ARG ARGNEXT rbr RETURN_D PROG end
+ARG → ε
+ARG → id colon TYPE
+ARGNEXT → comma ARG ARGNEXT
+ARGNEXT → ε
+RETURN_D → TYPE RETURN_DN
+RETURN_D → ε
+RETURN_DN → comma TYPE RETURN_DN
+RETURN_DN → ε
+RETURN → return RETURN_ARG
+RETURN_ARG → expresion RETURN_ARG_N
+RETURN_ARG → ε
+RETURN_ARG_N → comma expresion RETURN_ARG_N
+RETURN_ARG_N → ε
+DECLARATION → RANGE id colon DECLARATION_T
+DECLARATION_T → TYPE ASSIGEN_MAY
+DECLARATION_T → function lbr ARG_D rbr colon ARG_D
+ARG_D → ε
+ARG_D → TYPE ARG_DN
+ARG_DN → colon TYPE ARG_DN
+ARG_DN → ε
+RET_D → ε
+RET_D → TYPE RET_DN
+RET_DN → colon TYPE RET_DN
+RET_DN → ε
+ASSIGEN_MAY → ε
+ASSIGEN_MAY → assigen expresion
+TYPE → integer
+TYPE → nil
+TYPE → number
+TYPE → string
+RANGE → local
+RANGE → global
