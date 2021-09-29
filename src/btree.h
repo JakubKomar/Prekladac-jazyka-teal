@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "./../baseDeclarations.h"
+#include "./baseDeclarations.h"
 
 typedef struct bNode {
     char *key;

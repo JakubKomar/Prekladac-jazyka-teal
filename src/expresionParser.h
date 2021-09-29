@@ -7,7 +7,7 @@
 
 #include "./scaner.h"
 #include "./baseDeclarations.h"
-#include "./library/stack.h"
+#include "./stack.h"
 
 tokenType expresionDevelop(tokenType actual,scanerData *sData) ;
 bool isId(tokenType toCompere)  ;

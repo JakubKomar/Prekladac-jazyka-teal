@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "./../baseDeclarations.h"
+#include "./baseDeclarations.h"
 
 #define STACK_BASE_SIZE 100  //počateční velkost zásobníku
 

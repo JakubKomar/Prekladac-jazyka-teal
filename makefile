@@ -24,7 +24,9 @@ d:
 	cp $(BIN) ../
 
 pack: clean
-	zip -r $(ZIP) src/ makefile README.txt 
+	cd src && \
+	zip -r $(ZIP) * README.txt && \
+	mv $(ZIP) ../
 
 run:
 	test -f ifj21 && ./ifj21

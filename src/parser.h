@@ -7,7 +7,7 @@
 #include "baseDeclarations.h"
 #include "scaner.h"
 #include "expresionParser.h"
-#include "library/stack.h"
+#include "stack.h"
 
 void LLTableErr();
 void parserMain();
