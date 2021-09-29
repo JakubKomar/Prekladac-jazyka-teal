@@ -1,30 +1,31 @@
+
 (1)	    START → PROLOG PROG
 (2)	    PROLOG → require string
 (3)	    PROG → id ID_NEXT assigen expresion N_EXPRESIONS PROG
-(4)	    PROG → FUNCTION PROG
+(4) 	PROG → FUNCTION PROG
 (5)	    PROG → DECLARATION PROG
 (6)	    PROG → WHILE PROG
 (7)	    PROG → IF PROG
-(8)	    PROG → ε
-(9)	    ID_NEXT → comma id ID_NEXT
-(10)	ID_NEXT → ε
-(11)	N_EXPRESIONS → comma expresion N_EXPRESIONS
-(12)	N_EXPRESIONS → ε
-(13)	WHILE → while expresion do PROG end
-(14)	IF → if expresion then PROG ELSE_M end
-(15)	ELSE_M → else PROG
-(16)	ELSE_M → ε
-(17)	FUNCTION → function id lbr ARG ARGNEXT rbr RETURN_D PROG RETURN end
-(18)	ARG → ε
-(19)	ARG → id colon TYPE
-(20)	ARGNEXT → comma ARG ARGNEXT
-(21)	ARGNEXT → ε
-(22)	RETURN_D → TYPE RETURN_DN
-(23)	RETURN_D → ε
-(24)	RETURN_DN → comma RETURN_D
-(25)	RETURN_DN → ε
-(26)	RETURN → return RETURN_ARG
-(27)	RETURN → ε
+(8)	    PROG → RETURN PROG
+(9)	    PROG → ε
+(10)	ID_NEXT → comma id ID_NEXT
+(11)	ID_NEXT → ε
+(12)	N_EXPRESIONS → comma expresion N_EXPRESIONS
+(13)	N_EXPRESIONS → ε
+(14)	WHILE → while expresion do PROG end
+(15)	IF → if expresion then PROG ELSE_M end
+(16)	ELSE_M → else PROG
+(17)	ELSE_M → ε
+(18)	FUNCTION → function id lbr ARG ARGNEXT rbr RETURN_D PROG end
+(19)	ARG → ε
+(20)	ARG → id colon TYPE
+(21)	ARGNEXT → comma ARG ARGNEXT
+(22)	ARGNEXT → ε
+(23)	RETURN_D → TYPE RETURN_DN
+(24)	RETURN_D → ε
+(25)	RETURN_DN → comma RETURN_D
+(26)	RETURN_DN → ε
+(27)	RETURN → return RETURN_ARG
 (28)	RETURN_ARG → expresion RETURN_ARG_N
 (29)	RETURN_ARG → ε
 (30)	RETURN_ARG_N → comma RETURN_ARG
@@ -36,11 +37,15 @@
 (36)	ARG_D → TYPE ARG_DN
 (37)	ARG_DN → colon ARG_D
 (38)	ARG_DN → ε
-(39)	ASSIGEN_MAY → ε
-(40)	ASSIGEN_MAY → assigen expresion
-(41)	TYPE → integer
-(42)	TYPE → nil
-(43)	TYPE → number
-(44)	TYPE → string
-(45)	RANGE → local
-(46)	RANGE → global
+(39)	RET_D → ε
+(40)	RET_D → TYPE RET_DN
+(41)	RET_DN → colon RET_D
+(42)	RET_DN → ε
+(43)	ASSIGEN_MAY → ε
+(44)	ASSIGEN_MAY → assigen expresion
+(45)	TYPE → integer
+(46)	TYPE → nil
+(47)	TYPE → number
+(48)	TYPE → string
+(49)	RANGE → local
+(50)	RANGE → global

@@ -1,48 +1,52 @@
 %token id require string comma assigen expresion while do end if else  function lbr rbr colon return integer nil number string local global then
 %% /* LL(1) */
-START:PROLOG PROG ;
-PROLOG:require string;
-PROG:id ID_NEXT assigen expresion N_EXPRESIONS PROG
-|FUNCTION PROG
-|DECLARATION PROG
-|WHILE PROG
-|IF PROG
-|/*eps*/;
-ID_NEXT:comma id ID_NEXT
-|/*eps*/;
-N_EXPRESIONS: comma expresion N_EXPRESIONS
-|/*eps*/;
-WHILE: while expresion do PROG end;
-IF:if expresion then PROG ELSE_M end;
-ELSE_M: else PROG
-| /*eps*/;
-FUNCTION:function id lbr ARG ARGNEXT rbr RETURN_D PROG RETURN end;
-ARG:/*eps*/
-|id colon TYPE;
-ARGNEXT:comma ARG ARGNEXT
-|/*eps*/;
-RETURN_D:TYPE RETURN_DN
-|/*eps*/;
-RETURN_DN:comma RETURN_D
-|/*eps*/;
-RETURN:return RETURN_ARG PROG
-|/*eps*/;
-RETURN_ARG:expresion RETURN_ARG_N
-|/*eps*/;
-RETURN_ARG_N:comma RETURN_ARG
-|/*eps*/;
-DECLARATION: RANGE id colon DECLARATION_T;
-DECLARATION_T:TYPE ASSIGEN_MAY
-|function lbr ARG_D rbr colon ARG_D;
-ARG_D:/*eps*/
-|TYPE ARG_DN;
-ARG_DN:colon ARG_D
-|/*eps*/;
-ASSIGEN_MAY:/*eps*/
-|assigen expresion;
-TYPE:integer
-|nil
-|number
-|string;
-RANGE:local
-|global;
+START : PROLOG PROG;
+PROLOG : require string;
+PROG : id ID_NEXT assigen expresion N_EXPRESIONS PROG;
+PROG : FUNCTION PROG;
+PROG : DECLARATION PROG;
+PROG : WHILE PROG;
+PROG : IF PROG;
+PROG : RETURN PROG;
+PROG : /*eps*/;
+ID_NEXT : comma id ID_NEXT;
+ID_NEXT : /*eps*/;
+N_EXPRESIONS : comma expresion N_EXPRESIONS;
+N_EXPRESIONS : /*eps*/;
+WHILE : while expresion do PROG end;
+IF : if expresion then PROG ELSE_M end;
+ELSE_M : else PROG;
+ELSE_M : /*eps*/;
+FUNCTION : function id lbr ARG ARGNEXT rbr RETURN_D PROG end;
+ARG : /*eps*/;
+ARG : id colon TYPE;
+ARGNEXT : comma ARG ARGNEXT;
+ARGNEXT : /*eps*/;
+RETURN_D : TYPE RETURN_DN;
+RETURN_D : /*eps*/;
+RETURN_DN : comma RETURN_D;
+RETURN_DN : /*eps*/;
+RETURN : return RETURN_ARG;
+RETURN_ARG : expresion RETURN_ARG_N;
+RETURN_ARG : /*eps*/;
+RETURN_ARG_N : comma RETURN_ARG;
+RETURN_ARG_N : /*eps*/;
+DECLARATION : RANGE id colon DECLARATION_T;
+DECLARATION_T : TYPE ASSIGEN_MAY;
+DECLARATION_T : function lbr ARG_D rbr colon ARG_D;
+ARG_D : /*eps*/;
+ARG_D : TYPE ARG_DN;
+ARG_DN : colon ARG_D;
+ARG_DN : /*eps*/;
+RET_D : /*eps*/;
+RET_D : TYPE RET_DN;
+RET_DN : colon RET_D;
+RET_DN : /*eps*/;
+ASSIGEN_MAY : /*eps*/;
+ASSIGEN_MAY : assigen expresion;
+TYPE : integer;
+TYPE : nil;
+TYPE : number;
+TYPE : string;
+RANGE : local;
+RANGE : global;
