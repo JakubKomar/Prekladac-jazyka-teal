@@ -1,7 +1,7 @@
 CFLAGS=-std=c99 -Wall -pedantic -g
 
 BIN=ifj21
-ZIP=project.zip
+ZIP=xkomar33.zip
 CC=gcc
 RM=rm -f
 SRC=$(wildcard src/**/*.c) $(wildcard src/*.c)
