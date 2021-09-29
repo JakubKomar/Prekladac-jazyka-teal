@@ -55,8 +55,8 @@ void stackPrint(stack *s)
 {
     debugS("Stack debug extract:\n");
     for (int i =0; i <s->last ; i++)
-        debug("%-4d. %d\n",i,s->array[i]);
-    debugS("↑Head of stack is here.↑");
+        debug("%-4d. %s\n",i,tokenStr(s->array[i]));
+    debugS("↑Head of stack is here.↑\n");
 }
 
 bool stackFull(stack *s)

@@ -5,8 +5,26 @@
  */
 #include "expresionParser.h"
 
+const char precTable[14][14] =
+{
+//	  +       -       *       /       <       >      <=      >=      ==      !=      (         )     val      $
+	{'>'	,'>'	,'<'	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// +
+	{'>'	,'>'	,'<'	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// -
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,'<'	,'>'},// *
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,'<'	,'>'},// /
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// <=
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >=
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,'<'	,'>'	,'<'	,'>'},// ==
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,'<'	,'>'	,'<'	,'>'},// !=
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'='	,'<'	,' '},// (	
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// )
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// val
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
+};
 
-void expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
+tokenType expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
 {
     bool operatorFlag=false;
     bool firstOperant=true;
@@ -49,6 +67,7 @@ void expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve fináln�
         }
         actual=getNextUsefullToken(sData);
     }
+    return actual;
 }
 bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
 {
