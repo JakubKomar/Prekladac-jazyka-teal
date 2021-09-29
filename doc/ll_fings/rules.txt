@@ -1,58 +1,58 @@
-START → PROLOG PROG
-PROLOG → require string
-PROG → id ID_NEXT assigen EXP_OR_FUNC  PROG
-PROG → FUNCTION PROG
-PROG → DECLARATION PROG
-PROG → WHILE PROG
-PROG → IF PROG
-PROG → RETURN PROG
-PROG → FUNC_CALL PROG
-PROG → ε
-EXP_OR_FUNC → expresion N_EXPRESIONS
-EXP_OR_FUNC → FUNC_CALL
-FUNC_CALL →func_call F_ARG rbr
-F_ARG →ε
-F_ARG →experesion F_ARG_N
-F_ARG_N →ε
-F_ARG_N → comma experesion F_ARG_N
-ID_NEXT → comma id ID_NEXT
-ID_NEXT → ε
-N_EXPRESIONS → comma expresion N_EXPRESIONS
-N_EXPRESIONS → ε
-WHILE → while expresion do PROG end
-IF → if expresion then PROG ELSE_M end
-ELSE_M → else PROG
-ELSE_M → ε
-FUNCTION → function id lbr ARG ARGNEXT rbr RETURN_D PROG end
-ARG → ε
-ARG → id colon TYPE
-ARGNEXT → comma ARG ARGNEXT
-ARGNEXT → ε
-RETURN_D → TYPE RETURN_DN
-RETURN_D → ε
-RETURN_DN → comma TYPE RETURN_DN
-RETURN_DN → ε
-RETURN → return RETURN_ARG
-RETURN_ARG → expresion RETURN_ARG_N
-RETURN_ARG → ε
-RETURN_ARG_N → comma expresion RETURN_ARG_N
-RETURN_ARG_N → ε
-DECLARATION → RANGE id colon DECLARATION_T
-DECLARATION_T → TYPE ASSIGEN_MAY
-DECLARATION_T → function lbr ARG_D rbr colon ARG_D
-ARG_D → ε
-ARG_D → TYPE ARG_DN
-ARG_DN → colon TYPE ARG_DN
-ARG_DN → ε
-RET_D → ε
-RET_D → TYPE RET_DN
-RET_DN → colon TYPE RET_DN
-RET_DN → ε
-ASSIGEN_MAY → ε
-ASSIGEN_MAY → assigen expresion
-TYPE → integer
-TYPE → nil
-TYPE → number
-TYPE → string
-RANGE → local
-RANGE → global
+(1)	    START → PROLOG PROG
+(2)	    PROLOG → require string
+(3)	    PROG → id ID_NEXT assigen EXP_OR_FUNC PROG
+(4)	    PROG → FUNCTION PROG
+(5)	    PROG → DECLARATION PROG
+(6) 	PROG → WHILE PROG
+(7) 	PROG → IF PROG
+(8)	    PROG → RETURN PROG
+(9)	    PROG → FUNC_CALL PROG
+(10)	PROG → ε
+(11)	EXP_OR_FUNC → expresion N_EXPRESIONS
+(12)	EXP_OR_FUNC → FUNC_CALL
+(13)	FUNC_CALL → func_call F_ARG rbr
+(14)	F_ARG → ε
+(15)	F_ARG → experesion F_ARG_N
+(16)	F_ARG_N → ε
+(17)	F_ARG_N → comma experesion F_ARG_N
+(18)	ID_NEXT → comma id ID_NEXT
+(19)	ID_NEXT → ε
+(20)	N_EXPRESIONS → comma expresion N_EXPRESIONS
+(21)	N_EXPRESIONS → ε
+(22)	WHILE → while expresion do PROG end
+(23)	IF → if expresion then PROG ELSE_M end
+(24)	ELSE_M → else PROG
+(25)	ELSE_M → ε
+(26)	FUNCTION → function func_call ARG ARGNEXT rbr RETURN_D PROG end
+(27)	ARG → ε
+(28)	ARG → id colon TYPE
+(29)	ARGNEXT → comma ARG ARGNEXT
+(30)	ARGNEXT → ε
+(31)	RETURN_D → TYPE RETURN_DN
+(32)	RETURN_D → ε
+(33)	RETURN_DN → comma TYPE RETURN_DN
+(34)	RETURN_DN → ε
+(35)	RETURN → return RETURN_ARG
+(36)	RETURN_ARG → expresion RETURN_ARG_N
+(37)	RETURN_ARG → ε
+(38)	RETURN_ARG_N → comma expresion RETURN_ARG_N
+(39)	RETURN_ARG_N → ε
+(40)	DECLARATION → RANGE id colon DECLARATION_T
+(41)	DECLARATION_T → TYPE ASSIGEN_MAY
+(42)	DECLARATION_T → function lbr ARG_D rbr colon RET_D
+(43)	ARG_D → ε
+(44)	ARG_D → TYPE ARG_DN
+(45)	ARG_DN → colon TYPE ARG_DN
+(46)	ARG_DN → ε
+(47)	RET_D → ε
+(48)	RET_D → TYPE RET_DN
+(49)	RET_DN → colon TYPE RET_DN
+(50)	RET_DN → ε
+(51)	ASSIGEN_MAY → ε
+(52)	ASSIGEN_MAY → assigen EXP_OR_FUNC
+(53)	TYPE → integer
+(54)	TYPE → nil
+(55)	TYPE → number
+(56)	TYPE → string
+(57)	RANGE → local
+(58)	RANGE → global
