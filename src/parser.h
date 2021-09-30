@@ -6,7 +6,8 @@
 #pragma once
 #include "baseDeclarations.h"
 #include "scaner.h"
-#include "library/stack.h"
+#include "expresionParser.h"
+#include "stack.h"
 
 void LLTableErr();
 void parserMain();

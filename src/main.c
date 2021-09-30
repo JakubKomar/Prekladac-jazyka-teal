@@ -3,7 +3,6 @@
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#include "baseDeclarations.h"
 #include "main.h"
 
 

@@ -61,6 +61,7 @@ typedef enum{
     S_EXP3,
     S_DOT1,
     S_DOT2,
+    S_FUNC_CALL,
     S_ERROR,
     S_UNDEFINATED,
 }state;

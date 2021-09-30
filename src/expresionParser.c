@@ -5,15 +5,38 @@
  */
 #include "expresionParser.h"
 
+const char precTable[14][14] =
+{
+//	  +       -       *       /       <       >      <=      >=      ==      !=      (         )     val      $
+	{'>'	,'>'	,'<'	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// +
+	{'>'	,'>'	,'<'	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// -
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,'<'	,'>'},// *
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,'<'	,'>'},// /
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// <=
+	{'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >=
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,'<'	,'>'	,'<'	,'>'},// ==
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,'<'	,'>'	,'<'	,'>'},// !=
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'='	,'<'	,' '},// (	
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// )
+	{'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// val
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
+};
 
-void expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
+tokenType expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
 {
     bool operatorFlag=false;
     bool firstOperant=true;
     bool instideBracked=false;
     while(true)
     {
-        if(firstOperant)
+        printf("-----------------------------------------------------debug:%s\n",tokenStr(actual));
+        if(actual==T_STR_LEN&&firstOperant)
+        {
+
+        }
+        else if(firstOperant)
         {
             if(isId(actual))
             {
@@ -49,6 +72,7 @@ void expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve fináln�
         }
         actual=getNextUsefullToken(sData);
     }
+    return actual;
 }
 bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
 {
@@ -56,7 +80,7 @@ bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly
 }
 bool isOperator(tokenType toCompere)     //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
 {
-    return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_RBR||toCompere==T_LBR;
+    return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_DOT2||toCompere==T_STR_LEN;
 }
 
 

@@ -19,3 +19,4 @@ function main()
     end
 end
 main()
+return 0

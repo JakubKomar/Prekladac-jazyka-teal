@@ -1,6 +1,7 @@
--- Bad var 2
-require "ifj21"
+-- Program 1: Vypocet faktorialu (iterativne) 2
+require 
 function main() -- uzivatelska funkce bez parametru
-    local a : d!ouble = 5;
+
+    return
 end
 main() -- prikaz hlavniho tela programu

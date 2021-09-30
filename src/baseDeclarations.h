@@ -11,7 +11,7 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "library/dstring.h"
+#include "dstring.h"
 #include "tokens.h"
 #define INPUT stdin
 

@@ -1,7 +1,7 @@
 CFLAGS=-std=c99 -Wall -pedantic -g
 
 BIN=ifj21
-ZIP=project.zip
+ZIP=xkomar33.zip
 CC=gcc
 RM=rm -f
 SRC=$(wildcard src/**/*.c) $(wildcard src/*.c)
@@ -24,7 +24,9 @@ d:
 	cp $(BIN) ../
 
 pack: clean
-	zip -r $(ZIP) src/ makefile README.txt 
+	cd src && \
+	zip -r $(ZIP) * README.txt && \
+	mv $(ZIP) ../
 
 run:
 	test -f ifj21 && ./ifj21

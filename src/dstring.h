@@ -5,7 +5,7 @@
  */
 #pragma once
 
-#include "./../baseDeclarations.h"
+#include "./baseDeclarations.h"
 
 #define STRING_BASE_SIZE 16   //base size memory alocation of string
 
