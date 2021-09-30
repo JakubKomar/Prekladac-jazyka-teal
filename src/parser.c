@@ -38,7 +38,7 @@ void parserMain(){
             }
             else
             {
-                errorD(32,"Terminál na zásabníku se neschoduje s aktuálním terminálem");
+                errorD(2,"Terminál na zásabníku se neschoduje s aktuálním terminálem");
             }
         }
     }   
@@ -628,5 +628,5 @@ void useLLtable(tokenType actualToken,stack *stack)
 }
 void LLTableErr()
 {
-    errorD(4,"Pro daný neterminál nebyl nalezen rozklad");
+    errorD(2,"Pro daný neterminál nebyl nalezen rozklad");
 }
