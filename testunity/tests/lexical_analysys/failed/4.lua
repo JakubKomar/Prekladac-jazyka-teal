@@ -1,4 +1,4 @@
--- Bad var 1
+-- Bad var 4
 require "ifj21"
 function main() -- uzivatelska funkce bez parametru
     local a : d!ouble = 5;

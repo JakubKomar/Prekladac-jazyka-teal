@@ -628,5 +628,5 @@ void useLLtable(tokenType actualToken,stack *stack)
 }
 void LLTableErr()
 {
-    errorD(32,"Pro daný neterminál nebyl nalezen rozklad");
+    errorD(4,"Pro daný neterminál nebyl nalezen rozklad");
 }
