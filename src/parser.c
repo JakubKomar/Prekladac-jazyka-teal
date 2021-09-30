@@ -98,7 +98,7 @@ void useLLtable(tokenType actualToken,stack *stack)
                 break;  
                 case K_IF:
                     stackPush(stack,N_PROG);  
-                    stackPush(stack,K_IF);  
+                    stackPush(stack,N_IF);  
                 break; 
                 case K_ELSE:
 
@@ -127,7 +127,12 @@ void useLLtable(tokenType actualToken,stack *stack)
         case N_EXP_OR_FUNC:
             switch (actualToken)
             {
-                case S_EXPRESION: 
+                case T_INT:
+                case T_STR_LEN:
+                case T_STR:
+                case K_NIL:
+                case T_DOUBLE:
+                case T_ID: 
                     stackPush(stack,N_EXPRESIONS);
                     stackPush(stack,S_EXPRESION); 
                 break;  
@@ -158,8 +163,13 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case T_RBR: 
 
                 break;  
-                case S_EXPRESION: 
-                    stackPush(stack,N_F_ARG); 
+                case T_INT:
+                case T_STR:
+                case T_STR_LEN:
+                case K_NIL:
+                case T_DOUBLE:
+                case T_ID: 
+                    stackPush(stack,N_F_ARG_N); 
                     stackPush(stack,S_EXPRESION); 
                 break;  
                 default:
@@ -212,6 +222,7 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case K_FUNCTION: 
                 case K_GLOBAL: 
                 case K_LOCAL: 
+                case K_IF:  
 
                 break; 
                 case T_COMMA: 
@@ -323,12 +334,10 @@ void useLLtable(tokenType actualToken,stack *stack)
         case N_RETURN_D:
             switch (actualToken)
             {
-                case K_STRING: 
-                case K_INTEGER:
-                case K_NIL:
-                case K_NUMBER:
+                case T_COLON: 
                     stackPush(stack,N_RETURN_DN); 
                     stackPush(stack,N_TYPE); 
+                    stackPush(stack,T_COLON); 
                 break;   
                 case T_ID:
                 case T_FUNC_CALL:
@@ -385,19 +394,16 @@ void useLLtable(tokenType actualToken,stack *stack)
         case N_RETURN_ARG:
             switch (actualToken)
             {
-                case S_EXPRESION: 
+                case T_INT:
+                case T_STR:
+                case T_STR_LEN:
+                case K_NIL:
+                case T_DOUBLE:
+                case T_ID: 
                     stackPush(stack,N_RETURN_ARG_N); 
                     stackPush(stack,S_EXPRESION); 
                 break;   
-                case T_ID:
-                case T_FUNC_CALL:
-                case K_WHILE:
                 case K_END:
-                case K_IF:
-                case K_FUNCTION:
-                case K_RETURN:
-                case K_LOCAL:
-                case K_GLOBAL:
                 case K_ELSE:
                 case T_EOF:
 
@@ -415,15 +421,7 @@ void useLLtable(tokenType actualToken,stack *stack)
                     stackPush(stack,S_EXPRESION); 
                     stackPush(stack,T_COMMA); 
                 break; 
-                case T_ID:
-                case T_FUNC_CALL:
-                case K_WHILE:
                 case K_END:
-                case K_IF:
-                case K_FUNCTION:
-                case K_RETURN:
-                case K_LOCAL:
-                case K_GLOBAL:
                 case K_ELSE:
                 case T_EOF:
 
