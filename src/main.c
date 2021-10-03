@@ -9,12 +9,15 @@
 int main(int argc, char** argv)
 {
     bool scanerOnlyF=false;
+    bool expresionOnlyF=false;
     bool debugF=false;
     for(int i=1;i<argc;i++){
         if(!strcmp(argv[i],"-d"))
             debugF=true;
         else if(!strcmp(argv[i],"-s"))
             scanerOnlyF=true;
+        else if(!strcmp(argv[i],"-e"))
+            expresionOnlyF=true;
         else if(!strcmp(argv[i],"-h")){
             fprintf(stderr,"Translater of programing language něco to programing language IFJ21\noptions:\n\t-d\tdebug mode enable\n\t-s\tsematic check only\n\t-h\tprint help\n");
             exit(0);
@@ -25,13 +28,13 @@ int main(int argc, char** argv)
         }
     }
     if(debugF)
-        debugRun(scanerOnlyF);
+        debugRun(scanerOnlyF,expresionOnlyF);
 
     parserMain();
     return 0;
 }
 
-void debugRun(bool scanerOnlyF)
+void debugRun(bool scanerOnlyF,bool expresionOnlyF)
 {
     if(scanerOnlyF)
     {
@@ -46,7 +49,17 @@ void debugRun(bool scanerOnlyF)
             i++;
         }
         stringDestruct(&(scData.fullToken));
-    
+    }
+    else if(expresionOnlyF)
+    {
+        scanerData scData;
+        tokenType actualToken=O_UNIMPORTANT;
+        initScanerData(&scData);
+        while(actualToken!=T_EOF)
+        {
+            actualToken=getNextUsefullToken(&scData);
+            expresionParse(actualToken,&scData);
+        }
     }
     exit(0);
 }

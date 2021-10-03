@@ -86,43 +86,45 @@ void expresionParse(tokenType actual,scanerData *sData)
     stackInit(&stack);
     stackPush(&stack,O_DOLAR);
 
-    while (stackHead(&stack)==O_DOLAR&&actual==O_DOLAR)
+    while (stackHead(&stack)!=O_DOLAR||actual!=O_DOLAR)
     {
+        debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackHead(&stack))); 
+        stackPrint(&stack)   ; 
         switch (getSymFromPrecTable(actual,stackHead(&stack)))
         {
-        case '=':
-            stackPush(&stack,actual);
-            actual=getNextToken(sData);
-            break;
-        case '<':
-            stackPush(&stack,O_HANDLE);
-            stackPush(&stack,actual);
-            actual=getNextToken(sData);
-            break; 
-        case '>':
-            //reduction
-            while (stackHead(&stack)!=O_HANDLE)
-            {
-                stackPop(&stack);
-            }
-            
-            break;
-        case ' ':
-            errorD(99,"syntax error");
-            break;
-        default:
-            errorD(99,"precedence table error");
-            break;
+            case '=':
+                stackPush(&stack,actual);
+                actual=getNextToken(sData);
+                break;
+            case '<':
+                stackPush(&stack,O_HANDLE);
+                stackPush(&stack,actual);
+                actual=getNextToken(sData);
+                break; 
+            case '>':
+                //reduction
+                while (stackHead(&stack)!=O_HANDLE)
+                {
+                    stackPop(&stack);
+                }     
+                stackPop(&stack);     
+                break;
+            case ' ':
+                errorD(99,"syntax error");
+                break;
+            default:
+                errorD(99,"precedence table error");
+                break;
         }
     }
 
     stackDestruct(&stack);
 } 
 
-char getSymFromPrecTable(tokenType actual, tokenType head)
+char getSymFromPrecTable(tokenType input, tokenType stack)
 {
-    int colum=getPosInTable(head);
-    int row=getPosInTable(actual);
+    int colum=getPosInTable(input);
+    int row=getPosInTable(stack);
     return precTable[row][colum];
 }
 
@@ -152,11 +154,15 @@ int getPosInTable(tokenType toDecode)
     case T_RBR:
         return 6;
     case T_ID:
+    case T_STR:
+    case T_INT:
+    case T_DOUBLE:
         return 7;  
     case O_DOLAR:
+    case T_EOF:
         return 8;
     default:
-        errorD(99,"sa table err"); 
+         return 8;
     }
 }
 /*T_RBR,      //pravá závorka

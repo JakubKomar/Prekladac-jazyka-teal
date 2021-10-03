@@ -6,4 +6,4 @@
 #pragma once
 #include "baseDeclarations.h"
 #include "parser.h"
-void debugRun(bool scanerOnly);
+void debugRun(bool scanerOnly,bool expresionOnly);
