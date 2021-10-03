@@ -5,25 +5,18 @@
  */
 #include "expresionParser.h"
 
-const char precTable[16][16] =
+const char precTable[10][10] =
 {
-//	  #      ..        +       -       *       /       <       >      <=      >=      ==      !=      (         )     val      $
-    {' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,' '	,'>'},// #
-    {' '	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// ..
-	{' '	,'<'	,'>'	,'>'	,'<'	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// +
-	{' '	,'<'	,'>'	,'>'	,'<'	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// -
-	{' '	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,'<'	,'>'},// *
-	{' '	,'<'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,'<'	,'>'},// /
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// <=
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,' '	,' '	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// >=
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,'<'	,'>'	,'<'	,'>'},// ==
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,' '	,'<'	,'>'	,'<'	,'>'},// !=
-	{' '	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'='	,'<'	,' '},// (	
-	{' '	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// )
-	{' '	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// val
-	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
+//	  #    *,/,//,   +-      ..       b       (       )        i      $
+    {'<'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// #
+    {'<'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// *,/
+	{'<'	,'<'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// +,-
+	{'<'	,'<'	,'<'	,'<'	,'>'	,'<'	,'>'	,'<'	,'>'},// ..
+	{'<'	,'<'	,'<'	,'<'	,' '	,'<'	,'>'	,'<'	,'>'},// >, <, <=, >=, ==, !=
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'='	,'<'	,' '},// (	
+	{'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'    ,' '	,'>'},// )
+	{' '	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// i
+	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
 
 tokenType expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
@@ -76,15 +69,16 @@ tokenType expresionDevelop(tokenType actual,scanerData *sData)   //nebude ve fin
     }   
     return actual;
 }
+
 bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
 {
     return toCompere==T_STR||toCompere==T_INT||toCompere==K_NIL||toCompere==T_DOUBLE||toCompere==T_ID;
 }
+
 bool isOperator(tokenType toCompere)     //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
 {
     return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_DOT2||toCompere==T_STR_LEN;
 }
-
 
 void expresionParse(tokenType actual,scanerData *sData)
 {
@@ -94,7 +88,7 @@ void expresionParse(tokenType actual,scanerData *sData)
 
     while (stackHead(&stack)==O_DOLAR&&actual==O_DOLAR)
     {
-        switch (getSomething(actual,stackHead(&stack)))
+        switch (getSymFromPrecTable(actual,stackHead(&stack)))
         {
         case '=':
             stackPush(&stack,actual);
@@ -124,50 +118,43 @@ void expresionParse(tokenType actual,scanerData *sData)
 
     stackDestruct(&stack);
 } 
-char getSomething(tokenType actual, tokenType head)
-{
-    int colum=getOrderInTable(head);
-    int row=getOrderInTable(actual);
-    return precTable[row][colum];
 
+char getSymFromPrecTable(tokenType actual, tokenType head)
+{
+    int colum=getPosInTable(head);
+    int row=getPosInTable(actual);
+    return precTable[row][colum];
 }
 
-int getOrderInTable(tokenType toDecode)
+int getPosInTable(tokenType toDecode)
 {
     switch (toDecode)
     {
     case T_STR_LEN:
         return 0;
-    case T_DOT2:
+    case T_MUL:  
+    case T_DIV:
+    case T_DIV2:
         return 1;
     case T_ADD:
-        return 2;
     case T_SUB:
-        return 3;  
-    case T_MUL:
-        return 4;    
-    case T_DIV:
-        return 5;
-    case T_LT:
-        return 6;   
+        return 2;  
+    case T_DOT2:
+        return 3;   
     case T_GT:
-        return 7;
     case T_LTE:
-        return 8;  
-    case T_GTE:
-        return 9;    
+    case T_GTE:  
     case T_EQ:
-        return 10;
     case T_NOT_EQ:
-        return 11;
+        return 4;
     case T_LBR:
-        return 12;           
+        return 5;           
     case T_RBR:
-        return 13;
+        return 6;
     case T_ID:
-        return 14;  
+        return 7;  
     case O_DOLAR:
-        return 15;
+        return 8;
     default:
         errorD(99,"sa table err"); 
     }

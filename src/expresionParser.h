@@ -15,5 +15,5 @@ bool isOperator(tokenType toCompere) ;
 
 
 void expresionParse(tokenType actual,scanerData *sData);
-char getSomething(tokenType actual, tokenType head);
-int getOrderInTable(tokenType toDecode);
+char getSymFromPrecTable(tokenType actual, tokenType head);
+int  getPosInTable(tokenType toDecode);
