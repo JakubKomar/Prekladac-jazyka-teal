@@ -5,5 +5,7 @@
  */
 #pragma once
 #include "baseDeclarations.h"
+#include "scaner.h"
 #include "parser.h"
+#include "expresionParser.h"
 void debugRun(bool scanerOnly,bool expresionOnly);

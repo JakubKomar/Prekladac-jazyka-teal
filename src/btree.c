@@ -21,7 +21,7 @@ void bDestruct(bNodePtr *tree)
     }
 }
 
-void bInsert(bNodePtr *tree, char *key, bDataPtr data)
+void bInsert(bNodePtr *tree, char *key, bData data)
 {
     if(*tree==NULL)	//pokud uzel neexistuje, musí se vytvořit
 	{
@@ -69,13 +69,13 @@ void bDelete(bNodePtr *tree, char *key)
     }
 }
 
-bDataPtr bSearch(bNodePtr *tree, char *key)
+bNodePtr bSearch(bNodePtr *tree, char *key)
 {
     if(tree)
     {
         int cmp = strcmp(key, (*tree)->key);  
         if(cmp==0) 
-            return (*tree)->data;            
+            return (*tree);            
         if(cmp < 0) 
             return bSearch(&(*tree)->lPtr,key);
         else

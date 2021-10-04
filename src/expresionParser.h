@@ -9,12 +9,21 @@
 #include "./baseDeclarations.h"
 #include "./stack.h"
 
-tokenType expresionDevelop(tokenType actual,scanerData *sData) ;
+typedef struct
+{
+    stack stack;
+}expresionParserData;
+
+
+
+
+
+token expresionDevelop(token actual,scanerData *sData) ;
 bool isId(tokenType toCompere)  ;
 bool isOperator(tokenType toCompere) ;
 void reduction(stack *s);
-void generateExpresion(tokenType id1, tokenType op ,tokenType id2);
+void generateExpresion(token id1, token op ,token id2);
 
-void expresionParse(tokenType actual,scanerData *sData);
+void expresionParse(token actual,scanerData *sData);
 char getSymFromPrecTable(tokenType actual, tokenType head);
 int  getPosInTable(tokenType toDecode);

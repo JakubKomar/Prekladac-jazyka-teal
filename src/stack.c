@@ -10,7 +10,7 @@ void stackInit(stack *s)
 {
     s->capacity=STACK_BASE_SIZE;
     s->last=0;
-    s->array=malloc(sizeof(tokenType)*STACK_BASE_SIZE);
+    s->array=malloc(sizeof(token)*STACK_BASE_SIZE);
     if(!s->array)
         errorD(99,"Stack initialization error");
 }
@@ -18,20 +18,20 @@ void stackInit(stack *s)
 void stackRealoc(stack *s)
 {
     s->capacity=s->capacity*2;
-    s->array=realloc(s->array,sizeof(tokenType)* s->capacity);
+    s->array=realloc(s->array,sizeof(token)* s->capacity);
     if(!s->array)
         errorD(99,"Stack realoc error");
 }
 
-void stackPush(stack *s, tokenType type)
+void stackPush(stack *s, token token)
 {
     if(stackFull(s))
         stackRealoc(s);
     s->last++;
-    s->array[s->last-1]=type;
+    s->array[s->last-1]=token;
 }
 
-tokenType stackPop(stack *s)
+token stackPop(stack *s)
 {
     if(stackEmpty(s))
         errorD(99,"Stack owerflow");
@@ -39,23 +39,23 @@ tokenType stackPop(stack *s)
     return s->array[s->last];
 }
 
-tokenType stackHead(stack *s)
+token stackHead(stack *s)
 {
     if(stackEmpty(s))
         errorD(99,"Stack is empty");
     return s->array[s->last-1];
 }
 
-tokenType stackTop(stack *s)
+token stackTop(stack *s)
 {
     for (int i =s->last-1; i>=0 ;i--)
     {
-        if(s->array[i]<O_HANDLE)
+        if(s->array[i].type <O_HANDLE)
         {
             return s->array[i];
         }
     }
-    return O_ERR;
+    return (token){O_ERR,NULL};
 }
 
 void stackInsertHanle(stack *s)
@@ -63,7 +63,7 @@ void stackInsertHanle(stack *s)
     int i =s->last-1;
     for (; i>=0 ;i--)
     {
-        if(s->array[i]<O_HANDLE)
+        if(s->array[i].type<O_HANDLE)
         {
             break;
         }
@@ -71,18 +71,19 @@ void stackInsertHanle(stack *s)
     if(i>s->last-1)
         errorD(99,"cant insert handle behind dolar");
     stackShiftRight(s,i);
-    s->array[i+1]=O_HANDLE;
+    s->array[i+1].type=O_HANDLE;
 }
 
 void stackRemoveHande(stack *s)
 {
-    if(stackPop(s)!=O_HANDLE)
+    if(stackPop(s).type!=O_HANDLE)
         errorD(99,"handle isnt on top of stack");
 }
 
 void stackShiftRight(stack *s,int wege)
 {
-    stackPush(s,O_UNIMPORTANT);
+    token empty={O_UNIMPORTANT,NULL};
+    stackPush(s,empty);
     for (int i =s->last-1; i>wege ;i--)
     {
         s->array[i]=s->array[i-1];
@@ -91,6 +92,10 @@ void stackShiftRight(stack *s,int wege)
 
 void stackDestruct(stack *s)
 {
+    while (!stackEmpty(s))
+    {
+        stackPop(s);
+    }
     free(s->array);
 }
 

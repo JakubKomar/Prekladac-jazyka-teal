@@ -5,6 +5,9 @@
  */
 #pragma once
 #include "baseDeclarations.h"
+#include "dstring.h"
+#include "btree.h"
+#include "tokens.h"
 
 typedef struct {
     char curentSymbol;
@@ -77,7 +80,7 @@ tokenType checkKeywords(scanerData *data);
  * @param *data scanner data
  * @return next usefull token
  */
-tokenType getNextUsefullToken(scanerData * data);
+token getNextUsefullToken(scanerData * data);
 /**
  * geting next token
  * @param *data scanner data

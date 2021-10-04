@@ -92,10 +92,16 @@ typedef enum{
     NE_EXP,
 }tokenType;
 
+#include "btree.h"
+
+typedef struct {
+    tokenType type;
+    struct bNode * symTablePtr;
+}token;
 
 /**
  * returning string name of token for debuging purpose
  * @param type token type for string converzion
  * @return string name of token
 */
-char * tokenStr(tokenType type);
+char * tokenStr(token type);

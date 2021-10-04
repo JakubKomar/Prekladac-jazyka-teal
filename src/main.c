@@ -39,10 +39,10 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
     if(scanerOnlyF)
     {
         scanerData scData;
-        tokenType actualToken=O_UNIMPORTANT;
+        token actualToken=(token){O_UNIMPORTANT,NULL};
         initScanerData(&scData);
         int i=0;
-        while(actualToken!=T_EOF)
+        while(actualToken.type!=T_EOF)
         {
             actualToken=getNextUsefullToken(&scData);
             debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),scData.fullToken.str);
@@ -53,9 +53,9 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
     else if(expresionOnlyF)
     {
         scanerData scData;
-        tokenType actualToken=O_UNIMPORTANT;
+        token actualToken=(token){O_UNIMPORTANT,NULL};
         initScanerData(&scData);
-        while(actualToken!=T_EOF)
+        while(actualToken.type!=T_EOF)
         {
             actualToken=getNextUsefullToken(&scData);
             expresionParse(actualToken,&scData);

@@ -11,8 +11,6 @@
 #include <malloc.h>
 #include <string.h>
 
-#include "dstring.h"
-#include "tokens.h"
 #define INPUT stdin
 
 //začátek převzaté části 

@@ -1,9 +1,9 @@
 #include "tokens.h"
 
-char * tokenStr(tokenType type)
+char * tokenStr(token type)
 {
     char * str;
-    switch (type)
+    switch (type.type)
     {
         case T_ID:
             str="T_ID";

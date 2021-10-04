@@ -5,15 +5,21 @@
  */
 #include "scaner.h"
 
-tokenType getNextUsefullToken(scanerData * data)
+token getNextUsefullToken(scanerData * data)
 {
-    tokenType token;
+    tokenType tType;
     do
     {
-       token=getNextToken(data);
-    } while (token==O_UNIMPORTANT||token==O_ERR);
+       tType=getNextToken(data);
+    } while (tType==O_UNIMPORTANT||tType==O_ERR);
     
-    return token;
+    token next={tType,NULL};
+    if(tType==T_ID||tType==T_INT||tType==T_STR||tType==T_DOUBLE)
+    {
+        //vložit do tabulky symbolů
+    }
+
+    return next;
 }
 
 tokenType getNextToken(scanerData * data)

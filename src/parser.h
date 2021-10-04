@@ -9,6 +9,22 @@
 #include "expresionParser.h"
 #include "stack.h"
 
+typedef struct {
+    stack stack;
+    token actualToken;   
+}parserData;
+
+
+typedef struct {
+    scanerData sData;
+    parserData pData;
+    expresionParserData epData;
+    //memory model
+}systemData;
+
+
+
+void systemDataInit(systemData * data);
 void LLTableErr();
 void parserMain();
-void useLLtable(tokenType actualToken,stack *stack);
+void useLLtable(token actualToken,stack *stack);
