@@ -230,6 +230,16 @@ char * tokenStr(tokenType type)
         case N_RET_DN:
             str="N_RET_DN";
         break;
+        case O_NONE:
+            str="O_NONE";
+        break;
+        case NE_EXP:
+            str="NE_EXP";
+        break;
+        default:
+            str="Unknown token type";
+        break;
+
     }
     return str;
 }

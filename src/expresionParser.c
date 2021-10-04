@@ -88,26 +88,26 @@ void expresionParse(tokenType actual,scanerData *sData)
 
     while (stackHead(&stack)!=O_DOLAR||actual!=O_DOLAR)
     {
-        debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackHead(&stack))); 
+        debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(&stack))); 
         stackPrint(&stack)   ; 
-        switch (getSymFromPrecTable(actual,stackHead(&stack)))
+        switch (getSymFromPrecTable(actual,stackTop(&stack)))
         {
             case '=':
                 stackPush(&stack,actual);
                 actual=getNextToken(sData);
                 break;
             case '<':
-                stackPush(&stack,O_HANDLE);
+                stackInsertHanle(&stack);
                 stackPush(&stack,actual);
                 actual=getNextToken(sData);
                 break; 
             case '>':
-                //reduction
-                while (stackHead(&stack)!=O_HANDLE)
+                reduction(&stack);
+                /*while (stackHead(&stack)!=O_HANDLE)
                 {
                     stackPop(&stack);
                 }     
-                stackPop(&stack);     
+                stackPop(&stack);    */ 
                 break;
             case ' ':
                 errorD(99,"syntax error");
@@ -117,9 +117,68 @@ void expresionParse(tokenType actual,scanerData *sData)
                 break;
         }
     }
-
     stackDestruct(&stack);
 } 
+
+void reduction(stack *s)
+{
+    tokenType id1=O_NONE;
+    tokenType op=O_NONE;
+    tokenType id2=O_NONE;
+
+    tokenType aux=stackPop(s);
+    switch (aux)
+    {
+        case T_INT:
+        case T_DOUBLE:
+        case T_STR:
+        case T_ID:
+            stackRemoveHande(s);
+            stackPush(s,NE_EXP);
+            return;
+        break;
+        case NE_EXP:
+            id2=aux;
+        break;
+        default:
+            errorD(-1,"sa reduction err");
+    }
+    aux=stackPop(s);
+    switch (aux)
+    {
+        case T_STR_LEN:
+            stackRemoveHande(s);
+            stackPush(s,NE_EXP);
+            op=aux;
+            generateExpresion(id1,op,id2);
+            return;
+        break;
+        default:
+            if(isOperator(aux))
+                op=aux;
+            else
+                errorD(-1,"sa reduction err");
+    }
+    aux=stackPop(s);
+    switch (aux)
+    {
+        case NE_EXP:
+            id1=aux;
+            stackRemoveHande(s);
+            stackPush(s,NE_EXP);
+            generateExpresion(id1,op,id2);
+            return;
+        break;
+        default:
+            errorD(-1,"sa reduction err");
+    }
+
+}
+
+void generateExpresion(tokenType id1, tokenType op ,tokenType id2)
+{
+    debug("generated: %s %s %s\n",tokenStr(id2),tokenStr(op),tokenStr(id1));
+}
 
 char getSymFromPrecTable(tokenType input, tokenType stack)
 {

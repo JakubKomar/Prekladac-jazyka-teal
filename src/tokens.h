@@ -48,13 +48,13 @@ typedef enum{
     K_THEN,
     K_WHILE,
     K_WRITE,
-
     K_INTEGER,
     K_STRING,
     K_NUMBER,
     //ostatní
-    O_HANDLE,   //začátek handle
     O_DOLAR,
+    O_HANDLE,   //začátek handle
+    O_NONE,
     O_ERR,      //nesmí nastat // ze scenru se nevypíše
     O_UNIMPORTANT,//token nebude zapsán do listu-není důležitý // ze scenru se nevypíše
     S_EXPRESION,
@@ -88,6 +88,8 @@ typedef enum{
     N_ASSIGEN_MAY,
     N_TYPE,
     N_RANGE,
+    //neterminals for expresion analysis
+    NE_EXP,
 }tokenType;
 
 

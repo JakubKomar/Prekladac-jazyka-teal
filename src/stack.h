@@ -44,6 +44,15 @@ tokenType stackPop(stack *s);
  */
 tokenType stackHead(stack *s);
 /**
+ * return first terminal on stack
+ * @param *s stack to operate whith
+ * @return  first terminal on stack
+ */
+tokenType stackTop(stack *s);
+void stackInsertHanle(stack *s);
+void stackRemoveHande(stack *s);
+void stackShiftRight(stack *s,int wege);
+/**
  * checking if stack is empty
  * @param *s stack to check
  * @return TRUE-stack is empty, FALSE-stack is not empty
