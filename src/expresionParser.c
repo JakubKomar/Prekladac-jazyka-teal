@@ -12,7 +12,7 @@ const char precTable[10][10] =
     {'<'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// *,/
 	{'<'	,'<'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// +,-
 	{'<'	,'<'	,'<'	,'<'	,'>'	,'<'	,'>'	,'<'	,'>'},// ..
-	{'<'	,'<'	,'<'	,'<'	,' '	,'<'	,'>'	,'<'	,'>'},// >, <, <=, >=, ==, !=
+	{'<'	,'<'	,'<'	,'<'	,'>'	,'<'	,'>'	,'<'	,'>'},// >, <, <=, >=, ==, !=
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'='	,'<'	,' '},// (	
 	{'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'    ,' '	,'>'},// )
 	{' '	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// i
@@ -86,7 +86,7 @@ void expresionParse(tokenType actual,scanerData *sData)
     stackInit(&stack);
     stackPush(&stack,O_DOLAR);
 
-    while (stackHead(&stack)!=O_DOLAR||actual!=O_DOLAR)
+    while (stackTop(&stack)!=O_DOLAR||actual!=T_EOF)
     {
         debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(&stack))); 
         stackPrint(&stack)   ; 
@@ -103,11 +103,6 @@ void expresionParse(tokenType actual,scanerData *sData)
                 break; 
             case '>':
                 reduction(&stack);
-                /*while (stackHead(&stack)!=O_HANDLE)
-                {
-                    stackPop(&stack);
-                }     
-                stackPop(&stack);    */ 
                 break;
             case ' ':
                 errorD(99,"syntax error");
@@ -139,6 +134,15 @@ void reduction(stack *s)
         break;
         case NE_EXP:
             id2=aux;
+        break;
+        case T_RBR:
+            if(stackPop(s)!=NE_EXP)
+                errorD(-1,"expresion in bracked err");
+            if(stackPop(s)!=T_LBR)
+                errorD(-1,"expresion in bracked err");
+            stackRemoveHande(s);
+            stackPush(s,NE_EXP);    
+            return;
         break;
         default:
             errorD(-1,"sa reduction err");
@@ -203,6 +207,7 @@ int getPosInTable(tokenType toDecode)
     case T_DOT2:
         return 3;   
     case T_GT:
+    case T_LT:
     case T_LTE:
     case T_GTE:  
     case T_EQ:
