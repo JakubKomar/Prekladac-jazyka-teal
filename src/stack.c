@@ -46,6 +46,49 @@ tokenType stackHead(stack *s)
     return s->array[s->last-1];
 }
 
+tokenType stackTop(stack *s)
+{
+    for (int i =s->last-1; i>=0 ;i--)
+    {
+        if(s->array[i]<O_HANDLE)
+        {
+            return s->array[i];
+        }
+    }
+    return O_ERR;
+}
+
+void stackInsertHanle(stack *s)
+{
+    int i =s->last-1;
+    for (; i>=0 ;i--)
+    {
+        if(s->array[i]<O_HANDLE)
+        {
+            break;
+        }
+    }
+    if(i>s->last-1)
+        errorD(99,"cant insert handle behind dolar");
+    stackShiftRight(s,i);
+    s->array[i+1]=O_HANDLE;
+}
+
+void stackRemoveHande(stack *s)
+{
+    if(stackPop(s)!=O_HANDLE)
+        errorD(99,"handle isnt on top of stack");
+}
+
+void stackShiftRight(stack *s,int wege)
+{
+    stackPush(s,O_UNIMPORTANT);
+    for (int i =s->last-1; i>wege ;i--)
+    {
+        s->array[i]=s->array[i-1];
+    }   
+}   
+
 void stackDestruct(stack *s)
 {
     free(s->array);
