@@ -116,3 +116,8 @@ bool stackEmpty(stack *s)
 {
     return s->last==0;
 }
+
+void stackClear(stack *s)
+{
+    s->last=0;
+}

@@ -122,3 +122,5 @@ void initScanerData(scanerData * data);
  * @param *data scanner data
 */
 void loadChar(scanerData * data);
+
+void destructScanerData(scanerData * data);

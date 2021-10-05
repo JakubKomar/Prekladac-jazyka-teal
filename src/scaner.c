@@ -395,6 +395,11 @@ void initScanerData(scanerData * data)
     loadChar(data);
 } 
 
+void destructScanerData(scanerData * data)
+{
+    stringDestruct(&data->fullToken);
+}
+
 void loadChar(scanerData * data)
 {
     data->curentSymbol=fgetc(INPUT);

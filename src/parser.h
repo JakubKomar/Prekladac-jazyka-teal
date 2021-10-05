@@ -4,24 +4,12 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
+
 #include "baseDeclarations.h"
 #include "scaner.h"
 #include "expresionParser.h"
 #include "stack.h"
-
-typedef struct {
-    stack stack;
-    token actualToken;   
-}parserData;
-
-
-typedef struct {
-    scanerData sData;
-    parserData pData;
-    expresionParserData epData;
-    //memory model
-}systemData;
-
+#include "programData.h"
 
 
 void systemDataInit(systemData * data);

@@ -69,3 +69,5 @@ bool stackFull(stack *s);
  * @param *s stack to print
  */
 void stackPrint(stack *s);
+
+void stackClear(stack *s);

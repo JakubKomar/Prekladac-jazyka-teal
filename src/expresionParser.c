@@ -80,29 +80,30 @@ bool isOperator(tokenType toCompere)     //nebude ve finální verzi, pouze pro 
     return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_DOT2||toCompere==T_STR_LEN;
 }
 
-void expresionParse(token actual,scanerData *sData)
+void expresionParse(systemData *sData)
 {
-    stack stack;
-    stackInit(&stack);
-    stackPush(&stack,(token){O_DOLAR,NULL});
+    stack * stack=&sData->epData.stack;
+    token actual =sData->pData.actualToken;
+    stackClear(stack);
+    stackPush(stack,(token){O_DOLAR,NULL});
 
-    while (stackTop(&stack).type!=O_DOLAR||actual.type!=T_EOF)
+    while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
-        //debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(&stack))); 
-        //stackPrint(&stack)   ; 
-        switch (getSymFromPrecTable(actual.type,stackTop(&stack).type))
+        debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
+        stackPrint(stack)  ; 
+        switch (getSymFromPrecTable(actual.type,stackTop(stack).type))
         {
             case '=':
-                stackPush(&stack,actual);
-                actual=getNextUsefullToken(sData);
+                stackPush(stack,actual);
+                actual=getNextUsefullToken(&sData->sData);
                 break;
             case '<':
-                stackInsertHanle(&stack);
-                stackPush(&stack,actual);
-                actual=getNextUsefullToken(sData);
+                stackInsertHanle(stack);
+                stackPush(stack,actual);
+                actual=getNextUsefullToken(&sData->sData);
                 break; 
             case '>':
-                reduction(&stack);
+                reduction(stack);
                 break;
             case ' ':
                 errorD(99,"syntax error");
@@ -112,7 +113,7 @@ void expresionParse(token actual,scanerData *sData)
                 break;
         }
     }
-    stackDestruct(&stack);
+    sData->pData.actualToken=actual;
 } 
 
 void reduction(stack *s)
@@ -226,4 +227,14 @@ int getPosInTable(tokenType toDecode)
         default:
             return 8;
     }
+}
+
+void initExpresionData(expresionParserData *data)
+{   
+    stackInit(&data->stack);
+}
+
+void destructExpresionData(expresionParserData *data)
+{   
+    stackDestruct(&data->stack);
 }

@@ -4,7 +4,6 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #include "parser.h"
-#include <signal.h>
 
 void parserMain()
 {
@@ -26,7 +25,7 @@ void parserMain()
         else if(stackHead(stack).type==S_EXPRESION)
         {
             stackPop(stack);
-            actualToken=expresionDevelop(actualToken,&sData.sData);
+            expresionParse(&sData);
         }
         else
         {
@@ -51,16 +50,33 @@ void initParserData(parserData * data)
     stackPush(&(data->stack),(token){N_START,NULL});
 }
 
+void destructParserData(parserData * data)
+{
+    stackDestruct(&(data->stack));
+}
 
 void systemDataInit(systemData * data)
 {
-    initScanerData(&(data->sData));
-    initParserData(&(data->pData));
+    data->sDataAloc=false;
+    data->pDataAloc=false;
+    data->epDataAloc=false;
+
+    initScanerData(&data->sData);
+    data->sDataAloc=true;
+    initParserData(&data->pData);
+    data->pDataAloc=true;
+    initExpresionData(&data->epData);
+    data->epDataAloc=true;
 }
 
 void systemDataDestruct(systemData * data)
 {
-    initScanerData(&(data->sData));
+    if(data->sDataAloc)
+        destructScanerData(&data->sData);
+    if(data->pDataAloc)
+        destructParserData(&data->pData);
+    if(data->epDataAloc)
+        destructExpresionData(&data->epData);
 }
 
 void useLLtable(token Token,stack *stack) 

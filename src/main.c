@@ -50,6 +50,7 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
         }
         stringDestruct(&(scData.fullToken));
     }
+    /*
     else if(expresionOnlyF)
     {
         scanerData scData;
@@ -60,6 +61,6 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
             actualToken=getNextUsefullToken(&scData);
             expresionParse(actualToken,&scData);
         }
-    }
+    }*/
     exit(0);
 }
