@@ -15,6 +15,11 @@ void stackInit(stack *s)
         errorD(100,"Stack initialization error");
 }
 
+void stackDestruct(stack *s)
+{
+    free(s->array);
+}
+
 void stackRealoc(stack *s)
 {
     s->capacity=s->capacity*2;
@@ -46,18 +51,6 @@ token stackHead(stack *s)
     return s->array[s->last-1];
 }
 
-token stackTop(stack *s)
-{
-    for (int i =s->last-1; i>=0 ;i--)
-    {
-        if(s->array[i].type <O_HANDLE)
-        {
-            return s->array[i];
-        }
-    }
-    return (token){O_ERR,NULL};
-}
-
 void stackInsertHanle(stack *s)
 {
     int i =s->last-1;
@@ -72,31 +65,6 @@ void stackInsertHanle(stack *s)
         errorD(99,"cant insert handle behind dolar");
     stackShiftRight(s,i);
     s->array[i+1].type=O_HANDLE;
-}
-
-void stackRemoveHande(stack *s)
-{
-    if(stackPop(s).type!=O_HANDLE)
-        errorD(99,"handle isnt on top of stack");
-}
-
-void stackShiftRight(stack *s,int wege)
-{
-    token empty={O_UNIMPORTANT,NULL};
-    stackPush(s,empty);
-    for (int i =s->last-1; i>wege ;i--)
-    {
-        s->array[i]=s->array[i-1];
-    }   
-}   
-
-void stackDestruct(stack *s)
-{
-    while (!stackEmpty(s))
-    {
-        stackPop(s);
-    }
-    free(s->array);
 }
 
 void stackPrint(stack *s)
@@ -121,3 +89,33 @@ void stackClear(stack *s)
 {
     s->last=0;
 }
+
+/************** expresion parser function **************/
+
+token stackTop(stack *s)
+{
+    for (int i =s->last-1; i>=0 ;i--)
+    {
+        if(s->array[i].type <O_HANDLE)
+        {
+            return s->array[i];
+        }
+    }
+    return (token){O_ERR,NULL};
+}
+
+void stackRemoveHande(stack *s)
+{
+    if(stackPop(s).type!=O_HANDLE)
+        errorD(99,"handle isnt on top of stack");
+}
+
+void stackShiftRight(stack *s,int wege)
+{
+    token empty={O_UNIMPORTANT,NULL};
+    stackPush(s,empty);
+    for (int i =s->last-1; i>wege ;i--)
+    {
+        s->array[i]=s->array[i-1];
+    }   
+}   

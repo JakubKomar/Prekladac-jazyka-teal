@@ -17,7 +17,7 @@ typedef struct {
     string fullToken;
 }scanerData;
 
-//states of state machines
+/**states of state machine**/
 typedef enum{       
     S_START,
     S_ID,
@@ -118,9 +118,12 @@ bool isDecimal(char toCompare);
 */ 
 void initScanerData(scanerData * data);
 /**
+ * destriction function for scanner
+ * @param *data data to destruct
+*/ 
+void destructScanerData(scanerData * data);
+/**
  * loading next char from input, menwhile harvesting actual pozition in file for error masseges
  * @param *data scanner data
 */
 void loadChar(scanerData * data);
-
-void destructScanerData(scanerData * data);

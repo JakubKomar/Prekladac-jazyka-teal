@@ -1,3 +1,10 @@
+/**
+ * @brief   data structures for mains part of program
+ *
+ * @authors Jakub Komárek (xkomar33)
+ */
+
+
 #pragma once
 #include "baseDeclarations.h"
 #include "scaner.h"

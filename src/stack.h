@@ -49,9 +49,6 @@ token stackHead(stack *s);
  * @return  first terminal on stack
  */
 token stackTop(stack *s);
-void stackInsertHanle(stack *s);
-void stackRemoveHande(stack *s);
-void stackShiftRight(stack *s,int wege);
 /**
  * checking if stack is empty
  * @param *s stack to check
@@ -69,5 +66,27 @@ bool stackFull(stack *s);
  * @param *s stack to print
  */
 void stackPrint(stack *s);
-
+/**
+ * clear all items from stack
+ * @param *s stack to operate whith
+*/
 void stackClear(stack *s);
+
+/************** expresion parser function **************/
+
+/**
+ * inserting hadle before terminal
+ * @param *s stack to operate whith
+ */
+void stackInsertHanle(stack *s);
+/**
+ * removing handle from stack- if there is no handle->error
+ * @param *s stack to operate whith
+ */
+void stackRemoveHande(stack *s);
+/**
+ * shift all item from wage in stack to right 
+ * @param *s stack to operate whith
+ * @param wage index in stack 
+ */
+void stackShiftRight(stack *s,int wege);

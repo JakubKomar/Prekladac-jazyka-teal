@@ -1,5 +1,5 @@
 /**
- * @brief   Zpracování výrazů
+ * @brief   Expresion parsing
  *
  * @authors Jakub Komárek (xkomar33)
  */
@@ -18,17 +18,6 @@ const char precTable[10][10] =
 	{' '	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// i
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
-
-
-bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
-{
-    return toCompere==T_STR||toCompere==T_INT||toCompere==K_NIL||toCompere==T_DOUBLE||toCompere==T_ID;
-}
-
-bool isOperator(tokenType toCompere)     //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
-{
-    return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_DOT2||toCompere==T_STR_LEN;
-}
 
 void expresionParse(systemData *sData)
 {
@@ -56,7 +45,7 @@ void expresionParse(systemData *sData)
                 reduction(stack);
                 break;
             case ' ':
-                errorD(99,"syntax error");
+                errorD(2,"syntax error");
                 break;
             default:
                 errorD(99,"precedence table error");
@@ -88,15 +77,15 @@ void reduction(stack *s)
         break;
         case T_RBR:
             if(stackPop(s).type!=NE_EXP)
-                errorD(-1,"expresion in bracked err");
+                errorD(2,"expresion in bracked err");
             if(stackPop(s).type!=T_LBR)
-                errorD(-1,"expresion in bracked err");
+                errorD(2,"expresion in bracked err");
             stackRemoveHande(s);
             stackPush(s,(token){NE_EXP,NULL});    
             return;
         break;
         default:
-            errorD(-1,"sa reduction err");
+            errorD(2,"sa reduction err");
     }
     aux=stackPop(s).type;
     switch (aux)
@@ -112,7 +101,7 @@ void reduction(stack *s)
             if(isOperator(aux))
                 op.type=aux;
             else
-                errorD(-1,"sa reduction err");
+                errorD(2,"sa reduction err");
     }
     aux=stackPop(s).type;
     switch (aux)
@@ -125,7 +114,7 @@ void reduction(stack *s)
             return;
         break;
         default:
-            errorD(-1,"sa reduction err");
+            errorD(2,"sa reduction err");
     }
 }
 
@@ -188,3 +177,14 @@ void destructExpresionData(expresionParserData *data)
 {   
     stackDestruct(&data->stack);
 }
+
+bool isId(tokenType toCompere)   
+{
+    return toCompere==T_STR||toCompere==T_INT||toCompere==K_NIL||toCompere==T_DOUBLE||toCompere==T_ID;
+}
+
+bool isOperator(tokenType toCompere)    
+{
+    return toCompere==T_DIV2||toCompere==T_DIV||toCompere==T_MUL||toCompere==T_ADD||toCompere==T_SUB||toCompere==T_STR_LEN||toCompere==T_EQ||toCompere==T_NOT_EQ||toCompere==T_LT||toCompere==T_LTE||toCompere==T_GT||toCompere==T_GTE||toCompere==T_DOT2||toCompere==T_STR_LEN;
+}
+

@@ -51,14 +51,14 @@ typedef enum{
     K_INTEGER,
     K_STRING,
     K_NUMBER,
-    //ostatní
+    //other
     O_DOLAR,
-    O_HANDLE,   //začátek handle
+    O_HANDLE,   //begining of handle
     O_NONE,
-    O_ERR,      //nesmí nastat // ze scenru se nevypíše
-    O_UNIMPORTANT,//token nebude zapsán do listu-není důležitý // ze scenru se nevypíše
+    O_ERR,      //error state
+    O_UNIMPORTANT,//token isnt importat for function of code
     S_EXPRESION,
-    //neterminály
+    //nonterminals
     N_START,
     N_PROLOG,
     N_PROG,
@@ -100,7 +100,7 @@ typedef struct {
 }token;
 
 /**
- * returning string name of token for debuging purpose
+ * returning string name of token for debuging purporse
  * @param type token type for string converzion
  * @return string name of token
 */

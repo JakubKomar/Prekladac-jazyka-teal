@@ -1,5 +1,5 @@
 /**
- * @brief   Sym table probably...
+ * @brief   Sym table 
  *
  * @authors Jakub Komárek (xkomar33)
  */

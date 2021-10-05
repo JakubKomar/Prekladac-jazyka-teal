@@ -1,5 +1,5 @@
 /**
- * @brief   Zpracování výrazů
+ * @brief   Expresion parsing
  *
  * @authors Jakub Komárek (xkomar33)
  */

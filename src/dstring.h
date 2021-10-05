@@ -11,9 +11,9 @@
 
 typedef struct
 {
-  unsigned int length;		// skutecna delka retezce
-  unsigned int capacity;	// velikost alokovane pameti
-  char* str;		// misto pro dany retezec ukonceny znakem '\0'
+  unsigned int length;		// real len of string
+  unsigned int capacity;	// alocatede len of string
+  char* str;		          // pointer to string ended by '\0'
 } string;
 
 /**
