@@ -10,7 +10,7 @@ void stringInit(string *s)
    s->capacity=STRING_BASE_SIZE;
    s->str=malloc(sizeof(char)*s->capacity);
    if(!s->str)
-      errorD(99,"Dynamic string alocation error");
+      errorD(100,"Dynamic string alocation error");
    stringClear(s);
 }
 
@@ -49,7 +49,7 @@ void stringRealoc(string *s)
    s->capacity=s->capacity*2;
    s->str=realloc(s->str,sizeof(char)*s->capacity);
    if(!s->str)
-      errorD(99,"Dynamic string realocation error");
+      errorD(100,"Dynamic string realocation error");
 }
 
 void stringRealocToSize(string *s,int newSize)
@@ -57,7 +57,7 @@ void stringRealocToSize(string *s,int newSize)
    s->capacity=newSize;
    s->str=realloc(s->str,sizeof(char)*s->capacity);
    if(!s->str)
-      errorD(99,"Dynamic string realocation error");
+      errorD(100,"Dynamic string realocation error");
 }
 
 void stringCopy(string *s1, string *s2)

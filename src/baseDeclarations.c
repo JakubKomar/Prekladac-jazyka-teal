@@ -1,3 +1,8 @@
+/**
+ * @brief  error handeling functions
+ *
+ * @authors Jakub Komárek (xkomar33)
+ */
 #include "baseDeclarations.h"
 
 void error(int code)
@@ -13,7 +18,7 @@ void errorD(int code,char * description)
     if(code){
         printError(code);
         fprintf(stderr,"More detailes: %s\n",description);
-        exit(code);
+        longjmp(errorHandelingJump, code);
     } 
 }
 

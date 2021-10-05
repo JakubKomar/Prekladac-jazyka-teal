@@ -5,14 +5,14 @@
  */
 #pragma once
 
-#include "./baseDeclarations.h"
-
+#include "baseDeclarations.h"
+#include "tokens.h"
 #define STACK_BASE_SIZE 100  //počateční velkost zásobníku
 
 typedef struct {
     unsigned int capacity;   //Velikost zásobníku
     unsigned int last;    //Spodek zásobníku
-    tokenType *array;   //Pole pro zásobník
+    token *array;   //Pole pro zásobník
 }stack;
 
 /**
@@ -30,28 +30,25 @@ void stackDestruct(stack *s);
  * @param *s stack to push
  * @param type token to push
  */
-void stackPush(stack *s, tokenType type);
+void stackPush(stack *s, token type);
 /**
  * stack pop operation
  * @param *s stack to pop
  * @return poped token
  */
-tokenType stackPop(stack *s);
+token stackPop(stack *s);
 /**
  * return head of stack
  * @param *s stack to operate whith
  * @return head of stack
  */
-tokenType stackHead(stack *s);
+token stackHead(stack *s);
 /**
  * return first terminal on stack
  * @param *s stack to operate whith
  * @return  first terminal on stack
  */
-tokenType stackTop(stack *s);
-void stackInsertHanle(stack *s);
-void stackRemoveHande(stack *s);
-void stackShiftRight(stack *s,int wege);
+token stackTop(stack *s);
 /**
  * checking if stack is empty
  * @param *s stack to check
@@ -69,3 +66,27 @@ bool stackFull(stack *s);
  * @param *s stack to print
  */
 void stackPrint(stack *s);
+/**
+ * clear all items from stack
+ * @param *s stack to operate whith
+*/
+void stackClear(stack *s);
+
+/************** expresion parser function **************/
+
+/**
+ * inserting hadle before terminal
+ * @param *s stack to operate whith
+ */
+void stackInsertHanle(stack *s);
+/**
+ * removing handle from stack- if there is no handle->error
+ * @param *s stack to operate whith
+ */
+void stackRemoveHande(stack *s);
+/**
+ * shift all item from wage in stack to right 
+ * @param *s stack to operate whith
+ * @param wage index in stack 
+ */
+void stackShiftRight(stack *s,int wege);

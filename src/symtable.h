@@ -4,19 +4,21 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
+#include "tokens.h"
+#include "dstring.h"
+#include "baseDeclarations.h"
 
-#include "./baseDeclarations.h"
+typedef struct {
+    tokenType type;
+    string text;
+} bData;
 
 typedef struct bNode {
     char *key;
-    struct bData *data;
-    struct bNode *lPtr;
+    bData data;
+    struct bNode * lPtr;
     struct bNode *rPtr;
 } *bNodePtr;
-
-typedef struct bData{
-    int data;
-} *bDataPtr;
 
 /**
  * binary tree inicialization
@@ -33,12 +35,12 @@ void bDestruct(bNodePtr *tree);
  * @param *tree-tree to search from
  * @return finded-pointer to searched node, not finded - NULL
  */ 
-bDataPtr bSearch(bNodePtr *tree, char *key);
+bNodePtr bSearch(bNodePtr *tree, char *key);
 /**
  * binary tree insertion
  * @param *tree-tree to insert,* key-key from inserted node, data-iformation to insert
  */ 
-void bInsert(bNodePtr *tree, char *key, bDataPtr data);
+void bInsert(bNodePtr *tree, char *key, bData data);
 /**
  * binary tree auxiliary function
  */ 

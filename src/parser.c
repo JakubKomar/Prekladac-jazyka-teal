@@ -4,56 +4,79 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #include "parser.h"
-#include <signal.h>
 
-void parserMain(){
-    scanerData scData;
-    initScanerData(&scData);
-    tokenType actualToken=getNextUsefullToken(&scData);
-    stack stack;
-    stackInit(&stack);
-    stackPush(&stack,T_EOF);
-    stackPush(&stack,N_START);
-    while (!stackEmpty(&stack))
+void parserMain(systemData * sData)
+{
+    sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+    stack * stack=&(sData->pData.stack);
+
+    while (!stackEmpty(stack))
     {    
-        debug("actual token: %s\n",tokenStr(actualToken));    
-        stackPrint(&stack);
+        debug("actual token: %s\n",tokenStr(sData->pData.actualToken));    
+        stackPrint(stack);
         debugS("-------------------------------------------------------\n");  
-        if(stackHead(&stack)>=N_START)//pokud neterminál
+        if(stackHead(stack).type>=N_START)//pokud neterminál
         {
-            useLLtable(actualToken,&stack);
+            useLLtable(sData->pData.actualToken,stack);
         }
-        else if(stackHead(&stack)==S_EXPRESION)
+        else if(stackHead(stack).type==S_EXPRESION)
         {
-            stackPop(&stack);
-            actualToken=expresionDevelop(actualToken,&scData);
+            stackPop(stack);
+            expresionParse(sData);
         }
         else
         {
-            if(stackHead(&stack)==actualToken)
+            if(stackHead(stack).type==sData->pData.actualToken.type)
             {
-                stackPop(&stack);
-                debug("conzume: %s\n",tokenStr(actualToken));
-                actualToken=getNextUsefullToken(&scData);
+                stackPop(stack);
+                debug("conzume: %s\n",tokenStr(sData->pData.actualToken));
+                sData->pData.actualToken=getNextUsefullToken(&sData->sData);
             }
             else
             {
                 errorD(2,"Terminál na zásabníku se neschoduje s aktuálním terminálem");
             }
         }
-    }   
+    } 
 }
 
-void useLLtable(tokenType actualToken,stack *stack) 
+void initParserData(parserData * data)
 {
-    switch (stackPop(stack))
+    stackInit(&(data->stack));
+    stackPush(&(data->stack),(token){T_EOF,NULL});
+    stackPush(&(data->stack),(token){N_START,NULL});
+}
+
+void destructParserData(parserData * data)
+{
+    stackDestruct(&(data->stack));
+}
+
+void systemDataInit(systemData * data)
+{
+    initScanerData(&data->sData);
+    initParserData(&data->pData);
+    initExpresionData(&data->epData);
+}
+
+void systemDataDestruct(systemData * data)
+{
+    destructScanerData(&data->sData);
+    destructParserData(&data->pData);
+    destructExpresionData(&data->epData);
+}
+
+void useLLtable(token Token,stack *stack) 
+{
+    tokenType actualToken=Token.type;
+    switch (stackPop(stack).type)
     {
         case N_START:
             switch (actualToken)
             {
                 case K_REQUIRE: 
-                    stackPush(stack,N_PROG);
-                    stackPush(stack,N_PROLOG); 
+                    stackPush(stack,(token){N_PROG,NULL});
+                    stackPush(stack,(token){N_PROLOG,NULL}); 
                 break;    
                 default:
                     LLTableErr();
@@ -64,8 +87,8 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_REQUIRE:
-                    stackPush(stack,T_STR);  
-                    stackPush(stack,K_REQUIRE);
+                    stackPush(stack,(token){T_STR,NULL});  
+                    stackPush(stack,(token){K_REQUIRE,NULL});
                 break;    
                 default:
                     LLTableErr();
@@ -79,45 +102,45 @@ void useLLtable(tokenType actualToken,stack *stack)
     
                 break;   
                 case T_ID:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_EXP_OR_FUNC); 
-                    stackPush(stack,T_ASSIGEN); 
-                    stackPush(stack,N_ID_NEXT); 
-                    stackPush(stack,T_ID); 
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_EXP_OR_FUNC,NULL}); 
+                    stackPush(stack,(token){T_ASSIGEN,NULL}); 
+                    stackPush(stack,(token){N_ID_NEXT,NULL}); 
+                    stackPush(stack,(token){T_ID,NULL}); 
                 break;  
                 case T_FUNC_CALL:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_FUNC_CALL);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_FUNC_CALL,NULL});  
                 break;  
                 case K_WHILE:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_WHILE);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_WHILE,NULL});  
                 break;  
                 case K_END:
 
                 break;  
                 case K_IF:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_IF);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_IF,NULL});  
                 break; 
                 case K_ELSE:
 
                 break; 
                 case K_FUNCTION:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_FUNCTION);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_FUNCTION,NULL});  
                 break; 
                 case K_RETURN:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_RETURN);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_RETURN,NULL});  
                 break; 
                 case K_LOCAL:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_DECLARATION);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_DECLARATION,NULL});  
                 break; 
                 case K_GLOBAL:
-                    stackPush(stack,N_PROG);  
-                    stackPush(stack,N_DECLARATION);  
+                    stackPush(stack,(token){N_PROG,NULL});  
+                    stackPush(stack,(token){N_DECLARATION,NULL});  
                 break; 
                 default:
                     LLTableErr();
@@ -133,11 +156,11 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case K_NIL:
                 case T_DOUBLE:
                 case T_ID: 
-                    stackPush(stack,N_EXPRESIONS);
-                    stackPush(stack,S_EXPRESION); 
+                    stackPush(stack,(token){N_EXPRESIONS,NULL});
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
                 break;  
                 case T_FUNC_CALL: 
-                    stackPush(stack,N_FUNC_CALL);
+                    stackPush(stack,(token){N_FUNC_CALL,NULL});
                 break;  
                 default:
                     LLTableErr();
@@ -148,9 +171,9 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_FUNC_CALL: 
-                    stackPush(stack,T_RBR); 
-                    stackPush(stack,N_F_ARG); 
-                    stackPush(stack,T_FUNC_CALL); 
+                    stackPush(stack,(token){T_RBR,NULL}); 
+                    stackPush(stack,(token){N_F_ARG,NULL}); 
+                    stackPush(stack,(token){T_FUNC_CALL,NULL}); 
                 break;  
                 default:
                     LLTableErr();
@@ -169,8 +192,8 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case K_NIL:
                 case T_DOUBLE:
                 case T_ID: 
-                    stackPush(stack,N_F_ARG_N); 
-                    stackPush(stack,S_EXPRESION); 
+                    stackPush(stack,(token){N_F_ARG_N,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
                 break;  
                 default:
                     LLTableErr();
@@ -184,9 +207,9 @@ void useLLtable(tokenType actualToken,stack *stack)
 
                 break;  
                 case T_COMMA: 
-                    stackPush(stack,N_F_ARG_N); 
-                    stackPush(stack,S_EXPRESION); 
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_F_ARG_N,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;  
                 default:
                     LLTableErr();
@@ -200,9 +223,9 @@ void useLLtable(tokenType actualToken,stack *stack)
 
                 break;   
                 case T_COMMA: 
-                    stackPush(stack,N_ID_NEXT); 
-                    stackPush(stack,T_ID); 
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_ID_NEXT,NULL}); 
+                    stackPush(stack,(token){T_ID,NULL}); 
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;  
                 default:
                     LLTableErr();
@@ -226,9 +249,9 @@ void useLLtable(tokenType actualToken,stack *stack)
 
                 break; 
                 case T_COMMA: 
-                    stackPush(stack,N_EXPRESIONS); 
-                    stackPush(stack,S_EXPRESION); 
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_EXPRESIONS,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;  
                 default:
                     LLTableErr();
@@ -239,11 +262,11 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_WHILE: 
-                    stackPush(stack,K_END); 
-                    stackPush(stack,N_PROG); 
-                    stackPush(stack,K_DO); 
-                    stackPush(stack,S_EXPRESION); 
-                    stackPush(stack,K_WHILE); 
+                    stackPush(stack,(token){K_END,NULL}); 
+                    stackPush(stack,(token){N_PROG,NULL}); 
+                    stackPush(stack,(token){K_DO,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
+                    stackPush(stack,(token){K_WHILE,NULL}); 
                 break;   
                 default:
                     LLTableErr();
@@ -254,12 +277,12 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_IF: 
-                    stackPush(stack,K_END); 
-                    stackPush(stack,N_ELSE_M); 
-                    stackPush(stack,N_PROG); 
-                    stackPush(stack,K_THEN); 
-                    stackPush(stack,S_EXPRESION); 
-                    stackPush(stack,K_IF); 
+                    stackPush(stack,(token){K_END,NULL}); 
+                    stackPush(stack,(token){N_ELSE_M,NULL}); 
+                    stackPush(stack,(token){N_PROG,NULL}); 
+                    stackPush(stack,(token){K_THEN,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
+                    stackPush(stack,(token){K_IF,NULL}); 
                 break;   
                 default:
                     LLTableErr();
@@ -273,8 +296,8 @@ void useLLtable(tokenType actualToken,stack *stack)
 
                 break; 
                 case K_ELSE: 
-                    stackPush(stack,N_PROG); 
-                    stackPush(stack,K_ELSE); 
+                    stackPush(stack,(token){N_PROG,NULL}); 
+                    stackPush(stack,(token){K_ELSE,NULL}); 
                 break;   
                 default:
                     LLTableErr();
@@ -285,13 +308,13 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_FUNCTION: 
-                    stackPush(stack,K_END); 
-                    stackPush(stack,N_PROG); 
-                    stackPush(stack,N_RETURN_D); 
-                    stackPush(stack,T_RBR); 
-                    stackPush(stack,N_ARG); 
-                    stackPush(stack,T_FUNC_CALL); 
-                    stackPush(stack,K_FUNCTION);
+                    stackPush(stack,(token){K_END,NULL}); 
+                    stackPush(stack,(token){N_PROG,NULL}); 
+                    stackPush(stack,(token){N_RETURN_D,NULL}); 
+                    stackPush(stack,(token){T_RBR,NULL}); 
+                    stackPush(stack,(token){N_ARG,NULL}); 
+                    stackPush(stack,(token){T_FUNC_CALL,NULL}); 
+                    stackPush(stack,(token){K_FUNCTION,NULL});
                 break;   
                 default:
                     LLTableErr();
@@ -302,10 +325,10 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_ID: 
-                    stackPush(stack,N_ARGNEXT); 
-                    stackPush(stack,N_TYPE); 
-                    stackPush(stack,T_COLON); 
-                    stackPush(stack,T_ID); 
+                    stackPush(stack,(token){N_ARGNEXT,NULL}); 
+                    stackPush(stack,(token){N_TYPE,NULL}); 
+                    stackPush(stack,(token){T_COLON,NULL}); 
+                    stackPush(stack,(token){T_ID,NULL}); 
                 break; 
                 case T_RBR: 
                 break;  
@@ -320,11 +343,11 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case T_RBR: 
                 break;  
                 case T_COMMA: 
-                    stackPush(stack,N_ARGNEXT); 
-                    stackPush(stack,N_TYPE); 
-                    stackPush(stack,T_COLON); 
-                    stackPush(stack,T_ID);  
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_ARGNEXT,NULL}); 
+                    stackPush(stack,(token){N_TYPE,NULL}); 
+                    stackPush(stack,(token){T_COLON,NULL}); 
+                    stackPush(stack,(token){T_ID,NULL});  
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;   
                 default:
                     LLTableErr();
@@ -335,9 +358,9 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_COLON: 
-                    stackPush(stack,N_RETURN_DN); 
-                    stackPush(stack,N_TYPE); 
-                    stackPush(stack,T_COLON); 
+                    stackPush(stack,(token){N_RETURN_DN,NULL}); 
+                    stackPush(stack,(token){N_TYPE,NULL}); 
+                    stackPush(stack,(token){T_COLON,NULL}); 
                 break;   
                 case T_ID:
                 case T_FUNC_CALL:
@@ -359,9 +382,9 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_COMMA: 
-                    stackPush(stack,N_RETURN_DN); 
-                    stackPush(stack,N_TYPE); 
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_RETURN_DN,NULL}); 
+                    stackPush(stack,(token){N_TYPE,NULL}); 
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;  
                 case T_ID:
                 case T_FUNC_CALL:
@@ -383,8 +406,8 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_RETURN: 
-                    stackPush(stack,N_RETURN_ARG); 
-                    stackPush(stack,K_RETURN); 
+                    stackPush(stack,(token){N_RETURN_ARG,NULL}); 
+                    stackPush(stack,(token){K_RETURN,NULL}); 
                 break;   
                 default:
                     LLTableErr();
@@ -400,8 +423,8 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case K_NIL:
                 case T_DOUBLE:
                 case T_ID: 
-                    stackPush(stack,N_RETURN_ARG_N); 
-                    stackPush(stack,S_EXPRESION); 
+                    stackPush(stack,(token){N_RETURN_ARG_N,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
                 break;   
                 case K_END:
                 case K_ELSE:
@@ -417,9 +440,9 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_COMMA: 
-                    stackPush(stack,N_RETURN_ARG_N); 
-                    stackPush(stack,S_EXPRESION); 
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_RETURN_ARG_N,NULL}); 
+                    stackPush(stack,(token){S_EXPRESION,NULL}); 
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break; 
                 case K_END:
                 case K_ELSE:
@@ -436,10 +459,10 @@ void useLLtable(tokenType actualToken,stack *stack)
             {
                 case K_LOCAL: 
                 case K_GLOBAL: 
-                    stackPush(stack,N_DECLARATION_T);
-                    stackPush(stack,T_COLON);
-                    stackPush(stack,T_ID);
-                    stackPush(stack,N_RANGE);
+                    stackPush(stack,(token){N_DECLARATION_T,NULL});
+                    stackPush(stack,(token){T_COLON,NULL});
+                    stackPush(stack,(token){T_ID,NULL});
+                    stackPush(stack,(token){N_RANGE,NULL});
                 break;   
                 default:
                     LLTableErr();
@@ -453,16 +476,16 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case K_INTEGER: 
                 case K_STRING: 
                 case K_NIL:
-                    stackPush(stack,N_ASSIGEN_MAY);
-                    stackPush(stack,N_TYPE);
+                    stackPush(stack,(token){N_ASSIGEN_MAY,NULL});
+                    stackPush(stack,(token){N_TYPE,NULL});
                 break;  
                 case K_FUNCTION: 
-                    stackPush(stack,N_RET_D);
-                    stackPush(stack,T_COLON);
-                    stackPush(stack,T_RBR);
-                    stackPush(stack,N_ARG_D);
-                    stackPush(stack,T_LBR);
-                    stackPush(stack,K_FUNCTION);
+                    stackPush(stack,(token){N_RET_D,NULL});
+                    stackPush(stack,(token){T_COLON,NULL});
+                    stackPush(stack,(token){T_RBR,NULL});
+                    stackPush(stack,(token){N_ARG_D,NULL});
+                    stackPush(stack,(token){T_LBR,NULL});
+                    stackPush(stack,(token){K_FUNCTION,NULL});
                 break;      
                 default:
                     LLTableErr();
@@ -476,8 +499,8 @@ void useLLtable(tokenType actualToken,stack *stack)
                 case K_INTEGER: 
                 case K_STRING: 
                 case K_NIL:
-                    stackPush(stack,N_ARG_DN);
-                    stackPush(stack,N_TYPE);
+                    stackPush(stack,(token){N_ARG_DN,NULL});
+                    stackPush(stack,(token){N_TYPE,NULL});
                 break;  
                 case T_RBR: 
                     
@@ -491,9 +514,9 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_COMMA: 
-                    stackPush(stack,N_ARG_DN);
-                    stackPush(stack,N_TYPE);
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_ARG_DN,NULL});
+                    stackPush(stack,(token){N_TYPE,NULL});
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;  
                 case T_RBR: 
                     
@@ -507,16 +530,16 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_COLON: 
-                    stackPush(stack,N_ARG_DN);
-                    stackPush(stack,N_TYPE);
-                    stackPush(stack,T_COLON); 
+                    stackPush(stack,(token){N_ARG_DN,NULL});
+                    stackPush(stack,(token){N_TYPE,NULL});
+                    stackPush(stack,(token){T_COLON,NULL}); 
                 break;  
                 case K_NUMBER: 
                 case K_INTEGER: 
                 case K_STRING: 
                 case K_NIL:
-                    stackPush(stack,N_RET_DN);
-                    stackPush(stack,N_TYPE);
+                    stackPush(stack,(token){N_RET_DN,NULL});
+                    stackPush(stack,(token){N_TYPE,NULL});
                 break;
                 case T_EOF: 
                 case T_ID:
@@ -540,9 +563,9 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_COMMA: 
-                    stackPush(stack,N_RET_DN);
-                    stackPush(stack,N_TYPE);
-                    stackPush(stack,T_COMMA); 
+                    stackPush(stack,(token){N_RET_DN,NULL});
+                    stackPush(stack,(token){N_TYPE,NULL});
+                    stackPush(stack,(token){T_COMMA,NULL}); 
                 break;  
                 case T_EOF: 
                 case T_ID:
@@ -566,8 +589,8 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case T_ASSIGEN: 
-                    stackPush(stack,N_EXP_OR_FUNC); 
-                    stackPush(stack,T_ASSIGEN); 
+                    stackPush(stack,(token){N_EXP_OR_FUNC,NULL}); 
+                    stackPush(stack,(token){T_ASSIGEN,NULL}); 
                 break;  
                 case T_EOF: 
                 case T_ID:
@@ -591,16 +614,16 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_NUMBER: 
-                    stackPush(stack,K_NUMBER);
+                    stackPush(stack,(token){K_NUMBER,NULL});
                 break;    
                 case K_INTEGER: 
-                    stackPush(stack,K_INTEGER);
+                    stackPush(stack,(token){K_INTEGER,NULL});
                 break;    
                 case K_STRING: 
-                    stackPush(stack,K_STRING);
+                    stackPush(stack,(token){K_STRING,NULL});
                 break;
                 case K_NIL:
-                    stackPush(stack,K_NIL);
+                    stackPush(stack,(token){K_NIL,NULL});
                 break;
                 default:
                     LLTableErr();
@@ -611,10 +634,10 @@ void useLLtable(tokenType actualToken,stack *stack)
             switch (actualToken)
             {
                 case K_LOCAL: 
-                    stackPush(stack,K_LOCAL); 
+                    stackPush(stack,(token){K_LOCAL,NULL}); 
                 break; 
                 case K_GLOBAL: 
-                    stackPush(stack,K_GLOBAL); 
+                    stackPush(stack,(token){K_GLOBAL,NULL}); 
                 break;  
                 default:
                     LLTableErr();

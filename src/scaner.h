@@ -5,6 +5,9 @@
  */
 #pragma once
 #include "baseDeclarations.h"
+#include "dstring.h"
+#include "symtable.h"
+#include "tokens.h"
 
 typedef struct {
     char curentSymbol;
@@ -14,7 +17,7 @@ typedef struct {
     string fullToken;
 }scanerData;
 
-//states of state machines
+/**states of state machine**/
 typedef enum{       
     S_START,
     S_ID,
@@ -77,7 +80,7 @@ tokenType checkKeywords(scanerData *data);
  * @param *data scanner data
  * @return next usefull token
  */
-tokenType getNextUsefullToken(scanerData * data);
+token getNextUsefullToken(scanerData * data);
 /**
  * geting next token
  * @param *data scanner data
@@ -114,6 +117,11 @@ bool isDecimal(char toCompare);
  * @param *data data to incializate
 */ 
 void initScanerData(scanerData * data);
+/**
+ * destriction function for scanner
+ * @param *data data to destruct
+*/ 
+void destructScanerData(scanerData * data);
 /**
  * loading next char from input, menwhile harvesting actual pozition in file for error masseges
  * @param *data scanner data

@@ -1,9 +1,9 @@
 /**
- * @brief   Sym table probably...
+ * @brief   Sym table 
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#include "btree.h"
+#include "symtable.h"
 
 
 void bInit(bNodePtr *tree)
@@ -21,13 +21,13 @@ void bDestruct(bNodePtr *tree)
     }
 }
 
-void bInsert(bNodePtr *tree, char *key, bDataPtr data)
+void bInsert(bNodePtr *tree, char *key, bData data)
 {
     if(*tree==NULL)	//pokud uzel neexistuje, musí se vytvořit
 	{
 		*tree=malloc(sizeof(struct bNode));
 		if(*tree==NULL) //alakoce se nezdařila
-			errorD(99,"binary tree maloc error");	
+			errorD(100,"binary tree maloc error");	
 		//naplnění uzlu daty
 		(*tree)->lPtr=NULL;
 		(*tree)->rPtr=NULL;
@@ -69,13 +69,13 @@ void bDelete(bNodePtr *tree, char *key)
     }
 }
 
-bDataPtr bSearch(bNodePtr *tree, char *key)
+bNodePtr bSearch(bNodePtr *tree, char *key)
 {
     if(tree)
     {
         int cmp = strcmp(key, (*tree)->key);  
         if(cmp==0) 
-            return (*tree)->data;            
+            return (*tree);            
         if(cmp < 0) 
             return bSearch(&(*tree)->lPtr,key);
         else
