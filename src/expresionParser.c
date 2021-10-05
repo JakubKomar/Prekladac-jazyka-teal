@@ -19,56 +19,6 @@ const char precTable[10][10] =
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
 
-token expresionDevelop(token actual,scanerData *sData)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky,
-{
-    bool operatorFlag=false;
-    bool firstOperant=true;
-    bool instideBracked=false;
-    while(true)
-    {
-        printf("-----------------------------------------------------debug:%s\n",tokenStr(actual));
-        if(actual.type==T_STR_LEN&&firstOperant)
-        {
-
-        }
-        else if(firstOperant)
-        {
-            if(isId(actual.type))
-            {
-                firstOperant=false;
-            }
-            else
-                errorD(99,"šatný expression");
-        }
-        else if(operatorFlag)
-        {
-            if(isId(actual.type))
-            {
-                operatorFlag=false;
-            }
-            else
-                errorD(99,"šatný expression");
-        }
-        else if(isOperator(actual.type))
-        {
-            if(actual.type==T_LBR)
-                instideBracked=true;
-            else
-                operatorFlag=true;
-        }
-        else if(instideBracked)
-        {
-            if(actual.type==T_RBR)
-                instideBracked=false;
-        }
-        else
-        {
-            break;              
-        }
-        actual=getNextUsefullToken(sData);
-    }   
-    return actual;
-}
 
 bool isId(tokenType toCompere)   //nebude ve finální verzi, pouze pro účekly testu ll gramatiky
 {

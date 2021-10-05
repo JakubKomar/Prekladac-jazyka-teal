@@ -92,7 +92,7 @@ typedef enum{
     NE_EXP,
 }tokenType;
 
-#include "btree.h"
+#include "symtable.h"
 
 typedef struct {
     tokenType type;

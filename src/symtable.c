@@ -3,7 +3,7 @@
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#include "btree.h"
+#include "symtable.h"
 
 
 void bInit(bNodePtr *tree)

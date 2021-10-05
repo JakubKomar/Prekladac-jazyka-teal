@@ -6,7 +6,7 @@
 #pragma once
 #include "baseDeclarations.h"
 #include "dstring.h"
-#include "btree.h"
+#include "symtable.h"
 #include "tokens.h"
 
 typedef struct {

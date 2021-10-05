@@ -24,9 +24,9 @@ jmp_buf errorHandelingJump;
 #define DEBUG_TEST 0
 #endif
 #define debug(fmt, ...) \
-            do { if (DEBUG_TEST) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
+    do { if (DEBUG_TEST) fprintf(stderr, fmt, __VA_ARGS__); } while (0)
 #define debugS(fmt) \
-            do { if (DEBUG_TEST) fprintf(stderr, fmt); } while (0)
+    do { if (DEBUG_TEST) fprintf(stderr, fmt); } while (0)
 //konec převzaté části
 
 

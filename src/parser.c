@@ -7,17 +7,17 @@
 
 void parserMain(systemData * sData)
 {
-    token actualToken=getNextUsefullToken(&sData->sData);
+    sData->pData.actualToken=getNextUsefullToken(&sData->sData);
     stack * stack=&(sData->pData.stack);
 
     while (!stackEmpty(stack))
     {    
-        debug("actual token: %s\n",tokenStr(actualToken));    
+        debug("actual token: %s\n",tokenStr(sData->pData.actualToken));    
         stackPrint(stack);
         debugS("-------------------------------------------------------\n");  
         if(stackHead(stack).type>=N_START)//pokud neterminál
         {
-            useLLtable(actualToken,stack);
+            useLLtable(sData->pData.actualToken,stack);
         }
         else if(stackHead(stack).type==S_EXPRESION)
         {
@@ -26,11 +26,11 @@ void parserMain(systemData * sData)
         }
         else
         {
-            if(stackHead(stack).type==actualToken.type)
+            if(stackHead(stack).type==sData->pData.actualToken.type)
             {
                 stackPop(stack);
-                debug("conzume: %s\n",tokenStr(actualToken));
-                actualToken=getNextUsefullToken(&sData->sData);
+                debug("conzume: %s\n",tokenStr(sData->pData.actualToken));
+                sData->pData.actualToken=getNextUsefullToken(&sData->sData);
             }
             else
             {
