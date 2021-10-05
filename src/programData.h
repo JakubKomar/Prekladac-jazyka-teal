@@ -3,7 +3,6 @@
 #include "scaner.h"
 #include "stack.h"
 #include "dstring.h"
-#include "btree.h"
 
 typedef struct {
     stack stack;
@@ -16,11 +15,9 @@ typedef struct
 }expresionParserData;
 
 typedef struct {
-    bool sDataAloc;
-    bool pDataAloc;
-    bool epDataAloc;
     scanerData sData;
     parserData pData;
     expresionParserData epData;
     bNodePtr symTable;
 }systemData;
+

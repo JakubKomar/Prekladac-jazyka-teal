@@ -13,6 +13,7 @@
 
 
 void systemDataInit(systemData * data);
+void systemDataDestruct(systemData * data);
 void LLTableErr();
-void parserMain();
+void parserMain(systemData * data);
 void useLLtable(token actualToken,stack *stack);

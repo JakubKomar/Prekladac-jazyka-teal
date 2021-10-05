@@ -9,3 +9,4 @@
 #include "parser.h"
 #include "expresionParser.h"
 void debugRun(bool scanerOnly,bool expresionOnly);
+void argParse(int argc, char** argv);

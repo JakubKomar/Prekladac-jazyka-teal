@@ -5,13 +5,10 @@
  */
 #include "parser.h"
 
-void parserMain()
+void parserMain(systemData * sData)
 {
-    systemData sData;
-    systemDataInit(&sData);
-
-    token actualToken=getNextUsefullToken(&sData.sData);
-    stack * stack=&(sData.pData.stack);
+    token actualToken=getNextUsefullToken(&sData->sData);
+    stack * stack=&(sData->pData.stack);
 
     while (!stackEmpty(stack))
     {    
@@ -25,7 +22,7 @@ void parserMain()
         else if(stackHead(stack).type==S_EXPRESION)
         {
             stackPop(stack);
-            expresionParse(&sData);
+            expresionParse(sData);
         }
         else
         {
@@ -33,7 +30,7 @@ void parserMain()
             {
                 stackPop(stack);
                 debug("conzume: %s\n",tokenStr(actualToken));
-                actualToken=getNextUsefullToken(&sData.sData);
+                actualToken=getNextUsefullToken(&sData->sData);
             }
             else
             {
@@ -57,26 +54,16 @@ void destructParserData(parserData * data)
 
 void systemDataInit(systemData * data)
 {
-    data->sDataAloc=false;
-    data->pDataAloc=false;
-    data->epDataAloc=false;
-
     initScanerData(&data->sData);
-    data->sDataAloc=true;
     initParserData(&data->pData);
-    data->pDataAloc=true;
     initExpresionData(&data->epData);
-    data->epDataAloc=true;
 }
 
 void systemDataDestruct(systemData * data)
 {
-    if(data->sDataAloc)
-        destructScanerData(&data->sData);
-    if(data->pDataAloc)
-        destructParserData(&data->pData);
-    if(data->epDataAloc)
-        destructExpresionData(&data->epData);
+    destructScanerData(&data->sData);
+    destructParserData(&data->pData);
+    destructExpresionData(&data->epData);
 }
 
 void useLLtable(token Token,stack *stack) 

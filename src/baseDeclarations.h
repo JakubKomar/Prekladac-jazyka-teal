@@ -10,6 +10,9 @@
 #include <stdbool.h>
 #include <malloc.h>
 #include <string.h>
+#include <setjmp.h>
+
+jmp_buf errorHandelingJump;
 
 #define INPUT stdin
 

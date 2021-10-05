@@ -27,7 +27,7 @@ void bInsert(bNodePtr *tree, char *key, bData data)
 	{
 		*tree=malloc(sizeof(struct bNode));
 		if(*tree==NULL) //alakoce se nezdařila
-			errorD(99,"binary tree maloc error");	
+			errorD(100,"binary tree maloc error");	
 		//naplnění uzlu daty
 		(*tree)->lPtr=NULL;
 		(*tree)->rPtr=NULL;

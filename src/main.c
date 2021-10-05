@@ -8,6 +8,31 @@
 
 int main(int argc, char** argv)
 {
+    argParse( argc, argv);
+
+    systemData sData;
+    systemDataInit(&sData);
+
+    int errCode=setjmp(errorHandelingJump); //simulating try catch block
+    switch (errCode)
+    {
+        case 0:     //try
+            parserMain(&sData);
+            systemDataDestruct(&sData);
+        break; 
+        case 100:    //error by invalid allocation of resorses - to avoid segmatation falut just exit the program, garbrege collector shoud dealocate memory later
+            errCode=99;
+        break;
+        default:    //catch
+            systemDataDestruct(&sData);
+        break;
+    }
+    return errCode;
+}
+
+
+void argParse(int argc, char** argv)
+{
     bool scanerOnlyF=false;
     bool expresionOnlyF=false;
     bool debugF=false;
@@ -29,38 +54,45 @@ int main(int argc, char** argv)
     }
     if(debugF)
         debugRun(scanerOnlyF,expresionOnlyF);
-
-    parserMain();
-    return 0;
 }
 
 void debugRun(bool scanerOnlyF,bool expresionOnlyF)
 {
-    if(scanerOnlyF)
+    systemData sData;
+    systemDataInit(&sData);
+    int errCode=setjmp(errorHandelingJump); 
+    switch (errCode)
     {
-        scanerData scData;
-        token actualToken=(token){O_UNIMPORTANT,NULL};
-        initScanerData(&scData);
-        int i=0;
-        while(actualToken.type!=T_EOF)
-        {
-            actualToken=getNextUsefullToken(&scData);
-            debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),scData.fullToken.str);
-            i++;
-        }
-        stringDestruct(&(scData.fullToken));
+        case 0:  //try
+            if(scanerOnlyF)
+            {
+                scanerData scData;
+                initScanerData(&scData);
+                token actualToken=getNextUsefullToken(&scData);
+
+                for(int i=0;actualToken.type!=T_EOF;i++)
+                {
+                    actualToken=getNextUsefullToken(&scData);
+                    debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),scData.fullToken.str);
+                }
+                destructScanerData(&scData);
+            }
+            else if(expresionOnlyF)
+            {               
+                while(sData.pData.actualToken.type!=T_EOF)
+                {
+                    sData.pData.actualToken=getNextUsefullToken(&sData.sData);
+                    expresionParse(&sData);
+                }
+            }
+            systemDataDestruct(&sData);
+        break; 
+        case 100:    //error by invalid allocation of resorses - to avoid segmatation falut just exit the program, garbrege collector shoud dealocate memory later
+            errCode=99;
+        break;
+        default:    //catch
+            systemDataDestruct(&sData);
+        break;
     }
-    /*
-    else if(expresionOnlyF)
-    {
-        scanerData scData;
-        token actualToken=(token){O_UNIMPORTANT,NULL};
-        initScanerData(&scData);
-        while(actualToken.type!=T_EOF)
-        {
-            actualToken=getNextUsefullToken(&scData);
-            expresionParse(actualToken,&scData);
-        }
-    }*/
-    exit(0);
+    exit(errCode);
 }

@@ -12,7 +12,7 @@ void stackInit(stack *s)
     s->last=0;
     s->array=malloc(sizeof(token)*STACK_BASE_SIZE);
     if(!s->array)
-        errorD(99,"Stack initialization error");
+        errorD(100,"Stack initialization error");
 }
 
 void stackRealoc(stack *s)
@@ -20,7 +20,7 @@ void stackRealoc(stack *s)
     s->capacity=s->capacity*2;
     s->array=realloc(s->array,sizeof(token)* s->capacity);
     if(!s->array)
-        errorD(99,"Stack realoc error");
+        errorD(100,"Stack realoc error");
 }
 
 void stackPush(stack *s, token token)
