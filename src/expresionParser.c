@@ -67,7 +67,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData)
         *separatorF=true;
     else if(new!=T_LBR|| new!=T_RBR)
         *separatorF=false;
-    if(isOperator(new)||isId(new))
+    if(isOperator(new)||isId(new)||new==T_RBR||new==T_LBR)
         return sData->pData.actualToken;
     else
         return (token){T_EOF,NULL};
