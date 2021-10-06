@@ -12,7 +12,7 @@
 #include "./stack.h"
 
 
-
+token nextTokenExpParser(bool * separatorF,systemData * sData);
 void destructExpresionData(expresionParserData *data);
 void initExpresionData(expresionParserData *data);
 token expresionDevelop(token actual,scanerData *sData) ;

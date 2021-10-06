@@ -21,11 +21,12 @@ const char precTable[10][10] =
 
 void expresionParse(systemData *sData)
 {
+    debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;
     token actual =sData->pData.actualToken;
     stackClear(stack);
     stackPush(stack,(token){O_DOLAR,NULL});
-
+    bool separatorF=false;
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
         debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
@@ -34,12 +35,12 @@ void expresionParse(systemData *sData)
         {
             case '=':
                 stackPush(stack,actual);
-                actual=getNextUsefullToken(&sData->sData);
+                actual=nextTokenExpParser(&separatorF,sData);
                 break;
             case '<':
                 stackInsertHanle(stack);
                 stackPush(stack,actual);
-                actual=getNextUsefullToken(&sData->sData);
+                actual=nextTokenExpParser(&separatorF,sData);
                 break; 
             case '>':
                 reduction(stack);
@@ -52,8 +53,23 @@ void expresionParse(systemData *sData)
                 break;
         }
     }
-    sData->pData.actualToken=actual;
+    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
 } 
+
+token nextTokenExpParser(bool * separatorF,systemData * sData)
+{
+    sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+    if(*separatorF==true && (sData->pData.actualToken.type==T_ID))
+        return (token){T_EOF,NULL};
+    else if(isId(sData->pData.actualToken.type))
+        *separatorF=true;
+    else
+        *separatorF=false;
+    if(isOperator(sData->pData.actualToken.type)||isId(sData->pData.actualToken.type))
+        return sData->pData.actualToken;
+    else
+        return (token){T_EOF,NULL};
+}
 
 void reduction(stack *s)
 {
@@ -68,6 +84,7 @@ void reduction(stack *s)
         case T_DOUBLE:
         case T_STR:
         case T_ID:
+        case K_NIL:
             stackRemoveHande(s);
             stackPush(s,(token){NE_EXP,NULL});
             return;
@@ -159,6 +176,7 @@ int getPosInTable(tokenType toDecode)
         case T_ID:
         case T_STR:
         case T_INT:
+        case K_NIL:
         case T_DOUBLE:
             return 7;  
         case O_DOLAR:
