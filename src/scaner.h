@@ -13,8 +13,8 @@ typedef struct {
     char curentSymbol;
     int line;
     int colum;
-    int charCounter;
     string fullToken;
+    string fullLine;
 }scanerData;
 
 /**states of state machine**/
@@ -127,3 +127,8 @@ void destructScanerData(scanerData * data);
  * @param *data scanner data
 */
 void loadChar(scanerData * data);
+/**
+ * visualization, where exactly is error
+ * @param *data scanner data
+*/
+void errorVisualization(scanerData * data);

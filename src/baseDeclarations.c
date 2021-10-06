@@ -9,7 +9,7 @@ void error(int code)
 {
     if(code){
         printError(code);
-        exit(code);
+        longjmp(errorHandelingJump, code);
     } 
 }
 
@@ -17,7 +17,7 @@ void errorD(int code,char * description)
 {
     if(code){
         printError(code);
-        fprintf(stderr,"More detailes: %s\n",description);
+        fprintf(stderr,"\033[36mMore detailes: %s\033[0m\n",description);
         longjmp(errorHandelingJump, code);
     } 
 }
@@ -60,6 +60,6 @@ void printError(int code)
     default:
         text="Unknown error";
     }
-    fprintf(stderr,"Error: %s\n",text);
+    fprintf(stderr,"\033[31mError:\033[0m %s\n",text);
 }
 

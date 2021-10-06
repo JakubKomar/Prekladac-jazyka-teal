@@ -19,17 +19,19 @@ int main(int argc, char** argv)
         case 0:     //try
             parserMain(&sData);
             systemDataDestruct(&sData);
+            fprintf(stderr,"\033[32mTranslate successful \033[0m\n");//odstranit před odevzdáním, pouze vizualizace korekního překladu
+            return 0;
         break; 
         case 100:    //error by invalid allocation of resorses - to avoid segmatation falut just exit the program, garbrege collector shoud dealocate memory later
             errCode=99;
         break;
         default:    //catch
+            errorVisualization(&sData.sData);
             systemDataDestruct(&sData);
         break;
     }
     return errCode;
 }
-
 
 void argParse(int argc, char** argv)
 {
