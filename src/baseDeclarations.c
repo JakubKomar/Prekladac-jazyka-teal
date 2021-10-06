@@ -7,7 +7,8 @@
 
 void error(int code)
 {
-    if(code){
+    if(code)
+    {
         printError(code);
         longjmp(errorHandelingJump, code);
     } 
@@ -15,7 +16,8 @@ void error(int code)
 
 void errorD(int code,char * description)
 {
-    if(code){
+    if(code)
+    {
         printError(code);
         fprintf(stderr,"\033[36mMore detailes: %s\033[0m\n",description);
         longjmp(errorHandelingJump, code);

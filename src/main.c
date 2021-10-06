@@ -38,7 +38,8 @@ void argParse(int argc, char** argv)
     bool scanerOnlyF=false;
     bool expresionOnlyF=false;
     bool debugF=false;
-    for(int i=1;i<argc;i++){
+    for(int i=1;i<argc;i++)
+    {
         if(!strcmp(argv[i],"-d"))
             debugF=true;
         else if(!strcmp(argv[i],"-s"))
