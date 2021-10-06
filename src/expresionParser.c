@@ -59,13 +59,15 @@ void expresionParse(systemData *sData)
 token nextTokenExpParser(bool * separatorF,systemData * sData)
 {
     sData->pData.actualToken=getNextUsefullToken(&sData->sData);
-    if(*separatorF==true && (sData->pData.actualToken.type==T_ID))
+    tokenType new= sData->pData.actualToken.type;
+
+    if(*separatorF==true && (new==T_ID))
         return (token){T_EOF,NULL};
-    else if(isId(sData->pData.actualToken.type))
+    else if(isId(new))
         *separatorF=true;
-    else
+    else if(new!=T_LBR|| new!=T_RBR)
         *separatorF=false;
-    if(isOperator(sData->pData.actualToken.type)||isId(sData->pData.actualToken.type))
+    if(isOperator(new)||isId(new))
         return sData->pData.actualToken;
     else
         return (token){T_EOF,NULL};

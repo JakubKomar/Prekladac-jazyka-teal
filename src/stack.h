@@ -71,9 +71,7 @@ void stackPrint(stack *s);
  * @param *s stack to operate whith
 */
 void stackClear(stack *s);
-
-/************** expresion parser function **************/
-
+/************************ expresion parser function ***********************/
 /**
  * inserting hadle before terminal
  * @param *s stack to operate whith
