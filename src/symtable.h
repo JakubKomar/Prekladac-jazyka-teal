@@ -8,9 +8,8 @@
 #include "dstring.h"
 #include "baseDeclarations.h"
 
-typedef struct {
+typedef struct {    
     tokenType type;
-    string text;
 } bData;
 
 typedef struct bNode {

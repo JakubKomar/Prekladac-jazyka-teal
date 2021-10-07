@@ -46,7 +46,12 @@ void expresionParse(systemData *sData)
                 reduction(stack);
                 break;
             case ' ':
-                errorD(2,"syntax error");
+                if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
+                {
+                    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
+                    return;
+                }
+                errorD(2,"syntax error in expresion");
                 break;
             default:
                 errorD(99,"precedence table error");
