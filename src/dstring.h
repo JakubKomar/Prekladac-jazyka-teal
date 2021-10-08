@@ -16,6 +16,7 @@ typedef struct
   char* str;		          // pointer to string ended by '\0'
 } string;
 
+
 /**
  * string creation
  * @param *s string to init
