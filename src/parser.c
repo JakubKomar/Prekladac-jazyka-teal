@@ -156,6 +156,7 @@ void useLLtable(token Token,stack *stack)
                 case K_NIL:
                 case T_DOUBLE:
                 case T_ID: 
+                case T_LBR: 
                     stackPush(stack,(token){N_EXPRESIONS,NULL});
                     stackPush(stack,(token){S_EXPRESION,NULL}); 
                 break;  
@@ -420,6 +421,7 @@ void useLLtable(token Token,stack *stack)
                 case T_INT:
                 case T_STR:
                 case T_STR_LEN:
+                case T_LBR:
                 case K_NIL:
                 case T_DOUBLE:
                 case T_ID: 

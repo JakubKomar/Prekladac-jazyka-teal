@@ -21,11 +21,12 @@ const char precTable[10][10] =
 
 void expresionParse(systemData *sData)
 {
+    debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;
     token actual =sData->pData.actualToken;
     stackClear(stack);
     stackPush(stack,(token){O_DOLAR,NULL});
-
+    bool separatorF=false;
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
         debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
@@ -34,26 +35,48 @@ void expresionParse(systemData *sData)
         {
             case '=':
                 stackPush(stack,actual);
-                actual=getNextUsefullToken(&sData->sData);
+                actual=nextTokenExpParser(&separatorF,sData);
                 break;
             case '<':
                 stackInsertHanle(stack);
                 stackPush(stack,actual);
-                actual=getNextUsefullToken(&sData->sData);
+                actual=nextTokenExpParser(&separatorF,sData);
                 break; 
             case '>':
                 reduction(stack);
                 break;
             case ' ':
-                errorD(2,"syntax error");
+                if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
+                {
+                    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
+                    return;
+                }
+                errorD(2,"syntax error in expresion");
                 break;
             default:
                 errorD(99,"precedence table error");
                 break;
         }
     }
-    sData->pData.actualToken=actual;
+    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
 } 
+
+token nextTokenExpParser(bool * separatorF,systemData * sData)
+{
+    sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+    tokenType new= sData->pData.actualToken.type;
+
+    if(*separatorF==true && (new==T_ID))
+        return (token){T_EOF,NULL};
+    else if(isId(new))
+        *separatorF=true;
+    else if(new!=T_LBR|| new!=T_RBR)
+        *separatorF=false;
+    if(isOperator(new)||isId(new)||new==T_RBR||new==T_LBR)
+        return sData->pData.actualToken;
+    else
+        return (token){T_EOF,NULL};
+}
 
 void reduction(stack *s)
 {
@@ -68,6 +91,7 @@ void reduction(stack *s)
         case T_DOUBLE:
         case T_STR:
         case T_ID:
+        case K_NIL:
             stackRemoveHande(s);
             stackPush(s,(token){NE_EXP,NULL});
             return;
@@ -159,6 +183,7 @@ int getPosInTable(tokenType toDecode)
         case T_ID:
         case T_STR:
         case T_INT:
+        case K_NIL:
         case T_DOUBLE:
             return 7;  
         case O_DOLAR:

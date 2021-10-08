@@ -388,10 +388,10 @@ bool isDecimal(char toCompare)
 
 void initScanerData(scanerData * data)
 {
-    data->charCounter=0;
     data->colum=0;
     data->line=0;
     stringInit(&(data->fullToken));
+    stringInit(&(data->fullLine));
     loadChar(data);
 } 
 
@@ -403,12 +403,20 @@ void destructScanerData(scanerData * data)
 void loadChar(scanerData * data)
 {
     data->curentSymbol=fgetc(INPUT);
-    data->charCounter++;
     if(data->curentSymbol=='\n')
     {
+        stringClear(&data->fullLine);
         data->colum=0;
         data->line++;
     }
     else
+    {
+        stringAddChar(&data->fullLine, data->curentSymbol);
         data->colum++;
+    }
+}
+
+void errorVisualization(scanerData * data)
+{
+    fprintf(stderr,"\nIn input: L:%d C:%d :\n%s \033[35m<-\033[31mERROR\033[0m is near by\n",data->line,data->colum,data->fullLine.str);
 }

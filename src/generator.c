@@ -5,6 +5,7 @@
  */
 #include "generator.h"
 
-int doNotihing(){
+int doNotihing()
+{
     return 0;
 }
