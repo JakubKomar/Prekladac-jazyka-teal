@@ -66,11 +66,9 @@ void LLid(systemData *d)
 {
     //kontrola v tabulce symbolů
     LLid_next(d);
-    token t=next(d);
-    if(t.type!=T_ASSIGEN)
+    if(d->pData.actualToken.type!=T_ASSIGEN)
         LLerr();
     LLexp_or_func(d);
-    LLid_next(d);
     LLprog(d);
 }
 
@@ -121,6 +119,11 @@ void LLexp_or_func(systemData *d)
     next(d);
 }
 
+void LLfuncCall(systemData *d)
+{
+    //kontrola v tabulce symbolu
+}
+
 void LLexpresionN(systemData *d)
 {
     token t=next(d);
@@ -144,6 +147,7 @@ void LLexpresionN(systemData *d)
         break;
     }
 }
+
 token next(systemData *d)
 {
     d->pData.actualToken=getNextUsefullToken(&d->sData);

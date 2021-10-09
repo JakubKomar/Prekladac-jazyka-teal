@@ -8,11 +8,16 @@
 
 int main(int argc, char** argv)
 {
+    
+    fp=fopen("C:\\letsCodeSomeShit\\IFJ-2021\\src\\test.lua","r");
+    if(!fp)
+    {
+        fprintf(stderr,"file not opened\n");
+        exit(1);
+    }
     argParse( argc, argv);
-
     systemData sData;
     systemDataInit(&sData);
-
     int errCode=setjmp(errorHandelingJump); //simulating try catch block
     switch (errCode)
     {
@@ -30,6 +35,7 @@ int main(int argc, char** argv)
             systemDataDestruct(&sData);
         break;
     }
+    fclose(fp);
     return errCode;
 }
 

@@ -11,8 +11,14 @@
 #include <malloc.h>
 #include <string.h>
 #include <setjmp.h>
+#include <io.h>
 
-#define INPUT stdin /** input for reading code **/
+FILE *fp;
+#ifdef VCODE
+#define INPUT fp
+#else
+#define INPUT stdin
+#endif
 
 jmp_buf errorHandelingJump; /** jump for error handeling-part of simulated try catch block **/
 

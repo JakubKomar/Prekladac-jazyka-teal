@@ -403,6 +403,7 @@ void destructScanerData(scanerData * data)
 void loadChar(scanerData * data)
 {
     data->curentSymbol=fgetc(INPUT);
+    
     if(data->curentSymbol=='\n')
     {
         stringClear(&data->fullLine);

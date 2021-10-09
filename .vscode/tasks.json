@@ -3,15 +3,19 @@
         {
             "type": "cppbuild",
             "label": "C/C++: gcc.exe sestavit aktivní soubor",
-            "command": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin\\gcc.exe",
+            "command": "C:\\MinGW\\bin\\gcc.exe",
             "args": [
                 "-g",
-                "${file}",
+                "*.c",
+                "-D",
+                "DEBUG",
+                "-D",
+                "VCODE",
                 "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+                "ifj21"
             ],
             "options": {
-                "cwd": "C:\\Program Files (x86)\\mingw-w64\\i686-8.1.0-posix-dwarf-rt_v6-rev0\\mingw32\\bin"
+                "cwd": "${fileDirname}"
             },
             "problemMatcher": [
                 "$gcc"

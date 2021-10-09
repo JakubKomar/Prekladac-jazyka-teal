@@ -37,6 +37,7 @@ void useLLtable(token actualToken,stack *stack);
  */
 void LLerr();
 
+void LLfuncCall(systemData *d);
 void LLprolog(systemData * d);
 void LLprog(systemData * d);
 void LLid(systemData *d);
