@@ -65,7 +65,15 @@ void LLprog(systemData * d)
 void LLwhile(systemData *d)
 {
     token t=next(d); 
-    
+    expresionParse(d);
+    t=d->pData.actualToken;
+    if(t.type!=K_DO)
+        LLerr();
+    t=next(d); 
+    LLprog(d);
+    t=d->pData.actualToken;
+    if(t.type!=K_END)
+        LLerr();
 }
 
 void LLid(systemData *d)
@@ -75,8 +83,8 @@ void LLid(systemData *d)
     if(d->pData.actualToken.type!=T_ASSIGEN)
         LLerr();
     LLexp_or_func(d);
-    LLprog(d);
     next(d);
+    LLprog(d);
 }
 
 void LLid_next(systemData *d)
