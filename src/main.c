@@ -8,12 +8,14 @@
 
 int main(int argc, char** argv)
 {
-    
-    fp=fopen("C:\\letsCodeSomeShit\\IFJ-2021\\src\\test.lua","r");
-    if(!fp)
+    if(FORM_FILE)
     {
-        fprintf(stderr,"file not opened\n");
-        exit(1);
+        fp=fopen("C:\\letsCodeSomeShit\\IFJ-2021\\src\\test.lua","r");
+        if(!fp)
+        {
+            fprintf(stderr,"file not opened\n");
+            exit(1);
+        }
     }
     argParse( argc, argv);
     systemData sData;

@@ -37,11 +37,14 @@ void useLLtable(token actualToken,stack *stack);
  */
 void LLerr();
 
+void LLwhile(systemData *d);
 void LLfuncCall(systemData *d);
 void LLprolog(systemData * d);
 void LLprog(systemData * d);
 void LLid(systemData *d);
 void LLid_next(systemData * d);
 void LLexp_or_func(systemData *d);
+void LLfArg(systemData *d);
+void LLfArgN(systemData *d);
 void LLexpresionN(systemData *d);
 token next(systemData *d);

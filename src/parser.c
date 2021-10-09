@@ -38,10 +38,10 @@ void LLprog(systemData * d)
             LLid(d);
         break;  
         case T_FUNC_CALL:
-            //LLfunctionCall(d);
+            LLfuncCall(d);
         break;  
         case K_WHILE:
-            //LLwhile(d); 
+            LLwhile(d); 
         break;  
         case K_IF:
             //LLif(d); 
@@ -62,6 +62,12 @@ void LLprog(systemData * d)
     }
 }
 
+void LLwhile(systemData *d)
+{
+    token t=next(d); 
+    
+}
+
 void LLid(systemData *d)
 {
     //kontrola v tabulce symbolů
@@ -70,6 +76,7 @@ void LLid(systemData *d)
         LLerr();
     LLexp_or_func(d);
     LLprog(d);
+    next(d);
 }
 
 void LLid_next(systemData *d)
@@ -110,20 +117,66 @@ void LLexp_or_func(systemData *d)
             LLexpresionN(d);
         break;  
         case T_FUNC_CALL: 
-            
+            LLfuncCall(d);
         break;  
         default:
             LLerr();
         break;
     }
-    next(d);
 }
 
 void LLfuncCall(systemData *d)
 {
     //kontrola v tabulce symbolu
-}
+    token t=next(d);
+    switch (t.type)
+    {   
+        case T_ID: 
+            //kontrola v tabulce symbolu
+        case T_INT:
+        case T_STR:
+        case K_NIL:
+        case T_DOUBLE:
+            LLfArg(d);
+        case T_RBR: 
 
+        break;  
+        default:
+            LLerr();
+        break;
+    }
+    if(d->pData.actualToken.type!=T_RBR)
+        LLerr();
+}
+void LLfArg(systemData *d)
+{   
+    //kontrola v tabulce symbolu
+    LLfArgN(d);
+}
+void LLfArgN(systemData *d)
+{   
+    token t=next(d);
+    if(t.type==T_RBR)
+        return;
+    else if(t.type==T_COMMA)
+    {
+        t=next(d);
+        switch (t.type)
+        {   
+            case T_ID: 
+                //kontrola v tabulce symbolu
+            case T_INT:
+            case T_STR:
+            case K_NIL:
+            case T_DOUBLE:
+                LLfArgN(d);
+            break;  
+            default:
+                LLerr();
+            break;
+        }
+    }
+}
 void LLexpresionN(systemData *d)
 {
     token t=next(d);
