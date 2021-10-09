@@ -35,4 +35,12 @@ void useLLtable(token actualToken,stack *stack);
 /**
  * error handeling from "useLLtable" function
  */
-void LLTableErr();
+void LLerr();
+
+void LLprolog(systemData * d);
+void LLprog(systemData * d);
+void LLid(systemData *d);
+void LLid_next(systemData * d);
+void LLexp_or_func(systemData *d);
+void LLexpresionN(systemData *d);
+token next(systemData *d);
