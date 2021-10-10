@@ -29,39 +29,143 @@ void LLprolog(systemData * d)
 
 void LLprog(systemData * d)
 {
-    switch (d->pData.actualToken.type)
+    token t=d->pData.actualToken;
+    while (t.type!=T_EOF&&t.type!=K_END&&t.type!=K_ELSE)
     {
-        case T_EOF:
-        case K_END:
-        case K_ELSE:
-            return;
+        switch (t.type)
+        {
+            case T_ID:
+                LLid(d);
+            break;  
+            case T_FUNC_CALL:
+                LLfuncCall(d);
+            break;  
+            case K_WHILE:
+                LLwhile(d); 
+            break;  
+            case K_IF:
+                LLif(d); 
+            break; 
+            case K_FUNCTION:
+                LLfunction(d);  
+            break; 
+            case K_RETURN:
+                LLreturn(d);
+            break; 
+            case K_LOCAL:
+            case K_GLOBAL:
+                LLdeclaration(d);
+            break; 
+            default:
+                LLerr();
+            break;
+        }
+        t=d->pData.actualToken;
+    }
+}
+
+void LLfunction(systemData *d)
+{
+    token t=next(d);
+    if(t.type!=T_FUNC_CALL)
+        LLerr();
+    //kontrola v sym table
+    t=next(d);
+    switch (t.type)
+    {
+        case T_ID: 
+            //konrola/zaznamenání
+            LLfuncArg(d);
         break;   
-        case T_ID:
-            LLid(d);
-        break;  
-        case T_FUNC_CALL:
-            LLfuncCall(d);
-        break;  
-        case K_WHILE:
-            LLwhile(d); 
-        break;  
-        case K_IF:
-            LLif(d); 
-        break; 
-        case K_FUNCTION:
-            //LLfunction(d);  
-        break; 
-        case K_RETURN:
-            LLreturn(d);
-        break; 
-        case K_LOCAL:
-        case K_GLOBAL:
-            LLdeclaration(d);
+        case T_RBR:
+
         break; 
         default:
             LLerr();
         break;
     }
+    if(d->pData.actualToken.type!=T_RBR)
+        LLerr();
+    t=next(d);
+    if(t.type==T_COLON)   
+        LLreturnArg(d);
+    LLprog(d);
+    if(d->pData.actualToken.type!=K_END)
+        LLerr();
+    t=next(d);
+}
+void LLreturnArg(systemData *d)
+{
+    token type=next(d);
+    switch (type.type)
+    {
+        case K_NUMBER: 
+        case K_INTEGER: 
+        case K_STRING: 
+        case K_NIL:
+            //konrola/zaznamenání
+        break;   
+        default:
+            LLerr();
+        break;
+    }
+    token t=next(d);
+    switch (t.type)
+    {
+        case T_COMMA: 
+            LLreturnArg(d);
+        break;   
+        default:
+        break;
+    }
+}
+void LLfuncArg(systemData *d)
+{
+    token id=d->pData.actualToken;
+    token type=next(d);
+    if(type.type!=T_COLON)
+        LLerr();
+    type=next(d);
+    switch (type.type)
+    {
+        case K_NUMBER: 
+        case K_INTEGER: 
+        case K_STRING: 
+        case K_NIL:
+            //konrola/zaznamenání
+        break;   
+        default:
+            LLerr();
+        break;
+    }
+    LLfuncArgN(d);
+}
+
+void LLfuncArgN(systemData *d)
+{
+    token t=next(d);
+    if(t.type==T_RBR)
+        return;
+    else if(t.type!=T_ID)
+        LLerr();
+    token id=t;
+    t=next(d);
+    if(t.type!=T_COLON)
+        LLerr();
+    token type=next(d);
+    switch (type.type)
+    {
+        case K_NUMBER: 
+        case K_INTEGER: 
+        case K_STRING: 
+        case K_NIL:
+            //konrola/zaznamenání
+        break;   
+        default:
+            LLerr();
+        break;
+    }
+    LLfuncArgN(d);
 }
 
 void LLif(systemData *d)
@@ -77,7 +181,7 @@ void LLif(systemData *d)
     switch (t.type)
     {
         case K_END:
-            next(d);
+
         break;   
         case K_ELSE:
             LLelse(d);
@@ -165,7 +269,7 @@ void LLdeclaration(systemData *d)
     token pozition=d->pData.actualToken;
     token id=next(d);
     if(id.type!=T_ID)
-        errorD(-1,"redeklarace proměnné\n");
+        LLerr();
     token type=next(d);
     if(type.type!=T_COLON)
         LLerr();
@@ -213,7 +317,7 @@ void LLfuncDecParam(systemData *d)
         LLerr();
     t=next(d);
     if(t.type!=T_COLON)
-        LLerr();   
+        return;  
     t=next(d);          
     switch (t.type)
     {
@@ -287,6 +391,7 @@ void LLwhile(systemData *d)
     t=d->pData.actualToken;
     if(t.type!=K_END)
         LLerr();
+    t=next(d); 
 }
 
 void LLid(systemData *d)
@@ -296,7 +401,6 @@ void LLid(systemData *d)
     if(d->pData.actualToken.type!=T_ASSIGEN)
         LLerr();
     LLexp_or_func(d);
-    LLprog(d);
 }
 
 void LLid_next(systemData *d)
@@ -391,17 +495,19 @@ void LLfuncCall(systemData *d)
     }
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();
+    next(d);
 }
 
 void LLfArg(systemData *d)
 {   
     //kontrola v tabulce symbolu
+    expresionParse(d);
     LLfArgN(d);
 }
 
 void LLfArgN(systemData *d)
 {   
-    token t=next(d);
+    token t=d->pData.actualToken;
     if(t.type==T_RBR)
         return;
     else if(t.type==T_COMMA)
@@ -415,6 +521,7 @@ void LLfArgN(systemData *d)
             case T_STR:
             case K_NIL:
             case T_DOUBLE:
+                expresionParse(d);
                 LLfArgN(d);
             break;  
             default:
