@@ -1,56 +1,96 @@
-/**
- * @brief   Sym table
+/** @file symtable.h
+ * 
+ * IFJ21 compiler
+ * 
+ * @brief Symbol table enums and structures definition, and function declaration for binary tree.
  *
- * @authors Jakub Komárek (xkomar33)
+ * @authors
  */
+
 #pragma once
 #include "tokens.h"
 #include "dstring.h"
 #include "baseDeclarations.h"
 
-typedef struct {    
-    tokenType type;
-} bData;
+typedef enum {
+    ST_VAR,
+    ST_FUNC,
+} STType;
 
-typedef struct bNode {
-    char *key;
-    bData data;
-    struct bNode * lPtr;
-    struct bNode *rPtr;
-} *bNodePtr;
+typedef enum {
+    UNDEF,
+    NIL,
+    INT,
+    NUMBER,
+    STRING,
+    BOOL
+} STDataType;
 
-/**
- * binary tree inicialization
- * @param *tree-tree to incializate
- */ 
-void bInit(bNodePtr *tree);
-/**
- * deconstruction of tree
- * @param *tree-tree to destruction
- */ 
-void bDestruct(bNodePtr *tree);
-/**
- * binary tree search
- * @param *tree-tree to search from
- * @return finded-pointer to searched node, not finded - NULL
- */ 
-bNodePtr bSearch(bNodePtr *tree, char *key);
-/**
- * binary tree insertion
- * @param *tree-tree to insert,* key-key from inserted node, data-iformation to insert
- */ 
-void bInsert(bNodePtr *tree, char *key, bData data);
-/**
- * binary tree auxiliary function
- */ 
-void replaceByRightmost (bNodePtr ReplacedPtr, bNodePtr *tree);
-/**
- * remove node from binary tree 
- * @param *tree-tree where is node for removing,* key-key from deleted node
- */ 
-void bDelete(bNodePtr *tree, char *key);
-/**
- * debug function- print data from tree
- * @param *tree-node to print
- */ 
-void nodePrint(bNodePtr *tree);
+typedef struct {
+    STDataType type;
+    bool defined;
+} STVarData;
+
+typedef struct {
+    STDataType *paramTypes; //array of parameter types
+    unsigned short paramNum; //number of parameters
+    STDataType *retTypes; //array of returning types
+    unsigned short retNum; //number of returning types
+    bool defined;
+} STFuncData;
+
+typedef struct {
+    STType type;
+    STVarData varData;
+    STFuncData funcData;
+} STData;
+
+typedef struct BTNode {
+    char *id; //= key in BT
+    STData data;
+    struct BTNode *lPtr;
+    struct BTNode *rPtr;
+} STSymbol, *STSymbolPtr;
+
+/** @brief Symbol tree initialization
+ *
+ * @param RootPtr Root of tree.
+ * @return 
+ */
+void symtable_init (STSymbolPtr* RootPtr);
+
+/** @brief Searching data of specific symbol.
+ *
+ * @param RootPtr Root of tree.
+ * @param id Id to search.
+ * @return Pointer to data struct of symbol. NULL if not found.
+ */
+STData* symtable_search (STSymbolPtr RootPtr, char *id);
+
+/** @brief Inserts symbol and returns its data to fill.
+ *
+ * @param RootPtr Root of tree.
+ * @param id Id to insert.
+ * @return Pointer to data struct of symbol. NULL if unsuccessful malloc or symbol already exists.
+ */
+STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id);
+
+/** @brief Auxiliary function for copying and deallocation the rightmost node in a subtree.
+ *
+ * @param PtrReplaced Node where to copy data.
+ * @param RootPtr Root of a subtree.
+ */
+void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr);
+
+/** @brief Deletes symbol with the given id.
+ *
+ * @param RootPtr Root of tree.
+ * @param id Id to delete.
+ */
+void symtable_delete (STSymbolPtr* RootPtr, char *id);
+
+/** @brief Disposes of entire symbol tree a deallocates memory.
+ *
+ * @param RootPtr Root of tree.
+ */
+void symtable_dispose (STSymbolPtr* RootPtr);

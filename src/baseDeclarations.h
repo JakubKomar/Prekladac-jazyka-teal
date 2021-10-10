@@ -11,6 +11,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <setjmp.h>
+#include <stdarg.h>
 
 FILE *fp;
 #ifdef VCODE
