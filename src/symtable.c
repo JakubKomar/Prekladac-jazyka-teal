@@ -116,13 +116,13 @@ void symtable_delete (STSymbolPtr* RootPtr, char *id) {
 
 void symtable_dispose (STSymbolPtr* RootPtr) {
 	if((*RootPtr) != NULL)
-		{
-			symtable_dispose(&(*RootPtr)->rPtr);
-			symtable_dispose(&(*RootPtr)->lPtr);
-			free ((*RootPtr)->data.funcData.paramTypes);
-			free ((*RootPtr)->data.funcData.retTypes);
-			free ((*RootPtr)->id);
-			free ((*RootPtr));
-			(*RootPtr) = NULL;
-		}
+	{
+		symtable_dispose(&(*RootPtr)->rPtr);
+		symtable_dispose(&(*RootPtr)->lPtr);
+		free ((*RootPtr)->data.funcData.paramTypes);
+		free ((*RootPtr)->data.funcData.retTypes);
+		free ((*RootPtr)->id);
+		free ((*RootPtr));
+		(*RootPtr) = NULL;
+	}
 }

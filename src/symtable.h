@@ -52,7 +52,7 @@ typedef struct BTNode {
     struct BTNode *rPtr;
 } STSymbol, *STSymbolPtr;
 
-/** @brief Symbol tree initialization
+/** @brief Symbol tree initialization.
  *
  * @param RootPtr Root of tree.
  * @return 
@@ -89,7 +89,7 @@ void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr);
  */
 void symtable_delete (STSymbolPtr* RootPtr, char *id);
 
-/** @brief Disposes of entire symbol tree a deallocates memory.
+/** @brief Disposes of entire symbol tree and deallocates memory.
  *
  * @param RootPtr Root of tree.
  */

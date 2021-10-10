@@ -25,6 +25,6 @@ typedef struct {
     scanerData sData;
     parserData pData;
     expresionParserData epData;
-    bNodePtr symTable;
+    STSymbolPtr symTable;
 }systemData;
 
