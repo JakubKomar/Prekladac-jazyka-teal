@@ -37,7 +37,8 @@ int main(int argc, char** argv)
             systemDataDestruct(&sData);
         break;
     }
-    fclose(fp);
+    if(FORM_FILE)
+        fclose(fp);
     return errCode;
 }
 

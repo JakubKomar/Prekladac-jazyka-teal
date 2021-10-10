@@ -36,6 +36,15 @@ void useLLtable(token actualToken,stack *stack);
  * error handeling from "useLLtable" function
  */
 void LLerr();
+void LLif(systemData *d);
+void LLelse(systemData *d);
+void LLreturn(systemData *d);
+void LLreturnArgN(systemData *d);
+void LLdeclaration(systemData *d);
+void LLfuncDecParam(systemData *d);
+void LLfuncDecNParam(systemData *d);
+void LLfuncDecNRet(systemData *d);
+void LLfuncDecNParam(systemData *d);
 
 void LLwhile(systemData *d);
 void LLfuncCall(systemData *d);
