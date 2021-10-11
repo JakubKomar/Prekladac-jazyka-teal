@@ -4,7 +4,7 @@
  * 
  * @brief Symbol table implementation as binary tree.
  *
- * @authors
+ * @authors xtverd01, xkomar33
  */
 
 #include "symtable.h"
@@ -163,7 +163,7 @@ void symtable_print (STSymbolPtr* RootPtr)
 }
 
 
-/*frame model fuctions*/
+/******************frame model fuctions*********************/
 
 void frameStack_init(frameStack * s)
 {

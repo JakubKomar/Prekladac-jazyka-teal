@@ -95,7 +95,26 @@ void symtable_delete (STSymbolPtr* RootPtr, char *id);
  */
 void symtable_dispose (STSymbolPtr* RootPtr);
 
+/** @brief destructer to data in b tree
+ *
+ *  @param *RootPtr pointer to root item
+ */
+void symtable_data_disporese (STSymbolPtr* RootPtr);
+
+/** @brief destructer to data of function in b tree
+ *
+ *  @param *data pointer to data
+ */
+void symtable_data_disporese_func(STFuncData *data);
+
+/** @brief Debug function print all tree
+ *
+ * @param RootPtr Root of tree.
+ */
 void symtable_print (STSymbolPtr* RootPtr);
+
+
+/******************************  memory model*********************************/
 
 #define S_TABLE_FRAME_BASE 100  //počateční velkost zásobníku
 
@@ -104,7 +123,6 @@ typedef struct{
     STSymbolPtr bTree;
 }frame;
 
-
 typedef struct {
     int capacity;   //Velikost zásobníku
     int last;    //Spodek zásobníku
@@ -112,21 +130,76 @@ typedef struct {
     frame *localF;   //Pole pro zásobník
 }frameStack;
 
+/** @brief Inicialization of memory model
+ *
+ *  @param *s pointer to memory model
+ */
 void frameStack_init(frameStack * s);
+
+/** @brief realocation of frame memory model
+ *
+ *  @param *s pointer to memory model
+ */
 void frameStack_realoc(frameStack * s);
+
+/** @brief destruction of frame memory model
+ *
+ *  @param *s pointer to memory model
+ */
 void frameStack_disporse(frameStack * s);
 
+/** @brief push frame to memory model
+ *
+ *  @param *s pointer to memory model
+ *  @param isFunc if pushing is called from function definition 
+ */
 void frameStack_pushFrame(frameStack * s,bool isFunc);
+
+/** @brief pop frame from memory model
+ *
+ *  @param *s pointer to memory model
+ */
 void frameStack_popFrame(frameStack * s);
 
-
+/** @brief push frame to memory model
+ *
+ *  @param *s pointer to memory model
+ *  @param isFunc if pushing is called from function definition 
+ */
 void frameInit(frame *f,bool wedge);
+
+/** @brief frame inicialization
+ *
+ *  @param *f pointer to frame
+ *  @param wedge if true search will end on this frame-for function definition 
+ */
 void frameDisporse(frame *f);
 
+/** @brief searching in memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key key which is searched
+ */
 STData * frameStackSearch(frameStack *f,char * key);
+
+/** @brief inserting new item in memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key key which is searched
+ *  @param *isGlobal is item in global frame
+ */
 void frameStackInsert(frameStack *f,char *key,bool isGlobal);
+
+/** @brief printing whole memory model
+ *
+ *  @param *f pointer to memory model
+ */
 void frameStackPrint(frameStack *f);
+
+/** @brief printing binary tree
+ *
+ *  @param *RootPtr pointer to root item
+ */
 void symtable_print (STSymbolPtr* RootPtr);
 
-void symtable_data_disporese (STSymbolPtr* RootPtr);
-void symtable_data_disporese_func(STFuncData *data);
+ 
