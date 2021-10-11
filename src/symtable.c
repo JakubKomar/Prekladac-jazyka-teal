@@ -11,7 +11,11 @@
 
 void symtable_init (STSymbolPtr* RootPtr) 
 {
-	*RootPtr = NULL;
+	if(!((*RootPtr) = malloc(sizeof(STSymbol))))
+		errorD(100,"btree maloc error\n");
+	(*RootPtr)->id = NULL;
+	(*RootPtr)->lPtr = NULL;
+	(*RootPtr)->rPtr = NULL;
 }
 
 STData* symtable_search (STSymbolPtr RootPtr, char *id) 
@@ -39,6 +43,11 @@ STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id)
 		(*RootPtr)->lPtr = NULL;
 		(*RootPtr)->rPtr = NULL;
 		return &(*RootPtr)->data; //data to fill
+	}
+
+	if((*RootPtr)->id == NULL){ //first insert case
+		(*RootPtr)->id = id;
+		return &(*RootPtr)->data;
 	}
 
 	if(strcmp((*RootPtr)->id, id) == 0)
