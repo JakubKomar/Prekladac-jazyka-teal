@@ -52,10 +52,9 @@ typedef struct BTNode {
     STData data;
 } STSymbol, *STSymbolPtr;
 
-/** @brief Symbol tree initialization.
+/** @brief Symbol tree initialization. Allocates an instance.
  *
  * @param RootPtr Root of tree.
- * @return 
  */
 void symtable_init (STSymbolPtr* RootPtr);
 
