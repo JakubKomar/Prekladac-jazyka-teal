@@ -28,7 +28,7 @@ typedef enum {
 
 typedef struct {
     STDataType type;
-    bool defined;
+    bool declared;
 } STVarData;
 
 typedef struct {
@@ -36,20 +36,20 @@ typedef struct {
     unsigned short paramNum; //number of parameters
     STDataType *retTypes; //array of returning types
     unsigned short retNum; //number of returning types
-    bool defined;
+    bool declared;
 } STFuncData;
 
 typedef struct {
     STType type;
-    STVarData varData;
-    STFuncData funcData;
+    STVarData *varData;
+    STFuncData *funcData;
 } STData;
 
 typedef struct BTNode {
     char *id; //= key in BT
-    STData data;
     struct BTNode *lPtr;
     struct BTNode *rPtr;
+    STData data;
 } STSymbol, *STSymbolPtr;
 
 /** @brief Symbol tree initialization.
@@ -94,3 +94,39 @@ void symtable_delete (STSymbolPtr* RootPtr, char *id);
  * @param RootPtr Root of tree.
  */
 void symtable_dispose (STSymbolPtr* RootPtr);
+
+void symtable_print (STSymbolPtr* RootPtr);
+
+#define S_TABLE_FRAME_BASE 100  //počateční velkost zásobníku
+
+typedef struct{
+    bool wedge;
+    STSymbolPtr bTree;
+}frame;
+
+
+typedef struct {
+    int capacity;   //Velikost zásobníku
+    int last;    //Spodek zásobníku
+    frame globalF;
+    frame *localF;   //Pole pro zásobník
+}frameStack;
+
+void frameStack_init(frameStack * s);
+void frameStack_realoc(frameStack * s);
+void frameStack_disporse(frameStack * s);
+
+void frameStack_pushFrame(frameStack * s,bool isFunc);
+void frameStack_popFrame(frameStack * s);
+
+
+void frameInit(frame *f,bool wedge);
+void frameDisporse(frame *f);
+
+STData * frameStackSearch(frameStack *f,char * key);
+void frameStackInsert(frameStack *f,char *key,bool isGlobal);
+void frameStackPrint(frameStack *f);
+void symtable_print (STSymbolPtr* RootPtr);
+
+void symtable_data_disporese (STSymbolPtr* RootPtr);
+void symtable_data_disporese_func(STFuncData *data);

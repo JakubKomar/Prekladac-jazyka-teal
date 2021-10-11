@@ -18,8 +18,10 @@ int main(int argc, char** argv)
         }
     }
     argParse( argc, argv);
+    
     systemData sData;
     systemDataInit(&sData);
+
     int errCode=setjmp(errorHandelingJump); //simulating try catch block
     switch (errCode)
     {
@@ -37,6 +39,7 @@ int main(int argc, char** argv)
             systemDataDestruct(&sData);
         break;
     }
+    
     if(FORM_FILE)
         fclose(fp);
     return errCode;
@@ -56,7 +59,7 @@ void argParse(int argc, char** argv)
         else if(!strcmp(argv[i],"-e"))
             expresionOnlyF=true;
         else if(!strcmp(argv[i],"-h")){
-            fprintf(stderr,"Translater of programing language něco to programing language IFJ21\noptions:\n\t-d\tdebug mode enable\n\t-s\tsematic check only\n\t-h\tprint help\n");
+            fprintf(stderr,"Translater of programing language Teal to programing language IFJ21code\noptions:\n\t-d\tdebug mode enable\n\t-s\tsematic check only\n\t-h\tprint help\n");
             exit(0);
         }
         else{
@@ -96,6 +99,10 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
                     sData.pData.actualToken=getNextUsefullToken(&sData.sData);
                     expresionParse(&sData);
                 }
+            }
+            else
+            {
+               
             }
             systemDataDestruct(&sData);
         break; 
