@@ -12,8 +12,8 @@
 #include "dstring.h"
 
 typedef struct {
-    stack stack;
     token actualToken;   
+    frameStack dataModel;
 }parserData;
 
 typedef struct

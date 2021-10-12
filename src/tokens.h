@@ -4,9 +4,8 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
-
 #include "baseDeclarations.h"
-
+#include "symtable.h"
 //types of token
 typedef enum{   
     T_ID,
@@ -58,45 +57,14 @@ typedef enum{
     O_ERR,      //error state
     O_UNIMPORTANT,//token isnt importat for function of code
     S_EXPRESION,
-    //nonterminals
-    N_START,
-    N_PROLOG,
-    N_PROG,
-    N_EXP_OR_FUNC,
-    N_FUNC_CALL,
-    N_F_ARG,
-    N_F_ARG_N,
-    N_ID_NEXT,
-    N_EXPRESIONS,
-    N_WHILE,
-    N_IF,
-    N_ELSE_M,
-    N_FUNCTION,
-    N_ARG,
-    N_ARGNEXT,
-    N_RETURN_D,
-    N_RETURN_DN,
-    N_RETURN,
-    N_RETURN_ARG,
-    N_RETURN_ARG_N,
-    N_DECLARATION,
-    N_DECLARATION_T,
-    N_ARG_D,
-    N_ARG_DN,
-    N_RET_D,
-    N_RET_DN,
-    N_ASSIGEN_MAY,
-    N_TYPE,
-    N_RANGE,
     //neterminals for expresion analysis
     NE_EXP,
 }tokenType;
 
-#include "symtable.h"
 
 typedef struct {
     tokenType type;
-    struct bNode * symTablePtr;
+    struct STData *symDPtr;
 }token;
 
 /**

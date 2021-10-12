@@ -27,7 +27,8 @@ tokenType getNextToken(scanerData * data)
     state curentState=S_START;
     state prevState;
     stringClear(&(data->fullToken));
-   
+    data->write=true;
+
     while(true)
     {
         prevState=curentState;
@@ -37,7 +38,8 @@ tokenType getNextToken(scanerData * data)
             break;
         else if(curentState==S_EOF)
             return T_EOF;
-        stringAddChar(&(data->fullToken),data->curentSymbol);
+        if(data->write)
+            stringAddChar(&(data->fullToken),data->curentSymbol);
         loadChar(data);
     }
     tokenType token= getTokenFromState(prevState);
@@ -95,6 +97,7 @@ tokenType getTokenFromState(state state)
     switch (state)
     {
     case S_ID:
+    case S_IDS:
         token=T_ID;
     break;
     case S_FUNC_CALL:
@@ -237,6 +240,18 @@ state nextState(scanerData*data, state curentState)
         case S_ID:
             if(isLetter(sym)||isdigit(sym)||sym=='_')
                 next=S_ID;
+            else 
+            {   
+                if(sym=='(')
+                    next=S_FUNC_CALL;
+                else if(sym==' ')
+                    next=S_IDS;
+                data->write=false;
+            }
+        break;
+        case S_IDS:
+            if(sym==' ')
+                next=S_IDS;
             else if(sym=='(')
                 next=S_FUNC_CALL;
         break;
@@ -388,6 +403,7 @@ bool isDecimal(char toCompare)
 
 void initScanerData(scanerData * data)
 {
+    data->write=true;
     data->colum=0;
     data->line=0;
     stringInit(&(data->fullToken));

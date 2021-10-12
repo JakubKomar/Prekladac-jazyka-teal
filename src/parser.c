@@ -539,14 +539,12 @@ token next(systemData *d)
 
 void initParserData(parserData * data)
 {
-    stackInit(&(data->stack));
-    stackPush(&(data->stack),(token){T_EOF,NULL});
-    stackPush(&(data->stack),(token){N_START,NULL});
+    frameStack_init(&data->dataModel);
 }
 
 void destructParserData(parserData * data)
 {
-    stackDestruct(&(data->stack));
+    frameStack_disporse(&data->dataModel);
 }
 
 void systemDataInit(systemData * data)
@@ -565,5 +563,5 @@ void systemDataDestruct(systemData * data)
 
 void LLerr()
 {
-    errorD(2,"Pro daný neterminál nebyl nalezen rozklad");
+    errorD(2,"Chyba při kontrole syntaxe-porušeno rozkladové pravidlo.");
 }

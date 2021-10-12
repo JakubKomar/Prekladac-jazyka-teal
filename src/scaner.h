@@ -13,6 +13,7 @@ typedef struct {
     char curentSymbol;
     int line;
     int colum;
+    bool write;
     string fullToken;
     string fullLine;
 }scanerData;
@@ -21,6 +22,7 @@ typedef struct {
 typedef enum{       
     S_START,
     S_ID,
+    S_IDS,
     S_SUB,
     S_LINE_COM,
     S_LINE_COM_2,
