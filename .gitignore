@@ -62,3 +62,4 @@ ifj21
 
 # Local History for Visual Studio Code
 .history/
+*.json
