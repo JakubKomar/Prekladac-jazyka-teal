@@ -243,14 +243,56 @@ STData * frameStackSearch(frameStack *f,char * key)
 	return data;
 }
 
-void frameStackInsert(frameStack *f,char *key,bool isGlobal)
+STData * frameStackSearchActual(frameStack *f,char * key)
 {
+	STData *data=NULL;
+	data=symtable_search(f->localF[f->last].bTree,key);
+	return data;
+}
+
+
+STData * frameStackInsert(frameStack *f,char *key,bool isGlobal)
+{
+	STData * ptr;
 	if(isGlobal)
-		symtable_insert_woData(&f->globalF.bTree,key);
+		return symtable_insert_woData(&f->globalF.bTree,key);
 	else if(f->last>=0)
-		symtable_insert_woData(&f->localF[f->last].bTree,key);
+		return symtable_insert_woData(&f->localF[f->last].bTree,key);
 	else
 		errorD(99,"cant insert into noexisting frame\n");
+	return NULL;
+}
+
+STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isDeclaration)
+{
+	STData *ptr=frameStackInsert(f, key,isGlobal);
+	ptr->type=ST_FUNC;
+	ptr->varData=NULL;
+
+	ptr->funcData=malloc(sizeof(STFuncData));
+	if(!ptr->funcData)
+		errorD(100,"function sym table insert malloc error");
+
+	ptr->funcData->paramNum=0;
+	ptr->funcData->retNum=0;
+	ptr->funcData->paramTypes=NULL;
+	ptr->funcData->retTypes=NULL;
+
+	ptr->funcData->declared=isDeclaration;
+	
+	return ptr;
+}
+
+STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype)
+{
+	STData *ptr=frameStackInsert(f, key,isGlobal);
+	ptr->type=ST_VAR;
+	ptr->funcData=NULL;
+	ptr->varData=malloc(sizeof(STVarData));	
+	if(!ptr->varData)
+		errorD(100,"var sym table insert malloc error");
+	ptr->varData->type=Ttype;
+	return ptr;
 }
 
 void frameStackPrint(frameStack *f)

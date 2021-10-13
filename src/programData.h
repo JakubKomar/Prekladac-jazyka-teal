@@ -10,6 +10,7 @@
 #include "scaner.h"
 #include "stack.h"
 #include "dstring.h"
+#include "symtable.h"
 
 typedef struct {
     token actualToken;   

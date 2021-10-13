@@ -6,35 +6,26 @@
  *
  * @authors
  */
+#ifndef _SYMTABLE_H
+#define _SYMTABLE_H
 
-#pragma once
 #include "tokens.h"
-#include "dstring.h"
 #include "baseDeclarations.h"
+
 
 typedef enum {
     ST_VAR,
     ST_FUNC,
 } STType;
 
-typedef enum {
-    UNDEF,
-    NIL,
-    INT,
-    NUMBER,
-    STRING,
-    BOOL
-} STDataType;
-
 typedef struct {
-    STDataType type;
-    bool declared;
+    tokenType type;
 } STVarData;
 
 typedef struct {
-    STDataType *paramTypes; //array of parameter types
+    tokenType *paramTypes; //array of parameter types
     unsigned short paramNum; //number of parameters
-    STDataType *retTypes; //array of returning types
+    tokenType *retTypes; //array of returning types
     unsigned short retNum; //number of returning types
     bool declared;
 } STFuncData;
@@ -187,7 +178,7 @@ STData * frameStackSearch(frameStack *f,char * key);
  *  @param *key key which is searched
  *  @param *isGlobal is item in global frame
  */
-void frameStackInsert(frameStack *f,char *key,bool isGlobal);
+STData * frameStackInsert(frameStack *f,char *key,bool isGlobal);
 
 /** @brief printing whole memory model
  *
@@ -201,4 +192,7 @@ void frameStackPrint(frameStack *f);
  */
 void symtable_print (STSymbolPtr* RootPtr);
 
- 
+ STData * frameStackSearchActual(frameStack *f,char * key);
+ STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isDefinition);
+ STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
+ #endif 

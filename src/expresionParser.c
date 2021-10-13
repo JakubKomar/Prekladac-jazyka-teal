@@ -25,7 +25,7 @@ void expresionParse(systemData *sData)
     stack * stack=&sData->epData.stack;
     token actual =sData->pData.actualToken;
     stackClear(stack);
-    stackPush(stack,(token){O_DOLAR,NULL});
+    stackPush(stack,(token){O_DOLAR});
     bool separatorF=false;
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
@@ -67,7 +67,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData)
     tokenType new= sData->pData.actualToken.type;
 
     if(*separatorF==true && (new==T_ID))
-        return (token){T_EOF,NULL};
+        return (token){T_EOF};
     else if(isId(new))
         *separatorF=true;
     else if(new!=T_LBR|| new!=T_RBR)
@@ -75,7 +75,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData)
     if(isOperator(new)||isId(new)||new==T_RBR||new==T_LBR)
         return sData->pData.actualToken;
     else
-        return (token){T_EOF,NULL};
+        return (token){T_EOF};
 }
 
 void reduction(stack *s)
@@ -93,7 +93,7 @@ void reduction(stack *s)
         case T_ID:
         case K_NIL:
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP,NULL});
+            stackPush(s,(token){NE_EXP});
             return;
         break;
         case NE_EXP:
@@ -105,7 +105,7 @@ void reduction(stack *s)
             if(stackPop(s).type!=T_LBR)
                 errorD(2,"expresion in bracked err");
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP,NULL});    
+            stackPush(s,(token){NE_EXP});    
             return;
         break;
         default:
@@ -116,7 +116,7 @@ void reduction(stack *s)
     {
         case T_STR_LEN:
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP,NULL});
+            stackPush(s,(token){NE_EXP});
             op.type=aux;
             generateExpresion(id1,op,id2);
             return;
@@ -133,7 +133,7 @@ void reduction(stack *s)
         case NE_EXP:
             id1.type=aux;
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP,NULL});
+            stackPush(s,(token){NE_EXP});
             generateExpresion(id1,op,id2);
             return;
         break;

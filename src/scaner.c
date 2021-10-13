@@ -13,7 +13,7 @@ token getNextUsefullToken(scanerData * data)
        tType=getNextToken(data);
     } while (tType==O_UNIMPORTANT||tType==O_ERR);
     
-    token next={tType,NULL};
+    token next={tType};
     if(tType==T_ID||tType==T_INT||tType==T_STR||tType==T_DOUBLE)
     {
         //vložit do tabulky symbolů

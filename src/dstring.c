@@ -79,3 +79,12 @@ bool stringFull(string *s)
 {
    return (s->length+1)>=s->capacity;
 }
+
+char* strCpyWhithMalloc(string *s)
+{
+   char * ptr=malloc((s->length+1)*sizeof(char)); 
+   if(!ptr)
+      errorD(100,"strCpyWhithMalloc error");
+   strcpy(ptr,s->str);
+   return ptr;
+}

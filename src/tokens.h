@@ -3,9 +3,11 @@
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#pragma once
+#ifndef _TOKENS_H
+#define _TOKENS_H
+
 #include "baseDeclarations.h"
-#include "symtable.h"
+
 //types of token
 typedef enum{   
     T_ID,
@@ -64,7 +66,6 @@ typedef enum{
 
 typedef struct {
     tokenType type;
-    struct STData *symDPtr;
 }token;
 
 /**
@@ -73,3 +74,5 @@ typedef struct {
  * @return string name of token
 */
 char * tokenStr(token type);
+
+#endif 

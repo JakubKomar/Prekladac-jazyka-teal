@@ -266,27 +266,32 @@ void LLreturnArgN(systemData *d)
 
 void LLdeclaration(systemData *d)
 {
-    token pozition=d->pData.actualToken;
-    token id=next(d);
-    if(id.type!=T_ID)
+    token pozition=d->pData.actualToken;    //global/local
+
+    token id=next(d); 
+    if(id.type!=T_ID)   
         LLerr();
-    token type=next(d);
+    char *name=strCpyWhithMalloc(&d->sData.fullToken);
+
+    token type=next(d);     
     if(type.type!=T_COLON)
         LLerr();
-    type=next(d);
-
+    
+    STData *ptr;
+    type=next(d);   //type of declaration 
     switch (d->pData.actualToken.type)
     {
         case K_NUMBER: 
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
+            ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
                 LLexp_or_func(d);
         break;  
         case T_FUNC_CALL: 
-            //delklarace funkce
+            ptr =frameStackInsertFunction(&d->pData.dataModel,name,pozition.type==K_GLOBAL,false);
             LLfuncDecParam(d);           
         break;      
         default:
@@ -396,6 +401,7 @@ void LLwhile(systemData *d)
 
 void LLid(systemData *d)
 {
+
     //kontrola v tabulce symbolů
     LLid_next(d);
     if(d->pData.actualToken.type!=T_ASSIGEN)

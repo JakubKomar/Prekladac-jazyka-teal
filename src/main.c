@@ -42,6 +42,7 @@ int main(int argc, char** argv)
     
     if(FORM_FILE)
         fclose(fp);
+        
     return errCode;
 }
 
