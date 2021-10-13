@@ -300,6 +300,43 @@ void LLdeclaration(systemData *d)
     }
 }
 
+void LLfuncDecParam(systemData *d,STData *funcData)
+{
+    token t=next(d);
+    switch (t.type)
+    {
+        case K_NUMBER: 
+        case K_INTEGER: 
+        case K_STRING: 
+        case K_NIL:
+            LLfuncDecNParam(d,funcData);
+        break;   
+        case T_RBR:
+        break;   
+        default:
+            LLerr();
+        break;
+    }
+    if(d->pData.actualToken.type!=T_RBR)
+        LLerr();
+    t=next(d);
+    if(t.type!=T_COLON)
+        return;  
+    t=next(d);          
+    switch (t.type)
+    {
+        case K_NUMBER: 
+        case K_INTEGER: 
+        case K_STRING: 
+        case K_NIL:
+            LLfuncDecNRet(d,funcData);
+        break;   
+        default:
+
+        break;
+    }
+}
+
 void LLfuncDecNRet(systemData *d,STData *funcData)
 {
     token Type=d->pData.actualToken;
@@ -320,17 +357,14 @@ void LLfuncDecNRet(systemData *d,STData *funcData)
     next(d);
     switch (d->pData.actualToken.type)
     {
-        case T_RBR: 
-            funcData->funcData->retTypes=malloc(sizeof(tokenType)*funcData->funcData->retNum);
-            if(!funcData->funcData->retTypes)
-                error(100);
-        break; 
         case T_COMMA: 
             next(d);
             LLfuncDecNRet(d,funcData);
         break;      
         default:
-            LLerr();
+            funcData->funcData->retTypes=malloc(sizeof(tokenType)*funcData->funcData->retNum);
+            if(!funcData->funcData->retTypes)
+                error(100);
         break;
     }
     funcData->funcData->retTypes[order]=Type.type;

@@ -1,4 +1,4 @@
 -- Program 3: Prace s ěretzci a vestavenymi funkcemi 0
 require "ifj21"
 
-global a:function(string,integer)
+global a:function(string,integer):string,string,string,string,string,string,string,string,string,string,string

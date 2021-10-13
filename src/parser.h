@@ -92,7 +92,7 @@ void LLfuncDecNParam(systemData *d,STData *funcData);
  * simulating nonterminal for declaration retrun arg in fucntion
  * @param *d system data
  */
-void LLfuncDecNRet(systemData *d,,STData *funcData);
+void LLfuncDecNRet(systemData *d,STData *funcData);
 /**
  * simulating nonterminal for while structure
  * @param *d system data
