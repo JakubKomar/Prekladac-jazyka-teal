@@ -82,22 +82,17 @@ void LLdeclaration(systemData *d);
  * simulating nonterminal for declaration arg in fucntion
  * @param *d system data
  */
-void LLfuncDecParam(systemData *d);
+void LLfuncDecParam(systemData *d,STData *funcData);
 /**
  * simulating nonterminal for declaration N args in fucntion
  * @param *d system data
  */
-void LLfuncDecNParam(systemData *d);
+void LLfuncDecNParam(systemData *d,STData *funcData);
 /**
  * simulating nonterminal for declaration retrun arg in fucntion
  * @param *d system data
  */
-void LLfuncDecNRet(systemData *d);
-/**
- * simulating nonterminal for declaration N return args in fucntion
- * @param *d system data
- */
-void LLfuncDecNParam(systemData *d);
+void LLfuncDecNRet(systemData *d,,STData *funcData);
 /**
  * simulating nonterminal for while structure
  * @param *d system data

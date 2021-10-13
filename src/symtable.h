@@ -28,6 +28,7 @@ typedef struct {
     tokenType *retTypes; //array of returning types
     unsigned short retNum; //number of returning types
     bool declared;
+    bool defined;
 } STFuncData;
 
 typedef struct {
@@ -55,7 +56,7 @@ void symtable_init (STSymbolPtr* RootPtr);
  * @param id Id to search.
  * @return Pointer to data struct of symbol. NULL if not found.
  */
-STData* symtable_search (STSymbolPtr RootPtr, char *id);
+STData* symtable_search (STSymbolPtr* RootPtr, char *id);
 
 /** @brief Inserts symbol and returns its data to fill.
  *
@@ -110,7 +111,7 @@ void symtable_print (STSymbolPtr* RootPtr);
 
 typedef struct{
     bool wedge;
-    STSymbolPtr bTree;
+    STSymbol * bTree;
 }frame;
 
 typedef struct {
@@ -192,7 +193,7 @@ void frameStackPrint(frameStack *f);
  */
 void symtable_print (STSymbolPtr* RootPtr);
 
- STData * frameStackSearchActual(frameStack *f,char * key);
+ STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal);
  STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isDefinition);
  STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
  #endif 

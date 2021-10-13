@@ -292,7 +292,7 @@ void LLdeclaration(systemData *d)
         break;  
         case T_FUNC_CALL: 
             ptr =frameStackInsertFunction(&d->pData.dataModel,name,pozition.type==K_GLOBAL,false);
-            LLfuncDecParam(d);           
+            LLfuncDecParam(d,ptr);           
         break;      
         default:
             LLerr();
@@ -300,88 +300,76 @@ void LLdeclaration(systemData *d)
     }
 }
 
-void LLfuncDecParam(systemData *d)
+void LLfuncDecNRet(systemData *d,STData *funcData)
 {
-    token t=next(d);
-    switch (t.type)
+    token Type=d->pData.actualToken;
+    int order;
+    switch (Type.type)
     {
         case K_NUMBER: 
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            //nějak zaznamentat
-            LLfuncDecNParam(d);
-        break;   
-        case T_RBR:
-        break;   
-        default:
-            LLerr();
-        break;
-    }
-    if(d->pData.actualToken.type!=T_RBR)
-        LLerr();
-    t=next(d);
-    if(t.type!=T_COLON)
-        return;  
-    t=next(d);          
-    switch (t.type)
-    {
-        case K_NUMBER: 
-        case K_INTEGER: 
-        case K_STRING: 
-        case K_NIL:
-            //nějak zaznamentat návratové hodnoty
-            LLfuncDecNRet(d);
-        break;   
-        default:
-
-        break;
-    }
-}
-
-void LLfuncDecNRet(systemData *d)
-{
-    token t=next(d);
-    if(t.type!=T_COMMA)
-        return;   
-    t=next(d);          
-    switch (t.type)
-    {
-        case K_NUMBER: 
-        case K_INTEGER: 
-        case K_STRING: 
-        case K_NIL:
-            //nějak zaznamentat návratové hodnoty
-            LLfuncDecNRet(d);
-        break;   
-        default:
-            LLerr();
-        break;
-    }
-}
-
-void LLfuncDecNParam(systemData *d)
-{
-    token t=next(d);
-    if(t.type==T_RBR)
-        return;
-    else if(t.type!=T_COMMA)
-        LLerr();
-    t=next(d);  
-    switch (t.type)
-    {
-        case K_NUMBER: 
-        case K_INTEGER: 
-        case K_STRING: 
-        case K_NIL:
-            //nějak zaznamentat
-            LLfuncDecNParam(d);
+            order=funcData->funcData->retNum;
+            funcData->funcData->retNum++;
         break;      
         default:
             LLerr();
         break;
     }
+    next(d);
+    switch (d->pData.actualToken.type)
+    {
+        case T_RBR: 
+            funcData->funcData->retTypes=malloc(sizeof(tokenType)*funcData->funcData->retNum);
+            if(!funcData->funcData->retTypes)
+                error(100);
+        break; 
+        case T_COMMA: 
+            next(d);
+            LLfuncDecNRet(d,funcData);
+        break;      
+        default:
+            LLerr();
+        break;
+    }
+    funcData->funcData->retTypes[order]=Type.type;
+}
 
+void LLfuncDecNParam(systemData *d,STData *funcData)
+{
+    token Type=d->pData.actualToken;
+    int order;
+    switch (Type.type)
+    {
+        case K_NUMBER: 
+        case K_INTEGER: 
+        case K_STRING: 
+        case K_NIL:
+            order=funcData->funcData->paramNum;
+            funcData->funcData->paramNum++;
+        break;      
+        default:
+            LLerr();
+        break;
+    }
+    next(d);
+    switch (d->pData.actualToken.type)
+    {
+        case T_RBR: 
+            funcData->funcData->paramTypes=malloc(sizeof(tokenType)*funcData->funcData->paramNum);
+            if(!funcData->funcData->paramTypes)
+                error(100);
+        break; 
+        case T_COMMA: 
+            next(d);
+            LLfuncDecNParam(d,funcData);
+        break;      
+        default:
+            LLerr();
+        break;
+    }
+    funcData->funcData->paramTypes[order]=Type.type;
 }
 
 void LLwhile(systemData *d)

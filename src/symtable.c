@@ -11,25 +11,21 @@
 
 void symtable_init (STSymbolPtr* RootPtr) 
 {
-	if(!((*RootPtr) = malloc(sizeof(STSymbol))))
-		errorD(100,"btree maloc error\n");
-	(*RootPtr)->id = NULL;
-	(*RootPtr)->lPtr = NULL;
-	(*RootPtr)->rPtr = NULL;
+	*RootPtr= NULL;
 }
 
-STData* symtable_search (STSymbolPtr RootPtr, char *id) 
+STData* symtable_search (STSymbolPtr* RootPtr, char *id) 
 {
-	if(RootPtr == NULL)
+	if(*RootPtr == NULL)
 		return NULL;
 
-	if(strcmp(RootPtr->id, id) == 0)
-		return &RootPtr->data;
+	if(strcmp((*RootPtr)->id, id) == 0)
+		return &(*RootPtr)->data;
 
-	if(strcmp(RootPtr->id, id) > 0)
-		return symtable_search(RootPtr->lPtr, id);
+	if(strcmp((*RootPtr)->id, id) > 0)
+		return symtable_search(&(*RootPtr)->lPtr, id);
 	else
-		return symtable_search(RootPtr->rPtr, id);
+		return symtable_search(&(*RootPtr)->rPtr, id);
 }
 
 STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id) 
@@ -232,28 +228,25 @@ STData * frameStackSearch(frameStack *f,char * key)
 	STData *data=NULL;
 	for(int i=f->last;i>=0;--i)
 	{
-		data=symtable_search(f->localF[i].bTree,key);
+		data=symtable_search(&f->localF[i].bTree,key);
 
 		if(data!=NULL)
 			return data;
 		else if(f->localF[i].wedge)
 			break;
 	}
-	data=symtable_search(f->globalF.bTree,key);
+	data=symtable_search(&f->globalF.bTree,key);
 	return data;
 }
 
-STData * frameStackSearchActual(frameStack *f,char * key)
+STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal)
 {
-	STData *data=NULL;
-	data=symtable_search(f->localF[f->last].bTree,key);
-	return data;
+	return symtable_search(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
 }
 
 
 STData * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 {
-	STData * ptr;
 	if(isGlobal)
 		return symtable_insert_woData(&f->globalF.bTree,key);
 	else if(f->last>=0)
@@ -265,21 +258,35 @@ STData * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 
 STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isDeclaration)
 {
-	STData *ptr=frameStackInsert(f, key,isGlobal);
-	ptr->type=ST_FUNC;
-	ptr->varData=NULL;
+	STData *ptr= frameStackSearchActual(f,key,isGlobal);
+	if(ptr)
+	{
+		free(key);
+		if((isDeclaration&&ptr->funcData->declared)||(!isDeclaration&&ptr->funcData->defined))
+			errorD(3,"redeklarace/redefinice funkce");
+		if(isDeclaration)
+			ptr->funcData->declared=true;
+		else
+			ptr->funcData->defined=true;
+	}
+	else
+	{
+		ptr=frameStackInsert(f, key,isGlobal);
+		ptr->type=ST_FUNC;
+		ptr->varData=NULL;
 
-	ptr->funcData=malloc(sizeof(STFuncData));
-	if(!ptr->funcData)
-		errorD(100,"function sym table insert malloc error");
+		ptr->funcData=malloc(sizeof(STFuncData));
+		if(!ptr->funcData)
+			errorD(100,"function sym table insert malloc error");
 
-	ptr->funcData->paramNum=0;
-	ptr->funcData->retNum=0;
-	ptr->funcData->paramTypes=NULL;
-	ptr->funcData->retTypes=NULL;
+		ptr->funcData->paramNum=0;
+		ptr->funcData->retNum=0;
+		ptr->funcData->paramTypes=NULL;
+		ptr->funcData->retTypes=NULL;
 
-	ptr->funcData->declared=isDeclaration;
-	
+		ptr->funcData->declared=isDeclaration;
+		ptr->funcData->defined=!isDeclaration;
+	}
 	return ptr;
 }
 
