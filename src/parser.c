@@ -39,7 +39,7 @@ void LLprog(systemData * d)
             break;  
             case T_FUNC_CALL:
                 LLfuncCall(d);
-            break;  
+            break;
             case K_WHILE:
                 LLwhile(d); 
             break;  
@@ -69,13 +69,17 @@ void LLfunction(systemData *d)
     token t=next(d);
     if(t.type!=T_FUNC_CALL)
         LLerr();
-    //kontrola v sym table
+        
+    STData * data;
+    bool checkOnly;
+    char *key=strCpyWhithMalloc(&d->sData.fullToken);
+    data=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
+    frameStack_pushFrame(&d->pData.dataModel,true);
     t=next(d);
     switch (t.type)
     {
         case T_ID: 
-            //konrola/zaznamenání
-            LLfuncArg(d);
+            LLfuncArg(d,checkOnly,0,data);
         break;   
         case T_RBR:
 
@@ -84,17 +88,24 @@ void LLfunction(systemData *d)
             LLerr();
         break;
     }
+
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();
+    
     t=next(d);
     if(t.type==T_COLON)   
-        LLreturnArg(d);
+        LLreturnArg(d,checkOnly,0,data);
+
     LLprog(d);
+
     if(d->pData.actualToken.type!=K_END)
         LLerr();
+    frameStack_popFrame(&d->pData.dataModel);
+
     t=next(d);
 }
-void LLreturnArg(systemData *d)
+
+void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
 {
     token type=next(d);
     switch (type.type)
@@ -103,7 +114,17 @@ void LLreturnArg(systemData *d)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            //konrola/zaznamenání
+            if(checkOnly)
+            {
+                if(!(argNum<Fdata->funcData->retNum))
+                    errorD(-1,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                else if(Fdata->funcData->retTypes[argNum]!=type.type)
+                    errorD(3,"typ n8vratového parametru neodpovídá typu v deklaracaci");
+            }
+            else
+            {
+                Fdata->funcData->retNum++;
+            }
         break;   
         default:
             LLerr();
@@ -113,18 +134,35 @@ void LLreturnArg(systemData *d)
     switch (t.type)
     {
         case T_COMMA: 
-            LLreturnArg(d);
+            LLreturnArg(d,checkOnly,argNum+1,Fdata);
         break;   
         default:
+            if(!checkOnly)
+            {
+                if(!(Fdata->funcData->retTypes=malloc(sizeof(tokenType)*Fdata->funcData->retNum)))
+                    error(100);
+            }
+            else if(Fdata->funcData->retNum!=(argNum+1))
+            {
+                errorD(-1,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+            }
         break;
     }
+    if(!checkOnly)
+        Fdata->funcData->retTypes[argNum]=type.type;
 }
-void LLfuncArg(systemData *d)
+
+void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
 {
     token id=d->pData.actualToken;
+    if(id.type!=T_ID)
+        LLerr();
+    char *key=strCpyWhithMalloc(&d->sData.fullToken);  
+
     token type=next(d);
     if(type.type!=T_COLON)
         LLerr();
+
     type=next(d);
     switch (type.type)
     {
@@ -132,46 +170,57 @@ void LLfuncArg(systemData *d)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            //konrola/zaznamenání
+            frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            if(checkOnly)
+            {
+                if(!(Fdata->funcData->paramNum>argNum))
+                    errorD(-1,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                else if(Fdata->funcData->paramTypes[argNum]!=type.type)
+                    errorD(3,"typ parametru neodpovídá typu v deklaracaci");
+            }
+            else
+            {
+                Fdata->funcData->paramNum++;
+            }
         break;   
         default:
+            free(key);
             LLerr();
         break;
     }
-    LLfuncArgN(d);
-}
 
-void LLfuncArgN(systemData *d)
-{
     token t=next(d);
-    if(t.type==T_RBR)
-        return;
-    else if(t.type!=T_ID)
-        LLerr();
-    token id=t;
-    t=next(d);
-    if(t.type!=T_COLON)
-        LLerr();
-    token type=next(d);
-    switch (type.type)
+    switch (t.type)
     {
-        case K_NUMBER: 
-        case K_INTEGER: 
-        case K_STRING: 
-        case K_NIL:
-            //konrola/zaznamenání
+        case T_COMMA: 
+            next(d);
+            LLfuncArg(d,checkOnly,argNum+1,Fdata);
         break;   
+        case T_RBR:
+            if(!checkOnly)
+            {
+                if(!(Fdata->funcData->paramTypes=malloc(sizeof(tokenType)*Fdata->funcData->paramNum)))
+                {
+                    error(100);
+                }
+            }
+            else if(Fdata->funcData->paramNum!=(argNum+1))
+            {
+                errorD(-1,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+            }
+        break;
         default:
             LLerr();
         break;
     }
-    LLfuncArgN(d);
+    if(!checkOnly)
+        Fdata->funcData->paramTypes[argNum]=type.type;
 }
 
 void LLif(systemData *d)
 {
     token t=next(d);
-    expresionParse(d);
+    expresionParse(d,false);
     t=d->pData.actualToken;
     if(t.type!=K_THEN)
         LLerr();
@@ -221,7 +270,7 @@ void LLreturn(systemData *d)
         case T_DOUBLE:
         case T_ID: 
             //zparsovat a zkontrolovat
-            expresionParse(d);
+            expresionParse(d,false);
             LLreturnArgN(d);
         break;   
         case K_END:
@@ -250,7 +299,7 @@ void LLreturnArgN(systemData *d)
         case T_DOUBLE:
         case T_ID: 
             //zparsovat a zkontrolovat
-            expresionParse(d);
+            expresionParse(d,false);
             LLreturnArgN(d);
         break;   
         case K_END:
@@ -279,6 +328,7 @@ void LLdeclaration(systemData *d)
     
     STData *ptr;
     type=next(d);   //type of declaration 
+    bool checkOnly;
     switch (d->pData.actualToken.type)
     {
         case K_NUMBER: 
@@ -291,8 +341,8 @@ void LLdeclaration(systemData *d)
                 LLexp_or_func(d);
         break;  
         case T_FUNC_CALL: 
-            ptr =frameStackInsertFunction(&d->pData.dataModel,name,pozition.type==K_GLOBAL,false);
-            LLfuncDecParam(d,ptr);           
+            ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
+            LLfuncDecParam(d,ptr,checkOnly);           
         break;      
         default:
             LLerr();
@@ -300,7 +350,7 @@ void LLdeclaration(systemData *d)
     }
 }
 
-void LLfuncDecParam(systemData *d,STData *funcData)
+void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
 {
     token t=next(d);
     switch (t.type)
@@ -309,7 +359,7 @@ void LLfuncDecParam(systemData *d,STData *funcData)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            LLfuncDecNParam(d,funcData);
+            LLfuncDecNParam(d,Fdata,0,checkOnly);
         break;   
         case T_RBR:
         break;   
@@ -329,7 +379,7 @@ void LLfuncDecParam(systemData *d,STData *funcData)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            LLfuncDecNRet(d,funcData);
+            LLfuncDecNRet(d,Fdata,0,checkOnly);
         break;   
         default:
 
@@ -337,18 +387,24 @@ void LLfuncDecParam(systemData *d,STData *funcData)
     }
 }
 
-void LLfuncDecNRet(systemData *d,STData *funcData)
+void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)
 {
     token Type=d->pData.actualToken;
-    int order;
     switch (Type.type)
     {
         case K_NUMBER: 
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            order=funcData->funcData->retNum;
-            funcData->funcData->retNum++;
+            if(checkOnly)
+            {
+                if(!(argNum<Fdata->funcData->retNum))
+                    errorD(-1,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                else if(Fdata->funcData->retTypes[argNum]!=Type.type)
+                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
+            }
+            else
+                Fdata->funcData->retNum++;
         break;      
         default:
             LLerr();
@@ -359,29 +415,38 @@ void LLfuncDecNRet(systemData *d,STData *funcData)
     {
         case T_COMMA: 
             next(d);
-            LLfuncDecNRet(d,funcData);
+            LLfuncDecNRet(d,Fdata,argNum+1,checkOnly);
         break;      
         default:
-            funcData->funcData->retTypes=malloc(sizeof(tokenType)*funcData->funcData->retNum);
-            if(!funcData->funcData->retTypes)
-                error(100);
+            if(!checkOnly)
+            {
+                if(!(Fdata->funcData->retTypes=malloc(sizeof(tokenType)*Fdata->funcData->retNum)))
+                    error(100);
+            }
         break;
     }
-    funcData->funcData->retTypes[order]=Type.type;
+    if(!checkOnly)
+        Fdata->funcData->retTypes[argNum]=Type.type;
 }
 
-void LLfuncDecNParam(systemData *d,STData *funcData)
+void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
 {
     token Type=d->pData.actualToken;
-    int order;
     switch (Type.type)
     {
         case K_NUMBER: 
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            order=funcData->funcData->paramNum;
-            funcData->funcData->paramNum++;
+            if(checkOnly)
+            {
+                if(!(argNum<Fdata->funcData->paramNum))
+                    errorD(-1,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                else if(Fdata->funcData->paramTypes[argNum]!=Type.type)
+                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
+            }
+            else
+                Fdata->funcData->paramNum++;
         break;      
         default:
             LLerr();
@@ -391,25 +456,28 @@ void LLfuncDecNParam(systemData *d,STData *funcData)
     switch (d->pData.actualToken.type)
     {
         case T_RBR: 
-            funcData->funcData->paramTypes=malloc(sizeof(tokenType)*funcData->funcData->paramNum);
-            if(!funcData->funcData->paramTypes)
-                error(100);
+            if(!checkOnly)
+            {
+                if(!(Fdata->funcData->paramTypes=malloc(sizeof(tokenType)*Fdata->funcData->paramNum)))
+                    error(100);
+            }
         break; 
         case T_COMMA: 
             next(d);
-            LLfuncDecNParam(d,funcData);
+            LLfuncDecNParam(d,Fdata,argNum+1,checkOnly);
         break;      
         default:
             LLerr();
         break;
     }
-    funcData->funcData->paramTypes[order]=Type.type;
+    if(!checkOnly)
+        Fdata->funcData->paramTypes[argNum]=Type.type;
 }
 
 void LLwhile(systemData *d)
 {
     token t=next(d); 
-    expresionParse(d);
+    expresionParse(d,false);
     t=d->pData.actualToken;
     if(t.type!=K_DO)
         LLerr();
@@ -423,8 +491,6 @@ void LLwhile(systemData *d)
 
 void LLid(systemData *d)
 {
-
-    //kontrola v tabulce symbolů
     LLid_next(d);
     if(d->pData.actualToken.type!=T_ASSIGEN)
         LLerr();
@@ -433,7 +499,17 @@ void LLid(systemData *d)
 
 void LLid_next(systemData *d)
 {
-    token t=next(d);
+    token t=d->pData.actualToken;
+    if(t.type!=T_ID)
+        LLerr();
+
+    STData *data=frameStackSearch(&d->pData.dataModel,d->sData.fullToken.str);
+    if(data==NULL)
+        errorD(3,"přiřazení do nedeklarované proměnné");
+    else if(data->type==ST_FUNC)
+        errorD(3,"přiřazení do fukce není legální operace");
+
+    t=next(d);
     switch (t.type)
     {
         case T_ASSIGEN: 
@@ -447,9 +523,6 @@ void LLid_next(systemData *d)
         break;
     }
     t=next(d);
-    if(t.type!=T_ID)
-        LLerr();
-    //kontrola v tabulce symbolů
     LLid_next(d);
 }
 
@@ -465,7 +538,7 @@ void LLexp_or_func(systemData *d)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            expresionParse(d);
+            expresionParse(d,false);
             LLexpresionN(d);
         break;  
         case T_FUNC_CALL: 
@@ -492,7 +565,7 @@ void LLexpresionN(systemData *d)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            expresionParse(d);
+            expresionParse(d,false);
             LLexpresionN(d);
         break;  
         default:
@@ -503,7 +576,12 @@ void LLexpresionN(systemData *d)
 
 void LLfuncCall(systemData *d)
 {
-    //kontrola v tabulce symbolu
+    STData * data=frameStackSearch(&d->pData.dataModel,d->sData.fullToken.str);
+    if(!data)
+        errorD(3,"funkce není deklarována");
+    if(data->type!=ST_FUNC)
+        errorD(3,"proměnná nelze zavolat");
+        
     token t=next(d);
     switch (t.type)
     {   
@@ -529,7 +607,7 @@ void LLfuncCall(systemData *d)
 void LLfArg(systemData *d)
 {   
     //kontrola v tabulce symbolu
-    expresionParse(d);
+    expresionParse(d,false);
     LLfArgN(d);
 }
 
@@ -549,7 +627,7 @@ void LLfArgN(systemData *d)
             case T_STR:
             case K_NIL:
             case T_DOUBLE:
-                expresionParse(d);
+                expresionParse(d,false);
                 LLfArgN(d);
             break;  
             default:

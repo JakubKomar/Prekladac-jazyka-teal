@@ -27,6 +27,7 @@ int main(int argc, char** argv)
     {
         case 0:     //try
             parserMain(&sData);
+            frameStackPrint(&sData.pData.dataModel);
             systemDataDestruct(&sData);
             fprintf(stderr,"\033[32mTranslate successful \033[0m\n");//odstranit před odevzdáním, pouze vizualizace korekního překladu
             return 0;
@@ -98,7 +99,7 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
                 while(sData.pData.actualToken.type!=T_EOF)
                 {
                     sData.pData.actualToken=getNextUsefullToken(&sData.sData);
-                    expresionParse(&sData);
+                    expresionParse(&sData,false);
                 }
             }
             else

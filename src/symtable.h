@@ -193,7 +193,8 @@ void frameStackPrint(frameStack *f);
  */
 void symtable_print (STSymbolPtr* RootPtr);
 
- STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal);
- STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isDefinition);
- STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
+STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal);
+STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly);
+STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly);
+STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
  #endif 

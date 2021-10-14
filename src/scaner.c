@@ -414,6 +414,7 @@ void initScanerData(scanerData * data)
 void destructScanerData(scanerData * data)
 {
     stringDestruct(&data->fullToken);
+    stringDestruct(&data->fullLine);
 }
 
 void loadChar(scanerData * data)

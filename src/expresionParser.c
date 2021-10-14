@@ -19,7 +19,7 @@ const char precTable[10][10] =
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
 
-void expresionParse(systemData *sData)
+void expresionParse(systemData *sData,bool ignor)
 {
     debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;

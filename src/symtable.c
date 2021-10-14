@@ -48,6 +48,7 @@ STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id)
 
 	if(strcmp((*RootPtr)->id, id) == 0)
 	{
+		free(id);
 		errorD(3,"The symbol already exists in the symbol table.");
 		return NULL;
 	}
@@ -130,7 +131,7 @@ void symtable_dispose (STSymbolPtr* RootPtr)
 	{
 		symtable_dispose(&(*RootPtr)->rPtr);
 		symtable_dispose(&(*RootPtr)->lPtr);
-		//symtable_data_disporese(RootPtr);
+		symtable_data_disporese(&(*RootPtr));
 		free ((*RootPtr));
 		(*RootPtr) = NULL;
 	}
@@ -161,8 +162,20 @@ void symtable_print (STSymbolPtr* RootPtr)
 	if((*RootPtr)->lPtr!=NULL)
 		symtable_print(&(*RootPtr)->lPtr);
 	
-	debug("\t%s\n",(*RootPtr)->id);
-
+	debug("\t%10s %10s:",(*RootPtr)->id,(*RootPtr)->data.type==ST_FUNC?"Function":"Variable");
+	if((*RootPtr)->data.type==ST_FUNC)
+	{
+		debugS("[");
+		for (int i = 0; i < (*RootPtr)->data.funcData->paramNum; i++)
+			debug("%s,",tokenStr((token){(*RootPtr)->data.funcData->paramTypes[i]}));
+		debugS("],[");
+		for (int i = 0; i < (*RootPtr)->data.funcData->retNum; i++)
+			debug("%s,",tokenStr((token){(*RootPtr)->data.funcData->retTypes[i]}));
+		debugS("]");
+	}
+	else
+		debug("%s",tokenStr((token){(*RootPtr)->data.varData->type}));
+	debugS("\n");
 	if((*RootPtr)->rPtr!=NULL)
 		symtable_print(&(*RootPtr)->rPtr);
 }
@@ -256,18 +269,18 @@ STData * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 	return NULL;
 }
 
-STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isDeclaration)
+STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly)
 {
 	STData *ptr= frameStackSearchActual(f,key,isGlobal);
 	if(ptr)
 	{
 		free(key);
-		if((isDeclaration&&ptr->funcData->declared)||(!isDeclaration&&ptr->funcData->defined))
+		if(ptr->type!=ST_FUNC)
+			errorD(3,"k id funcke již byla přiřazena proměnná");
+		if(ptr->funcData->declared)
 			errorD(3,"redeklarace/redefinice funkce");
-		if(isDeclaration)
-			ptr->funcData->declared=true;
-		else
-			ptr->funcData->defined=true;
+		ptr->funcData->declared=true;
+		*checkOnly=true;
 	}
 	else
 	{
@@ -284,11 +297,50 @@ STData * frameStackInsertFunction(frameStack *f,char *key,bool isGlobal,bool isD
 		ptr->funcData->paramTypes=NULL;
 		ptr->funcData->retTypes=NULL;
 
-		ptr->funcData->declared=isDeclaration;
-		ptr->funcData->defined=!isDeclaration;
+		ptr->funcData->declared=true;
+		ptr->funcData->defined=false;
+		*checkOnly=false;
 	}
 	return ptr;
 }
+
+STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly)
+{
+	STData *ptr;
+	if((ptr=frameStackSearchActual(f,key,false)))
+	{}
+	else if((ptr=frameStackSearchActual(f,key,true)))
+	{}
+	else
+	{
+		ptr =frameStackInsert(f,key,false);
+		ptr->type=ST_FUNC;
+		ptr->varData=NULL;
+
+		ptr->funcData=malloc(sizeof(STFuncData));
+		if(!ptr->funcData)
+			errorD(100,"function sym table insert malloc error");
+
+		ptr->funcData->paramNum=0;
+		ptr->funcData->retNum=0;
+		ptr->funcData->paramTypes=NULL;
+		ptr->funcData->retTypes=NULL;
+
+		ptr->funcData->declared=false;
+		ptr->funcData->defined=true;
+		*checkOnly=false;
+		return ptr;
+	}
+	free(key);
+	*checkOnly=true;
+	if(ptr->type!=ST_FUNC)
+		errorD(3,"k id funcke již byla přiřazena proměnná");
+	else if(ptr->funcData->defined)
+		errorD(3,"tato funkce již byla definována");
+	ptr->funcData->defined=true;	
+	return ptr;
+}
+
 
 STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype)
 {

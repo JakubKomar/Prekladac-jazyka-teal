@@ -47,12 +47,12 @@ void LLfuncArgN(systemData *d);
  * simulating nonterminal for function parameter
  * @param *d system data
  */
-void LLfuncArg(systemData *d);
+void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
 /**
  * simulating nonterminal for function return parameters
  * @param *d system data
  */
-void LLreturnArg(systemData *d);
+void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
 /**
  * simulating nonterminal for if/else structure
  * @param *d system data
@@ -82,17 +82,17 @@ void LLdeclaration(systemData *d);
  * simulating nonterminal for declaration arg in fucntion
  * @param *d system data
  */
-void LLfuncDecParam(systemData *d,STData *funcData);
+void LLfuncDecParam(systemData *d,STData *funcData,bool checkOnly);
 /**
  * simulating nonterminal for declaration N args in fucntion
  * @param *d system data
  */
-void LLfuncDecNParam(systemData *d,STData *funcData);
+void LLfuncDecNParam(systemData *d,STData *funcData,int argNum,bool checkOnly);
 /**
  * simulating nonterminal for declaration retrun arg in fucntion
  * @param *d system data
  */
-void LLfuncDecNRet(systemData *d,STData *funcData);
+void LLfuncDecNRet(systemData *d,STData *funcData,int argNum,bool checkOnly);
 /**
  * simulating nonterminal for while structure
  * @param *d system data
