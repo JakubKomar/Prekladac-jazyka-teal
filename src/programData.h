@@ -10,10 +10,11 @@
 #include "scaner.h"
 #include "stack.h"
 #include "dstring.h"
+#include "symtable.h"
 
 typedef struct {
-    stack stack;
     token actualToken;   
+    frameStack dataModel;
 }parserData;
 
 typedef struct
@@ -25,6 +26,6 @@ typedef struct {
     scanerData sData;
     parserData pData;
     expresionParserData epData;
-    bNodePtr symTable;
+    STSymbolPtr symTable;
 }systemData;
 

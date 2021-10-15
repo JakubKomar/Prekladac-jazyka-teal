@@ -8,8 +8,17 @@
 
 int main(int argc, char** argv)
 {
+    if(FORM_FILE)
+    {
+        fp=fopen("test.lua","r");
+        if(!fp)
+        {
+            fprintf(stderr,"file not opened\n");
+            exit(1);
+        }
+    }
     argParse( argc, argv);
-
+    
     systemData sData;
     systemDataInit(&sData);
 
@@ -18,6 +27,7 @@ int main(int argc, char** argv)
     {
         case 0:     //try
             parserMain(&sData);
+            frameStackPrint(&sData.pData.dataModel);
             systemDataDestruct(&sData);
             fprintf(stderr,"\033[32mTranslate successful \033[0m\n");//odstranit před odevzdáním, pouze vizualizace korekního překladu
             return 0;
@@ -30,6 +40,10 @@ int main(int argc, char** argv)
             systemDataDestruct(&sData);
         break;
     }
+    
+    if(FORM_FILE)
+        fclose(fp);
+        
     return errCode;
 }
 
@@ -47,7 +61,7 @@ void argParse(int argc, char** argv)
         else if(!strcmp(argv[i],"-e"))
             expresionOnlyF=true;
         else if(!strcmp(argv[i],"-h")){
-            fprintf(stderr,"Translater of programing language něco to programing language IFJ21\noptions:\n\t-d\tdebug mode enable\n\t-s\tsematic check only\n\t-h\tprint help\n");
+            fprintf(stderr,"Translater of programing language Teal to programing language IFJ21code\noptions:\n\t-d\tdebug mode enable\n\t-s\tsematic check only\n\t-h\tprint help\n");
             exit(0);
         }
         else{
@@ -85,8 +99,12 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
                 while(sData.pData.actualToken.type!=T_EOF)
                 {
                     sData.pData.actualToken=getNextUsefullToken(&sData.sData);
-                    expresionParse(&sData);
+                    expresionParse(&sData,false);
                 }
+            }
+            else
+            {
+               
             }
             systemDataDestruct(&sData);
         break; 

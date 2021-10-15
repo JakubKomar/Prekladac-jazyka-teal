@@ -9,6 +9,7 @@
 #include "scaner.h"
 #include "expresionParser.h"
 #include "stack.h"
+#include "symtable.h"
 #include "programData.h"
 
 /**
@@ -33,6 +34,121 @@ void parserMain(systemData * data);
 */ 
 void useLLtable(token actualToken,stack *stack);
 /**
+ * simulating nonterminal for function definition
+ * @param *d system data
+ */
+void LLfunction(systemData *d);
+/**
+ * simulating nonterminal for function N parameter
+ * @param *d system data
+ */
+void LLfuncArgN(systemData *d);
+/**
+ * simulating nonterminal for function parameter
+ * @param *d system data
+ */
+void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
+/**
+ * simulating nonterminal for function return parameters
+ * @param *d system data
+ */
+void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
+/**
+ * simulating nonterminal for if/else structure
+ * @param *d system data
+ */
+void LLif(systemData *d);
+/**
+ * simulating nonterminal for else structure
+ * @param *d system data
+ */
+void LLelse(systemData *d);
+/**
+ * simulating nonterminal for return
+ * @param *d system data
+ */
+void LLreturn(systemData *d);
+/**
+ * simulating nonterminal for N return args
+ * @param *d system data
+ */
+void LLreturnArgN(systemData *d);
+/**
+ * simulating nonterminal for declaration function/var
+ * @param *d system data
+ */
+void LLdeclaration(systemData *d);
+/**
+ * simulating nonterminal for declaration arg in fucntion
+ * @param *d system data
+ */
+void LLfuncDecParam(systemData *d,STData *funcData,bool checkOnly);
+/**
+ * simulating nonterminal for declaration N args in fucntion
+ * @param *d system data
+ */
+void LLfuncDecNParam(systemData *d,STData *funcData,int argNum,bool checkOnly);
+/**
+ * simulating nonterminal for declaration retrun arg in fucntion
+ * @param *d system data
+ */
+void LLfuncDecNRet(systemData *d,STData *funcData,int argNum,bool checkOnly);
+/**
+ * simulating nonterminal for while structure
+ * @param *d system data
+ */
+void LLwhile(systemData *d);
+/**
+ * simulating nonterminal for function call
+ * @param *d system data
+ */
+void LLfuncCall(systemData *d);
+/**
+ * simulating nonterminal for header of program
+ * @param *d system data
+ */
+void LLprolog(systemData * d);
+/**
+ * simulating nonterminal for main body of program
+ * @param *d system data
+ */
+void LLprog(systemData * d);
+/**
+ * simulating nonterminal for id asigen
+ * @param *d system data
+ */
+void LLid(systemData *d);
+/**
+ * simulating nonterminal for next id asigen
+ * @param *d system data
+ */
+void LLid_next(systemData * d); 
+/**
+ * simulating nonterminal for asigen behind equlation
+ * @param *d system data
+ */
+void LLexp_or_func(systemData *d);
+/**
+ * simulating nonterminal for  
+ * @param *d system data
+ */
+void LLfArg(systemData *d);
+/**
+ * simulating nonterminal for 
+ * @param *d system data
+ */
+void LLfArgN(systemData *d);
+/**
+ * simulating nonterminal for 
+ * @param *d system data
+ */
+void LLexpresionN(systemData *d);
+/**
+ * simulating nonterminal for 
+ * @param *d system data
+ */
+token next(systemData *d);
+/**
  * error handeling from "useLLtable" function
  */
-void LLTableErr();
+void LLerr();

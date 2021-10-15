@@ -15,7 +15,7 @@
  * main part of expresion parser
  * @param *sData data to operat whith
  */
-void expresionParse(systemData *sData);
+void expresionParse(systemData *sData,bool ignor);
 /**
  * returning symbol from precedence table 
  * @param actual actual token on input

@@ -101,7 +101,7 @@ token stackTop(stack *s)
             return s->array[i];
         }
     }
-    return (token){O_ERR,NULL};
+    return (token){O_ERR};
 }
 
 void stackRemoveHande(stack *s)
@@ -112,7 +112,7 @@ void stackRemoveHande(stack *s)
 
 void stackShiftRight(stack *s,int wege)
 {
-    token empty={O_UNIMPORTANT,NULL};
+    token empty={O_UNIMPORTANT};
     stackPush(s,empty);
     for (int i =s->last-1; i>wege ;i--)
     {
