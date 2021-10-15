@@ -76,7 +76,7 @@ typedef enum{
  * @param *data scanner data
  * @return if ID-T_ID else keyword token
 */
-tokenType checkKeywords(scanerData *data);
+tokenType checkKeywords(scanerData *data,tokenType type);
 /**
  * geting next usefull token-ignoring commets, ...
  * @param *data scanner data

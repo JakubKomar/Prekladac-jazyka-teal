@@ -45,12 +45,12 @@ tokenType getNextToken(scanerData * data)
     tokenType token= getTokenFromState(prevState);
     if(token==O_ERR)
         errorD(1,"není koncový stav");  //zatím provizorní
-    else if(token==T_ID)
-        token=checkKeywords(data);
+    else if(token==T_ID||token==T_FUNC_CALL)
+        token=checkKeywords(data,token);
     return token;
 }
 
-tokenType checkKeywords(scanerData *data)
+tokenType checkKeywords(scanerData *data,tokenType type)
 {
     char *s=data->fullToken.str;
     tokenType token;
@@ -88,7 +88,16 @@ tokenType checkKeywords(scanerData *data)
         token=K_NUMBER;
     else
         token=T_ID;
-    return token;
+
+    if(type==T_FUNC_CALL&&token!=T_ID)
+    {
+        errorD(-1,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
+        return O_ERR;
+    }
+    else if(type==T_FUNC_CALL&&token==T_ID)
+        return T_FUNC_CALL;
+    else
+        return token;
 }
 
 tokenType getTokenFromState(state state)

@@ -171,7 +171,9 @@ void frameDisporse(frame *f);
  *  @param *f pointer to memory model
  *  @param *key key which is searched
  */
-STData * frameStackSearch(frameStack *f,char * key);
+STData * frameStackSearchVar(frameStack *f,char * key);
+
+STData * frameStackSearchFunc(frameStack *f,char * key);
 
 /** @brief inserting new item in memory model
  *
@@ -187,14 +189,46 @@ STData * frameStackInsert(frameStack *f,char *key,bool isGlobal);
  */
 void frameStackPrint(frameStack *f);
 
-/** @brief printing binary tree
+/** @brief searching in memory model
  *
- *  @param *RootPtr pointer to root item
+ *  @param *f pointer to memory model
+ *  @param *key name of searching the record
+ *  @param isGlobal where to search- true:global frame, false:local frame on the top of stack
+ *  @return pointer to finded data, if not finded null
  */
-void symtable_print (STSymbolPtr* RootPtr);
+STData * frameStackSearchActual(frameStack *f,char * key,bool isGlobal);
 
-STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal);
+/** @brief inserting function definition to memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of inserting the record
+ *  @param isGlobal where to inset- true:global frame, false:local frame on the top of stack
+ *  @return pointer to inserted data
+ */
 STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly);
+
+/** @brief inserting function declaration to memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of inserting the record
+ *  @param *checkOnly if there is a declaration record, param will be set on true, else false
+ *  @return pointer to inserted data
+ */
 STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly);
+
+/** @brief inserting var declaration to memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of inserting the record
+ *  @param isGlobal where to inset- true:global frame, false:local frame on the top of stack
+ *  @param *checkOnly if there is a definition record, param will be set on true, else false
+ *  @return pointer to inserted data
+ */
 STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
- #endif 
+
+void frameStack_initPreFunctions(frameStack * f);
+void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int parN,tokenType *retTypes,int retN);
+
+
+
+#endif 

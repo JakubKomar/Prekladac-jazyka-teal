@@ -1,4 +1,2 @@
--- Program 3: Prace s ěretzci a vestavenymi funkcemi 0
+-- Program 1: Vypocet faktorialu (iterativne) 2
 require "ifj21"
-
-global a:function(string,integer):string,string,string,string,string,string,string,string,string,string,string

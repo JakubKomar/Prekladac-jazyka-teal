@@ -75,6 +75,7 @@ void LLfunction(systemData *d)
     char *key=strCpyWhithMalloc(&d->sData.fullToken);
     data=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
     frameStack_pushFrame(&d->pData.dataModel,true);
+    //generate function header
     t=next(d);
     switch (t.type)
     {
@@ -101,7 +102,7 @@ void LLfunction(systemData *d)
     if(d->pData.actualToken.type!=K_END)
         LLerr();
     frameStack_popFrame(&d->pData.dataModel);
-
+    //generete function footer
     t=next(d);
 }
 
@@ -182,6 +183,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             {
                 Fdata->funcData->paramNum++;
             }
+            //generete param
         break;   
         default:
             free(key);
@@ -503,7 +505,7 @@ void LLid_next(systemData *d)
     if(t.type!=T_ID)
         LLerr();
 
-    STData *data=frameStackSearch(&d->pData.dataModel,d->sData.fullToken.str);
+    STData *data=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
     if(data==NULL)
         errorD(3,"přiřazení do nedeklarované proměnné");
     else if(data->type==ST_FUNC)
@@ -576,7 +578,7 @@ void LLexpresionN(systemData *d)
 
 void LLfuncCall(systemData *d)
 {
-    STData * data=frameStackSearch(&d->pData.dataModel,d->sData.fullToken.str);
+    STData * data=frameStackSearchFunc(&d->pData.dataModel,d->sData.fullToken.str);
     if(!data)
         errorD(3,"funkce není deklarována");
     if(data->type!=ST_FUNC)
@@ -646,6 +648,7 @@ token next(systemData *d)
 void initParserData(parserData * data)
 {
     frameStack_init(&data->dataModel);
+    frameStack_initPreFunctions(&data->dataModel);
 }
 
 void destructParserData(parserData * data)

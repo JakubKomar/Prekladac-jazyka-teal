@@ -21,13 +21,13 @@ int main(int argc, char** argv)
     
     systemData sData;
     systemDataInit(&sData);
+    frameStackPrint(&sData.pData.dataModel);
 
     int errCode=setjmp(errorHandelingJump); //simulating try catch block
     switch (errCode)
     {
         case 0:     //try
             parserMain(&sData);
-            frameStackPrint(&sData.pData.dataModel);
             systemDataDestruct(&sData);
             fprintf(stderr,"\033[32mTranslate successful \033[0m\n");//odstranit před odevzdáním, pouze vizualizace korekního překladu
             return 0;

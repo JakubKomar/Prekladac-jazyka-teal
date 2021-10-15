@@ -194,7 +194,21 @@ void frameStack_init(frameStack * s)
 
 	frameInit(&s->globalF,true);
 	frameStack_pushFrame(s,true);
+
 }
+
+void frameStack_initPreFunctions(frameStack * f)
+{
+	frameStack_initPreFunction(f,"reads",NULL,0,(tokenType []){K_STRING},1);
+	frameStack_initPreFunction(f,"readi",NULL,0,(tokenType []){K_INTEGER},1);
+	frameStack_initPreFunction(f,"readn",NULL,0,(tokenType []){K_NUMBER},1);
+	frameStack_initPreFunction(f,"tointeger",(tokenType []){K_NUMBER},1,(tokenType []){K_INTEGER},1);
+	frameStack_initPreFunction(f,"substr",(tokenType []){K_STRING,K_NUMBER,K_NUMBER},3,(tokenType []){K_STRING},1);
+	frameStack_initPreFunction(f,"ord",(tokenType []){K_STRING,K_STRING},2,(tokenType []){K_INTEGER},1);
+	frameStack_initPreFunction(f,"chr",(tokenType []){K_INTEGER},1,(tokenType []){K_STRING},1);
+	frameStack_initPreFunction(f,"write",NULL,0,NULL,0);
+}
+
 
 void frameStack_realoc(frameStack * s)
 {
@@ -236,7 +250,7 @@ void frameInit(frame *f,bool wedge)
 	symtable_init(&f->bTree);
 }
 
-STData * frameStackSearch(frameStack *f,char * key)
+STData * frameStackSearchVar(frameStack *f,char * key)
 {
 	STData *data=NULL;
 	for(int i=f->last;i>=0;--i)
@@ -247,6 +261,19 @@ STData * frameStackSearch(frameStack *f,char * key)
 			return data;
 		else if(f->localF[i].wedge)
 			break;
+	}
+	data=symtable_search(&f->globalF.bTree,key);
+	return data;
+}
+
+STData * frameStackSearchFunc(frameStack *f,char * key)
+{
+	STData *data=NULL;
+	for(int i=f->last;i>=0;--i)
+	{
+		data=symtable_search(&f->localF[i].bTree,key);
+		if(data!=NULL)
+			return data;
 	}
 	data=symtable_search(&f->globalF.bTree,key);
 	return data;
@@ -302,6 +329,60 @@ STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlob
 		*checkOnly=false;
 	}
 	return ptr;
+}
+
+void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int parN,tokenType *retTypes,int retN)
+{
+	int len=0;
+	while (true)
+	{
+		if(key[len]=='\0')
+			break;
+		len++;
+	}
+	char * copy;
+	if(!(copy=malloc(sizeof(char)*(len+2))))
+		error(100);
+	strcpy(copy,key);
+
+	STData *ptr;
+	ptr =frameStackInsert(f,copy,true);
+	ptr->type=ST_FUNC;
+	ptr->varData=NULL;
+
+	ptr->funcData=malloc(sizeof(STFuncData));
+	if(!ptr->funcData)
+		errorD(100,"function sym table insert malloc error");
+
+	ptr->funcData->paramNum=parN;
+	ptr->funcData->retNum=retN;
+	ptr->funcData->declared=true;
+	ptr->funcData->defined=true;
+	
+
+	if(parN>0)
+	{
+		if(!(ptr->funcData->paramTypes=malloc(sizeof(tokenType)*parN)))
+			error(100);
+		for(int i=0;i<parN;i++)
+		{
+			ptr->funcData->paramTypes[i]=params[i];
+		}
+	}
+	else
+		ptr->funcData->paramTypes=NULL;
+
+	if(retN>0)
+	{
+		if(!(ptr->funcData->retTypes=malloc(sizeof(tokenType)*retN)))
+			error(100);
+		for(int i=0;i<retN;i++)
+		{
+			ptr->funcData->retTypes[i]=retTypes[i];
+		}
+	}
+	else
+		ptr->funcData->retTypes=NULL;
 }
 
 STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly)

@@ -5,7 +5,7 @@ function main() -- uzivatelska funkce bez parametru
        
     else
 
-
+    
     return
 end
 main() -- prikaz hlavniho tela programu
