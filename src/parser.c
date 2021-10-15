@@ -401,9 +401,9 @@ void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(-1,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(5,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->retTypes[argNum]!=Type.type)
-                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
+                    errorD(5,"typ návratového parametru neodpovídá typu v definici");
             }
             else
                 Fdata->funcData->retNum++;
@@ -443,9 +443,9 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->paramNum))
-                    errorD(-1,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(5,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->paramTypes[argNum]!=Type.type)
-                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
+                    errorD(5,"typ návratového parametru neodpovídá typu v definici");
             }
             else
                 Fdata->funcData->paramNum++;
