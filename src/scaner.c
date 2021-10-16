@@ -14,11 +14,7 @@ token getNextUsefullToken(scanerData * data)
     } while (tType==O_UNIMPORTANT||tType==O_ERR);
     
     token next={tType};
-    if(tType==T_ID||tType==T_INT||tType==T_STR||tType==T_DOUBLE)
-    {
-        //vložit do tabulky symbolů
-    }
-
+    
     return next;
 }
 
@@ -61,7 +57,7 @@ tokenType checkKeywords(scanerData *data,tokenType type)
     else if(!strcmp(s,"end"))
         token=K_END;
     else if(!strcmp(s,"function"))
-        token=K_FUNCTION;
+        return K_FUNCTION;
     else if(!strcmp(s,"global"))
         token=K_GLOBAL;
     else if(!strcmp(s,"if"))
@@ -91,7 +87,7 @@ tokenType checkKeywords(scanerData *data,tokenType type)
 
     if(type==T_FUNC_CALL&&token!=T_ID)
     {
-        errorD(-1,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
+        errorD(3,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
         return O_ERR;
     }
     else if(type==T_FUNC_CALL&&token==T_ID)

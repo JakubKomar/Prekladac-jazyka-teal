@@ -83,16 +83,14 @@ void debugRun(bool scanerOnlyF,bool expresionOnlyF)
         case 0:  //try
             if(scanerOnlyF)
             {
-                scanerData scData;
-                initScanerData(&scData);
-                token actualToken=getNextUsefullToken(&scData);
+                token actualToken=(token){T_COMMA};
 
                 for(int i=0;actualToken.type!=T_EOF;i++)
                 {
-                    actualToken=getNextUsefullToken(&scData);
-                    debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),scData.fullToken.str);
+                    actualToken=getNextUsefullToken(&sData.sData);
+                    debug("%d\t%-10s\t%s\n",i,tokenStr(actualToken),sData.sData.fullToken.str);
                 }
-                destructScanerData(&scData);
+                destructScanerData(&sData.sData);
             }
             else if(expresionOnlyF)
             {               
