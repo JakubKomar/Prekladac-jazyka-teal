@@ -236,10 +236,22 @@ void frameStack_pushFrame(frameStack * s,bool isFunc)
 	frameInit(&s->localF[s->last],isFunc);
 }
 
+bool searchForNonDefinedFunction(STSymbolPtr* RootPtr)
+{
+	if((*RootPtr))
+	{
+		if(((*RootPtr)->data.type==ST_FUNC&&(!((*RootPtr)->data.funcData->defined)))||(searchForNonDefinedFunction(&(*RootPtr)->lPtr))||(searchForNonDefinedFunction(&(*RootPtr)->rPtr)))
+			return true;
+	}
+		return false;
+}
+
 void frameStack_popFrame(frameStack * s)
 {
 	if(s->last<0)
 		errorD(99,"podtečení zásobníku rámců");
+	if(searchForNonDefinedFunction(&s->localF[s->last].bTree))
+		errorD(3,"Byla nalezena deklarovaná funkce bez definice");
 	symtable_dispose(&s->localF[s->last].bTree);	
 	s->last--;
 }

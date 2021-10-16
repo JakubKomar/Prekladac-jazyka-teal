@@ -122,12 +122,12 @@ void LLid(systemData *d);
  * simulating nonterminal for next id asigen
  * @param *d system data
  */
-void LLid_next(systemData * d); 
+void LLid_next(systemData * d,int order); 
 /**
  * simulating nonterminal for asigen behind equlation
  * @param *d system data
  */
-void LLexp_or_func(systemData *d);
+void LLexp_or_func(systemData *d,int numOfAsigens);
 /**
  * simulating nonterminal for  
  * @param *d system data
@@ -142,7 +142,7 @@ void LLfArgN(systemData *d);
  * simulating nonterminal for 
  * @param *d system data
  */
-void LLexpresionN(systemData *d);
+void LLexpresionN(systemData *d,int numOfAsigens);
 /**
  * simulating nonterminal for 
  * @param *d system data

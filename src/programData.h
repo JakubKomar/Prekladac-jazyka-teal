@@ -15,6 +15,7 @@
 typedef struct {
     token actualToken;   
     frameStack dataModel;
+    stack expresionBuffer;
 }parserData;
 
 typedef struct

@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 {
     if(FORM_FILE)
     {
-        fp=fopen("test.lua","r");
+        fp=fopen("C:\\letsCodeSomeShit\\IFJ-2021\\src\\test.lua","r");
         if(!fp)
         {
             fprintf(stderr,"file not opened\n");
@@ -21,7 +21,6 @@ int main(int argc, char** argv)
     
     systemData sData;
     systemDataInit(&sData);
-    frameStackPrint(&sData.pData.dataModel);
 
     int errCode=setjmp(errorHandelingJump); //simulating try catch block
     switch (errCode)

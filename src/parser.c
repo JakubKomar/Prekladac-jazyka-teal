@@ -11,6 +11,9 @@ void parserMain(systemData * d)
     LLprog(d);
     if(d->pData.actualToken.type!=T_EOF)
         LLerr();
+    frameStack_popFrame(&d->pData.dataModel);
+    if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))
+        errorD(3,"k některé uživatelské funci chybí definice");
 }
 
 void LLprolog(systemData * d)
@@ -84,7 +87,7 @@ void LLfunction(systemData *d)
         break;   
         case T_RBR:
             if(checkOnly&&data->funcData->paramNum>0)
-                errorD(5,"počty parametů v deklaraci neodpovídají");
+                errorD(3,"počty parametů v deklaraci neodpovídají");
         break; 
         default:
             LLerr();
@@ -98,7 +101,7 @@ void LLfunction(systemData *d)
     if(t.type==T_COLON)   
         LLreturnArg(d,checkOnly,0,data);
     else if(checkOnly&&data->funcData->retNum>0)
-        errorD(5,"počty návratových parametů v deklaraci neodpovídají");
+        errorD(3,"počty návratových parametů v deklaraci neodpovídají");
 
     LLprog(d);
 
@@ -121,9 +124,9 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(5,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                    errorD(3,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
                 else if(Fdata->funcData->retTypes[argNum]!=type.type)
-                    errorD(5,"typ n8vratového parametru neodpovídá typu v deklaracaci");
+                    errorD(3,"typ n8vratového parametru neodpovídá typu v deklaracaci");
             }
             else
             {
@@ -148,7 +151,7 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             }
             else if(Fdata->funcData->retNum!=(argNum+1))
             {
-                errorD(5,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                errorD(3,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
             }
         break;
     }
@@ -178,9 +181,9 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             if(checkOnly)
             {
                 if(!(Fdata->funcData->paramNum>argNum))
-                    errorD(5,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                    errorD(3,"počty argumentů v definici neodpovídají počtu v deklaracaci");
                 else if(Fdata->funcData->paramTypes[argNum]!=type.type)
-                    errorD(5,"typ parametru neodpovídá typu v deklaracaci");
+                    errorD(3,"typ parametru neodpovídá typu v deklaracaci");
             }
             else
             {
@@ -211,7 +214,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             }
             else if(Fdata->funcData->paramNum!=(argNum+1))
             {
-                errorD(5,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                errorD(3,"počty argumentů v definici neodpovídají počtu v deklaracaci");
             }
         break;
         default:
@@ -343,7 +346,7 @@ void LLdeclaration(systemData *d)
             ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
-                LLexp_or_func(d);
+                LLexp_or_func(d,1);
         break;  
         case K_FUNCTION: 
             ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -368,7 +371,7 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
         break;   
         case T_RBR:
             if(checkOnly&&Fdata->funcData->paramNum>0)
-                errorD(5,"počty parametů v deklaraci neodpovídají");
+                errorD(3,"počty parametů v deklaraci neodpovídají");
         break;   
         default:
             LLerr();
@@ -390,7 +393,7 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
         break;   
         default:
             if(checkOnly&&Fdata->funcData->retNum>0)
-                errorD(5,"počty návratovýchparametů v deklaraci neodpovídají");
+                errorD(3,"počty návratovýchparametů v deklaraci neodpovídají");
         break;
     }
 }
@@ -407,9 +410,9 @@ void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(5,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(3,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->retTypes[argNum]!=Type.type)
-                    errorD(5,"typ návratového parametru neodpovídá typu v definici");
+                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
             }
             else
                 Fdata->funcData->retNum++;
@@ -449,9 +452,9 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->paramNum))
-                    errorD(5,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(3,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->paramTypes[argNum]!=Type.type)
-                    errorD(5,"typ návratového parametru neodpovídá typu v definici");
+                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
             }
             else
                 Fdata->funcData->paramNum++;
@@ -499,42 +502,39 @@ void LLwhile(systemData *d)
 
 void LLid(systemData *d)
 {
-    LLid_next(d);
-    if(d->pData.actualToken.type!=T_ASSIGEN)
-        LLerr();
-    LLexp_or_func(d);
+    LLid_next(d,0);
 }
 
-void LLid_next(systemData *d)
+void LLid_next(systemData *d,int order)
 {
     token t=d->pData.actualToken;
     if(t.type!=T_ID)
         LLerr();
-
+    order++;
     STData *data=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
     if(data==NULL)
         errorD(3,"přiřazení do nedeklarované proměnné");
     else if(data->type==ST_FUNC)
         errorD(3,"přiřazení do fukce není legální operace");
+    stackPush(&d->pData.expresionBuffer,(token){data->varData->type});
 
     t=next(d);
     switch (t.type)
     {
         case T_ASSIGEN: 
-            return;
+            LLexp_or_func(d,order);
         break;   
         case T_COMMA: 
-        
+            LLid_next(d,order);
         break;  
         default:
             LLerr();
         break;
     }
-    t=next(d);
-    LLid_next(d);
+    
 }
 
-void LLexp_or_func(systemData *d)
+void LLexp_or_func(systemData *d,int numOfAsigens)
 {
     token t=next(d);
     switch (t.type)
@@ -546,8 +546,7 @@ void LLexp_or_func(systemData *d)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            expresionParse(d,false);
-            LLexpresionN(d);
+            LLexpresionN(d,numOfAsigens);
         break;  
         case T_FUNC_CALL: 
             LLfuncCall(d);
@@ -558,12 +557,9 @@ void LLexp_or_func(systemData *d)
     }
 }
 
-void LLexpresionN(systemData *d)
+void LLexpresionN(systemData *d,int numOfAsigens)
 {
     token t=d->pData.actualToken;
-    if(t.type!=T_COMMA)
-        return;
-    t=next(d);
     switch (t.type)
     {
         case T_INT:
@@ -573,13 +569,23 @@ void LLexpresionN(systemData *d)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            expresionParse(d,false);
-            LLexpresionN(d);
+            if(numOfAsigens>0)
+                expresionParse(d,false);
+            else
+                expresionParse(d,true);
         break;  
         default:
             LLerr();
         break;
     }
+    if(t.type==T_COMMA)
+    {
+        t=next(d);
+        LLexpresionN(d,numOfAsigens-1);
+    }
+    else if(numOfAsigens>1)
+        errorD(3,"počet výrazů je menší než počet identifikátorů v příkazu přiřazení");
+
 }
 
 void LLfuncCall(systemData *d)
@@ -655,6 +661,7 @@ void initParserData(parserData * data)
 {
     frameStack_init(&data->dataModel);
     frameStack_initPreFunctions(&data->dataModel);
+    stackInit(&data->expresionBuffer);
 }
 
 void destructParserData(parserData * data)

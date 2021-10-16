@@ -228,7 +228,7 @@ STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Tty
 
 void frameStack_initPreFunctions(frameStack * f);
 void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int parN,tokenType *retTypes,int retN);
-
+bool searchForNonDefinedFunction(STSymbolPtr* RootPtr);
 
 
 #endif 
