@@ -180,13 +180,15 @@ void reduction(stack *s)
     }
 }
 
-tokenType aritmeticComCheck(token id1,token id2)
+tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
 {
+    if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+        errorD(8,"nepovolená operace s nil");
     if(id1.typeOfValue!=K_INTEGER&&id1.typeOfValue!=K_NUMBER)
         error(6);
     if(id2.typeOfValue!=K_INTEGER&&id2.typeOfValue!=K_NUMBER)
         error(6);
-    if(id1.typeOfValue==K_NUMBER||id1.typeOfValue==K_NUMBER)
+    if(id1.typeOfValue==K_NUMBER||id1.typeOfValue==K_NUMBER||forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
@@ -203,6 +205,34 @@ tokenType aritmeticComCheck(token id1,token id2)
     return K_INTEGER;
 }
 
+tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
+{
+    if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+    {
+        if(!nillEnable)
+            errorD(8,"nepovolená operace s nil");
+    }
+    else if(id1.typeOfValue!=id2.typeOfValue)
+    {
+        if(id1.typeOfValue==K_NUMBER||id1.typeOfValue==K_NUMBER)
+        {
+            if(id1.typeOfValue!=K_NUMBER)
+            {
+                //přetypování
+                id1.typeOfValue=K_NUMBER;
+            }
+            if(id2.typeOfValue!=K_NUMBER)
+            {
+                //přetypování
+                id2.typeOfValue=K_NUMBER;
+            }
+        }
+        error(6);
+    }
+    return K_BOOL;
+}
+
+
 tokenType generateExpresion(token id1, token op ,token id2)
 {
     debug("generated: %s %s %s\n",tokenStr(id2),tokenStr(op),tokenStr(id1));
@@ -210,48 +240,67 @@ tokenType generateExpresion(token id1, token op ,token id2)
     switch (op.type)
     {
         case T_MUL:
-            type=aritmeticComCheck(id1,id2);
+            type=aritmeticComCheck(id1,id2,false);
             //generování kódu
         break;
         case T_DIV:
-            type=aritmeticComCheck(id1,id2);
+            type=aritmeticComCheck(id1,id2,true);
 
         break;
         case T_DIV2:
-            type=aritmeticComCheck(id1,id2);
-
+            if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+                errorD(8,"nepovolená operace s nil");
+            if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
+                errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
+            type=K_INTEGER;
 
         break;
         case T_ADD:
-            type=aritmeticComCheck(id1,id2);
+            type=aritmeticComCheck(id1,id2,false);
 
         break;
         case T_SUB:
-            type=aritmeticComCheck(id1,id2);
+            type=aritmeticComCheck(id1,id2,false);
 
         break;
         case T_EQ:
-
+            comperzionComCheck(id1,id2,true);
+            type=K_BOOL;
         break;
         case T_NOT_EQ:
-
+            comperzionComCheck(id1,id2,true);
+            type=K_BOOL;
         break;
         case T_GT:
-
+            comperzionComCheck(id1,id2,false);
+            type=K_BOOL;
         break;
         case T_GTE:
-
+            comperzionComCheck(id1,id2,false);
+            type=K_BOOL;
         break;
         case T_LT:
-
+            comperzionComCheck(id1,id2,false);
+            type=K_BOOL;
         break;
         case T_LTE:
-
+            comperzionComCheck(id1,id2,false);
+            type=K_BOOL;
         break;
         case T_STR_LEN:
+            if(id2.typeOfValue==K_NIL)
+                errorD(8,"nepovolená operace s nil");
+            if(id2.typeOfValue!=K_STRING)
+                errorD(6,"operace délka řetězce lze provádět pouze na stringu");
+            type=K_INTEGER;
 
         break;
         case T_DOT2:
+            if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+                errorD(8,"nepovolená operace s nil");
+            if(id1.typeOfValue!=K_STRING||id2.typeOfValue!=K_STRING)
+                errorD(6,"operace konkatenance řetězců lze provádět pouze na stringu");
+            type=K_STRING;
 
         break;
         default:

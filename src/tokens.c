@@ -149,6 +149,9 @@ char * tokenStr(token type)
         case S_EXPRESION:
             str="S_EXPRESION";
         break;
+        case K_BOOL:
+            str="K_BOOL";
+        break;
         default:
             str="UNKNOWN";
         break;

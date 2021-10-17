@@ -52,6 +52,7 @@ typedef enum{
     K_INTEGER,
     K_STRING,
     K_NUMBER,
+    K_BOOL,
     //other
     O_DOLAR,
     O_HANDLE,   //begining of handle
