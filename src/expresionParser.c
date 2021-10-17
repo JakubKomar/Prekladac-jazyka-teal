@@ -23,10 +23,12 @@ void expresionParse(systemData *sData,bool ignor)
 {
     debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;
-    token actual =sData->pData.actualToken;
+    bool separatorF=false;
+    token actual =nextTokenExpParser(&separatorF,sData,true);
     stackClear(stack);
     stackPush(stack,(token){O_DOLAR});
-    bool separatorF=false;
+    if(actual.type==T_EOF)
+        errorD(2,"výraz nesmí být prázdný");
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
         debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
@@ -35,12 +37,12 @@ void expresionParse(systemData *sData,bool ignor)
         {
             case '=':
                 stackPush(stack,actual);
-                actual=nextTokenExpParser(&separatorF,sData);
+                actual=nextTokenExpParser(&separatorF,sData,false);
                 break;
             case '<':
                 stackInsertHanle(stack);
                 stackPush(stack,actual);
-                actual=nextTokenExpParser(&separatorF,sData);
+                actual=nextTokenExpParser(&separatorF,sData,false);
                 break; 
             case '>':
                 reduction(stack);
@@ -48,8 +50,8 @@ void expresionParse(systemData *sData,bool ignor)
             case ' ':
                 if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
                 {
-                    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
                     return;
+                    break;
                 }
                 errorD(2,"syntax error in expresion");
                 break;
@@ -61,19 +63,55 @@ void expresionParse(systemData *sData,bool ignor)
     debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
 } 
 
-token nextTokenExpParser(bool * separatorF,systemData * sData)
+token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
 {
-    sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+    if(!firstT)
+        sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+
     tokenType new= sData->pData.actualToken.type;
 
     if(*separatorF==true && (new==T_ID))
         return (token){T_EOF};
-    else if(isId(new))
+    else if(isConstant(new))
         *separatorF=true;
     else if(new!=T_LBR|| new!=T_RBR)
         *separatorF=false;
-    if(isOperator(new)||isId(new)||new==T_RBR||new==T_LBR)
-        return sData->pData.actualToken;
+
+
+    if(new==T_ID)
+    {
+        STSymbolPtr * ptr= frameStackSearchVar(&sData->pData.dataModel,sData->sData.fullToken.str);
+        STData *varData=ptr?&(*ptr)->data:NULL;
+        if(!varData)
+            errorD(3,"Proměnná ve výrazu není definována");
+        else if(varData->type!=ST_VAR)
+            errorD(3,"Proměnná ve výrazu je typu funkce");
+        else if(!varData->varData->defined)
+            debugS("proměnná požitá ve výrazu není definována\n");
+
+        return (token){new,varData->varData->type,(*ptr)->id};
+    }
+    else if(isOperator(new)||isConstant(new)||new==T_RBR||new==T_LBR)
+    {
+        switch (new)
+        {
+        case T_DOUBLE:
+            return (token){new,K_NUMBER};
+        break;
+        case T_INT:
+            return (token){new,K_INTEGER};
+        break;
+        case T_STR:
+            return (token){new,K_STRING};     
+        break;
+        case K_NIL:
+            return (token){new,K_NIL};
+        break;
+        default:
+             return (token){new,new};
+        break;
+        }
+    }
     else
         return (token){T_EOF};
 }
@@ -84,57 +122,57 @@ void reduction(stack *s)
     token op=(token){O_NONE};
     token id2=(token){O_NONE};
 
-    tokenType aux=stackPop(s).type;
-    switch (aux)
+    token aux=stackPop(s);
+    switch (aux.type)
     {
+        case T_ID:
         case T_INT:
         case T_DOUBLE:
         case T_STR:
-        case T_ID:
         case K_NIL:
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});
+            stackPush(s,(token){NE_EXP,aux.typeOfValue});
+            //natlačit hodnotu z proměnné/konstanty na zásobník
             return;
         break;
         case NE_EXP:
-            id2.type=aux;
+            id2=aux;
         break;
         case T_RBR:
-            if(stackPop(s).type!=NE_EXP)
+            aux=stackPop(s);
+            if(aux.type!=NE_EXP)
                 errorD(2,"expresion in bracked err");
             if(stackPop(s).type!=T_LBR)
                 errorD(2,"expresion in bracked err");
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});    
+            stackPush(s,(token){NE_EXP,aux.typeOfValue});    
             return;
         break;
         default:
             errorD(2,"sa reduction err");
     }
-    aux=stackPop(s).type;
-    switch (aux)
+    aux=stackPop(s);
+    switch (aux.type)
     {
         case T_STR_LEN:
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});
-            op.type=aux;
-            generateExpresion(id1,op,id2);
+            op=aux;
+            stackPush(s,(token){NE_EXP,generateExpresion(id1,op,id2)});
             return;
         break;
         default:
-            if(isOperator(aux))
-                op.type=aux;
+            if(isOperator(aux.type))
+                op=aux;
             else
                 errorD(2,"sa reduction err");
     }
-    aux=stackPop(s).type;
-    switch (aux)
+    aux=stackPop(s);
+    switch (aux.type)
     {
         case NE_EXP:
-            id1.type=aux;
+            id1=aux;
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});
-            generateExpresion(id1,op,id2);
+            stackPush(s,(token){NE_EXP,generateExpresion(id1,op,id2)});
             return;
         break;
         default:
@@ -142,9 +180,85 @@ void reduction(stack *s)
     }
 }
 
-void generateExpresion(token id1, token op ,token id2)
+tokenType aritmeticComCheck(token id1,token id2)
+{
+    if(id1.typeOfValue!=K_INTEGER&&id1.typeOfValue!=K_NUMBER)
+        error(6);
+    if(id2.typeOfValue!=K_INTEGER&&id2.typeOfValue!=K_NUMBER)
+        error(6);
+    if(id1.typeOfValue==K_NUMBER||id1.typeOfValue==K_NUMBER)
+    {
+        if(id1.typeOfValue!=K_NUMBER)
+        {
+            //přetypování
+            id1.typeOfValue=K_NUMBER;
+        }
+        if(id2.typeOfValue!=K_NUMBER)
+        {
+            //přetypování
+            id2.typeOfValue=K_NUMBER;
+        }
+        return K_NUMBER;
+    }
+    return K_INTEGER;
+}
+
+tokenType generateExpresion(token id1, token op ,token id2)
 {
     debug("generated: %s %s %s\n",tokenStr(id2),tokenStr(op),tokenStr(id1));
+    tokenType type;
+    switch (op.type)
+    {
+        case T_MUL:
+            type=aritmeticComCheck(id1,id2);
+            //generování kódu
+        break;
+        case T_DIV:
+            type=aritmeticComCheck(id1,id2);
+
+        break;
+        case T_DIV2:
+            type=aritmeticComCheck(id1,id2);
+
+
+        break;
+        case T_ADD:
+            type=aritmeticComCheck(id1,id2);
+
+        break;
+        case T_SUB:
+            type=aritmeticComCheck(id1,id2);
+
+        break;
+        case T_EQ:
+
+        break;
+        case T_NOT_EQ:
+
+        break;
+        case T_GT:
+
+        break;
+        case T_GTE:
+
+        break;
+        case T_LT:
+
+        break;
+        case T_LTE:
+
+        break;
+        case T_STR_LEN:
+
+        break;
+        case T_DOT2:
+
+        break;
+        default:
+            errorD(2,"porušeno rozkladové pravidlo");
+        break;
+    }
+    return type;
 }
 
 char getSymFromPrecTable(tokenType input, tokenType stack)
@@ -203,7 +317,7 @@ void destructExpresionData(expresionParserData *data)
     stackDestruct(&data->stack);
 }
 
-bool isId(tokenType toCompere)   
+bool isConstant(tokenType toCompere)   
 {
     return toCompere==T_STR||toCompere==T_INT||toCompere==K_NIL||toCompere==T_DOUBLE||toCompere==T_ID;
 }

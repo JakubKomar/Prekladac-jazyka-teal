@@ -14,13 +14,13 @@ void symtable_init (STSymbolPtr* RootPtr)
 	*RootPtr= NULL;
 }
 
-STData* symtable_search (STSymbolPtr* RootPtr, char *id) 
+STSymbolPtr* symtable_search (STSymbolPtr* RootPtr, char *id) 
 {
 	if(*RootPtr == NULL)
 		return NULL;
 
 	if(strcmp((*RootPtr)->id, id) == 0)
-		return &(*RootPtr)->data;
+		return &(*RootPtr);
 
 	if(strcmp((*RootPtr)->id, id) > 0)
 		return symtable_search(&(*RootPtr)->lPtr, id);
@@ -262,9 +262,9 @@ void frameInit(frame *f,bool wedge)
 	symtable_init(&f->bTree);
 }
 
-STData * frameStackSearchVar(frameStack *f,char * key)
+STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)
 {
-	STData *data=NULL;
+	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)
 	{
 		data=symtable_search(&f->localF[i].bTree,key);
@@ -280,20 +280,21 @@ STData * frameStackSearchVar(frameStack *f,char * key)
 
 STData * frameStackSearchFunc(frameStack *f,char * key)
 {
-	STData *data=NULL;
+	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)
 	{
 		data=symtable_search(&f->localF[i].bTree,key);
 		if(data!=NULL)
-			return data;
+			return &(*data)->data;
 	}
 	data=symtable_search(&f->globalF.bTree,key);
-	return data;
+	return &(*data)->data;
 }
 
 STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal)
 {
-	return symtable_search(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
+	STSymbolPtr *ptr=symtable_search(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
+	return ptr?&(*ptr)->data:NULL;
 }
 
 
@@ -444,6 +445,7 @@ STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Tty
 	if(!ptr->varData)
 		errorD(100,"var sym table insert malloc error");
 	ptr->varData->type=Ttype;
+	ptr->varData->defined=false;
 	return ptr;
 }
 

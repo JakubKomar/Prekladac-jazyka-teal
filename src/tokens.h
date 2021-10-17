@@ -63,9 +63,11 @@ typedef enum{
     NE_EXP,
 }tokenType;
 
-
+#include "symtable.h"
 typedef struct {
     tokenType type;
+    tokenType typeOfValue;  //for usege in expresion part
+    char * id;//for usege in expresion part
 }token;
 
 /**

@@ -20,6 +20,7 @@ typedef enum {
 
 typedef struct {
     tokenType type;
+    bool defined;
 } STVarData;
 
 typedef struct {
@@ -56,7 +57,7 @@ void symtable_init (STSymbolPtr* RootPtr);
  * @param id Id to search.
  * @return Pointer to data struct of symbol. NULL if not found.
  */
-STData* symtable_search (STSymbolPtr* RootPtr, char *id);
+STSymbolPtr* symtable_search (STSymbolPtr* RootPtr, char *id);
 
 /** @brief Inserts symbol and returns its data to fill.
  *
@@ -171,7 +172,7 @@ void frameDisporse(frame *f);
  *  @param *f pointer to memory model
  *  @param *key key which is searched
  */
-STData * frameStackSearchVar(frameStack *f,char * key);
+STSymbolPtr * frameStackSearchVar(frameStack *f,char * key);
 
 STData * frameStackSearchFunc(frameStack *f,char * key);
 

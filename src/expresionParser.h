@@ -44,13 +44,13 @@ void destructExpresionData(expresionParserData *data);
  * @param *data eParser data
  * @return token for use in expresion parser
  */
-token nextTokenExpParser(bool * separatorF,systemData * sData);
+token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT);
 /**
  * checking if token is id or constant
  * @param *toCompere tokentype to kompre
  * @return true-if is ID,int,string,... false if isnt
  */
-bool isId(tokenType toCompere);
+bool isConstant(tokenType toCompere);
 /**
  * checking if token is operant
  * @param *data data to destruct
@@ -65,4 +65,4 @@ void reduction(stack *s);
 /**
  * generating expresion - WIP
  */
-void generateExpresion(token id1, token op ,token id2);
+tokenType generateExpresion(token id1, token op ,token id2);

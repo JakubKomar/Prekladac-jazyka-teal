@@ -511,7 +511,8 @@ void LLid_next(systemData *d,int order)
     if(t.type!=T_ID)
         LLerr();
     order++;
-    STData *data=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
+    STSymbolPtr *ptr=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
+    STData *data=&(*ptr)->data;
     if(data==NULL)
         errorD(3,"přiřazení do nedeklarované proměnné");
     else if(data->type==ST_FUNC)
