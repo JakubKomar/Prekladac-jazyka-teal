@@ -60,6 +60,52 @@ PUSHS TF@string
 POPFRAME
 RETURN
 
+# OPERATORS
+
+LABEL hashtag
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@str
+POPS TF@str
+DEFVAR TF@len
+STRLEN TF@len TF@str
+DEFVAR TF@escaped_len
+MOVE TF@escaped_len TF@len
+
+DEFVAR TF@last_escaped
+MOVE TF@last_escaped bool@false
+
+DEFVAR TF@i
+MOVE TF@i int@0
+DEFVAR TF@c
+
+# loops throught the string and subs lenght for every escape sequence
+LABEL hashtag_loop
+JUMPIFEQ end_hashtag TF@i TF@len
+
+GETCHAR TF@c TF@str TF@i
+ADD TF@i TF@i int@1
+
+JUMPIFEQ not_escaped TF@last_escaped bool@false
+MOVE TF@last_escaped bool@false
+JUMP hashtag_loop
+
+LABEL not_escaped
+JUMPIFNEQ hashtag_loop TF@c string@\092
+SUB TF@escaped_len TF@escaped_len int@1
+MOVE TF@last_escaped bool@true
+JUMP hashtag_loop
+
+
+LABEL end_hashtag
+
+PUSHS TF@escaped_len
+POPFRAME
+RETURN
+
+
 # MAIN FOR TESTING
 LABEL main
 
@@ -115,5 +161,17 @@ DEFVAR TF@types
 TYPE TF@types TF@tst
 WRITE string@\010
 WRITE TF@types
+WRITE string@\010\010
+CREATEFRAME
+
+# hastag TEST
+WRITE string@HASHTAG\032TEST:\010
+DEFVAR TF@string
+READ TF@string string
+PUSHS TF@string
+CALL hashtag
+DEFVAR TF@tst
+POPS TF@tst
+WRITE TF@tst
 WRITE string@\010\010
 CREATEFRAME
