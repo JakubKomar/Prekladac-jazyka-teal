@@ -142,7 +142,7 @@ void LLfArgN(systemData *d);
  * simulating nonterminal for 
  * @param *d system data
  */
-void LLexpresionN(systemData *d,int numOfAsigens);
+void LLexpresionN(systemData *d,int numOfAsigens,int iteration);
 /**
  * simulating nonterminal for 
  * @param *d system data
@@ -152,3 +152,5 @@ token next(systemData *d);
  * error handeling from "useLLtable" function
  */
 void LLerr();
+
+void assigenCompCheck(tokenType a,tokenType b);

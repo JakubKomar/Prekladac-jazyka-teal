@@ -19,7 +19,7 @@ const char precTable[10][10] =
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
 
-void expresionParse(systemData *sData,bool ignor)
+tokenType expresionParse(systemData *sData,bool ignor)
 {
     debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;
@@ -27,8 +27,6 @@ void expresionParse(systemData *sData,bool ignor)
     token actual =nextTokenExpParser(&separatorF,sData,true);
     stackClear(stack);
     stackPush(stack,(token){O_DOLAR});
-    if(actual.type==T_EOF)
-        errorD(2,"výraz nesmí být prázdný");
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
         debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
@@ -49,17 +47,18 @@ void expresionParse(systemData *sData,bool ignor)
                 break;
             case ' ':
                 if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
-                {
-                    return;
-                    break;
-                }
-                errorD(2,"syntax error in expresion");
+                    return stackHead(stack).typeOfValue;
+                else
+                    errorD(2,"syntax error in expresion");
                 break;
             default:
                 errorD(99,"precedence table error");
                 break;
         }
     }
+    if(stackHead(stack).type!=NE_EXP)
+        errorD(2,"výraz nesmí být prázdný");
+    return stackHead(stack).typeOfValue;
     debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
 } 
 

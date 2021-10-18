@@ -526,6 +526,7 @@ void LLid_next(systemData *d,int order)
             LLexp_or_func(d,order);
         break;   
         case T_COMMA: 
+            next(d);
             LLid_next(d,order);
         break;  
         default:
@@ -547,7 +548,7 @@ void LLexp_or_func(systemData *d,int numOfAsigens)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            LLexpresionN(d,numOfAsigens);
+            LLexpresionN(d,numOfAsigens,0);
         break;  
         case T_FUNC_CALL: 
             LLfuncCall(d);
@@ -558,9 +559,10 @@ void LLexp_or_func(systemData *d,int numOfAsigens)
     }
 }
 
-void LLexpresionN(systemData *d,int numOfAsigens)
+void LLexpresionN(systemData *d,int numOfAsigens,int iteration)
 {
     token t=d->pData.actualToken;
+    tokenType typeOfresult;
     switch (t.type)
     {
         case T_INT:
@@ -571,7 +573,10 @@ void LLexpresionN(systemData *d,int numOfAsigens)
         case T_ID: 
         case T_LBR: 
             if(numOfAsigens>0)
-                expresionParse(d,false);
+            {
+                typeOfresult=expresionParse(d,false);
+                assigenCompCheck(d->pData.expresionBuffer.array[iteration].type,typeOfresult);
+            }
             else
                 expresionParse(d,true);
         break;  
@@ -579,13 +584,36 @@ void LLexpresionN(systemData *d,int numOfAsigens)
             LLerr();
         break;
     }
-    if(t.type==T_COMMA)
+    if(d->pData.actualToken.type==T_COMMA)
     {
         t=next(d);
-        LLexpresionN(d,numOfAsigens-1);
+        LLexpresionN(d,numOfAsigens-1,iteration+1);
     }
     else if(numOfAsigens>1)
         errorD(3,"počet výrazů je menší než počet identifikátorů v příkazu přiřazení");
+    stackClear(&d->pData.expresionBuffer);
+
+}
+
+void assigenCompCheck(tokenType a,tokenType b)
+{
+    if(a==b)
+        return;
+    else if(b==K_NIL)
+        return;
+    else
+    {
+        if(a==K_NUMBER&&b==K_INTEGER)
+        {
+            //přetypování na zásobníku
+        }
+        else if(a==K_INTEGER&&b==K_NUMBER)
+        {
+            //přetypování na zásobníku
+        }
+        else
+            errorD(6,"Typová nekompabilita v příkazu přiřazení");
+    }
 
 }
 
