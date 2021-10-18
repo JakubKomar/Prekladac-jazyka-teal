@@ -7,29 +7,6 @@ JUMP main
 
 # BUILT IN FUNCTIONS
 
-LABEL tointeger
-
-PUSHFRAME
-CREATEFRAME
-
-DEFVAR TF@f
-POPS TF@f
-
-JUMPIFEQ end_tointeger_nil TF@f nil@nil
-
-DEFVAR TF@i
-FLOAT2INT TF@i TF@f
-PUSHS TF@i
-POPFRAME
-RETURN
-
-LABEL end_tointeger_nil
-PUSHS nil@nil
-POPFRAME
-RETURN
-
-
-
 LABEL reads
 
 PUSHFRAME
@@ -67,6 +44,52 @@ DEFVAR TF@string
 READ TF@string float
 
 PUSHS TF@string
+POPFRAME
+RETURN
+
+
+
+LABEL write
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@s
+DEFVAR TF@i
+
+POPS TF@i
+
+LABEL write_loop
+JUMPIFEQ end_write TF@i int@0
+POPS TF@s
+WRITE TF@s
+SUB TF@i TF@i int@1
+JUMP write_loop
+
+LABEL end_write
+POPFRAME
+RETURN
+
+
+
+LABEL tointeger
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@f
+POPS TF@f
+
+JUMPIFEQ end_tointeger_nil TF@f nil@nil
+
+DEFVAR TF@i
+FLOAT2INT TF@i TF@f
+PUSHS TF@i
+POPFRAME
+RETURN
+
+LABEL end_tointeger_nil
+PUSHS nil@nil
 POPFRAME
 RETURN
 
@@ -333,28 +356,57 @@ RETURN
 
 
 
+# OUR FUNCTIONS
+
+LABEL safediv
+# function safediv (i: integer, j: integer) : integer
+# function safediv (i: number, j: number) : number
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@i
+DEFVAR TF@j
+
+POPS TF@i
+POPS TF@j
+
+DEFVAR TF@result
+
+DEFVAR TF@type
+TYPE TF@type TF@i
+JUMPIFEQ safediv_int TF@type string@int
+JUMPIFEQ safediv_number TF@type string@float
+
+# integer div
+LABEL safediv_int
+JUMPIFEQ safediv_div_zero TF@j int@0
+IDIV TF@result TF@i TF@j
+PUSHS TF@result
+
+POPFRAME 
+RETURN
+
+# number div
+LABEL safediv_number
+JUMPIFEQ safediv_div_zero TF@j float@0x0p+0
+DIV TF@result TF@i TF@j
+PUSHS TF@result
+
+POPFRAME 
+RETURN
+
+LABEL safediv_div_zero
+EXIT int@9
+
+
+
 # MAIN FOR TESTING
 LABEL main
 
 CREATEFRAME
 
-# TOINTEGER TEST
-WRITE string@TOINTEGER\032TEST:\010
-DEFVAR TF@num
-READ TF@num float
-PUSHS TF@num
-CALL tointeger
-DEFVAR TF@i
-POPS TF@i
-DPRINT TF@i
-DEFVAR TF@types
-TYPE TF@types TF@i
-WRITE string@\010
-WRITE TF@types
-WRITE string@\010\010
-CREATEFRAME
-
-# READS TEST
+# reads TEST
 WRITE string@READS\032TEST:\010
 CALL reads
 DEFVAR TF@test
@@ -367,7 +419,7 @@ WRITE TF@types
 WRITE string@\010\010
 CREATEFRAME
 
-# READI TEST
+# readi TEST
 WRITE string@READI\032TEST:\010
 CALL readi
 DEFVAR TF@test
@@ -380,7 +432,7 @@ WRITE TF@types
 WRITE string@\010\010
 CREATEFRAME
 
-# READN TEST
+# readn TEST
 WRITE string@READN\032TEST:\010
 CALL readn
 DEFVAR TF@test
@@ -388,6 +440,35 @@ POPS TF@test
 WRITE TF@test
 DEFVAR TF@types
 TYPE TF@types TF@test
+WRITE string@\010
+WRITE TF@types
+WRITE string@\010\010
+CREATEFRAME
+
+# write TEST
+WRITE string@WRITE\032TEST:\010
+DEFVAR TF@string1
+READ TF@string1 string
+DEFVAR TF@string2
+READ TF@string2 string
+PUSHS TF@string2
+PUSHS TF@string1
+PUSHS int@2
+CALL write
+WRITE string@\010\010
+CREATEFRAME
+
+# tointeger TEST
+WRITE string@TOINTEGER\032TEST:\010
+DEFVAR TF@num
+READ TF@num float
+PUSHS TF@num
+CALL tointeger
+DEFVAR TF@i
+POPS TF@i
+DPRINT TF@i
+DEFVAR TF@types
+TYPE TF@types TF@i
 WRITE string@\010
 WRITE TF@types
 WRITE string@\010\010
@@ -462,5 +543,39 @@ CALL concatenation
 DEFVAR TF@test
 POPS TF@test
 WRITE TF@test
+WRITE string@\010\010
+CREATEFRAME
+
+# safediv TEST INT
+WRITE string@SAFEDIV\032INT\032TEST:\010
+DEFVAR TF@int1
+READ TF@int1 int
+DEFVAR TF@int2
+READ TF@int2 int
+PUSHS TF@int2
+PUSHS TF@int1
+CALL safediv
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
+WRITE string@\010\010
+CREATEFRAME
+
+# safediv TEST NUMBER
+WRITE string@SAFEDIV\032FLOAT\032TEST:\010
+DEFVAR TF@float1
+READ TF@float1 float
+DEFVAR TF@float2
+READ TF@float2 float
+PUSHS TF@float2
+PUSHS TF@float1
+CALL safediv
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
+WRITE string@\010
+DEFVAR TF@testtoint
+FLOAT2INT TF@testtoint TF@test
+WRITE TF@testtoint
 WRITE string@\010\010
 CREATEFRAME
