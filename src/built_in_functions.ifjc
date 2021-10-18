@@ -3,7 +3,6 @@
 #
 # @authors Jakub Křivánek (xkriva30)
 #
-
 JUMP main
 
 # BUILT IN FUNCTIONS
@@ -30,6 +29,7 @@ POPFRAME
 RETURN
 
 
+
 LABEL reads
 
 PUSHFRAME
@@ -41,6 +41,7 @@ READ TF@string string
 PUSHS TF@string
 POPFRAME
 RETURN
+
 
 
 LABEL readi
@@ -55,6 +56,8 @@ PUSHS TF@string
 POPFRAME
 RETURN
 
+
+
 LABEL readn
 
 PUSHFRAME
@@ -67,7 +70,10 @@ PUSHS TF@string
 POPFRAME
 RETURN
 
+
+
 LABEL substr
+# uses hastag operator
 
 PUSHFRAME
 CREATEFRAME
@@ -94,19 +100,19 @@ LT TF@jlti TF@j TF@i
 JUMPIFEQ end_substr_empty TF@jlti bool@true
 
 # check if i and j arent out of bounds 1 to #s
-DEFVAR TF@in_bounds
+DEFVAR TF@out_of_bounds
 DEFVAR TF@len
 PUSHS TF@s
 CALL hashtag
 POPS TF@len
-LT TF@in_bounds TF@i int@1
-JUMPIFEQ end_substr_empty TF@in_bounds bool@true
-LT TF@in_bounds TF@j int@1
-JUMPIFEQ end_substr_empty TF@in_bounds bool@true
-GT TF@in_bounds TF@i TF@len
-JUMPIFEQ end_substr_empty TF@in_bounds bool@true
-GT TF@in_bounds TF@i TF@len
-JUMPIFEQ end_substr_empty TF@in_bounds bool@true
+LT TF@out_of_bounds TF@i int@1
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+LT TF@out_of_bounds TF@j int@1
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@i TF@len
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@j TF@len
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 
 # sub i to be have the index from 0
 SUB TF@i TF@i int@1
@@ -171,6 +177,94 @@ PUSHS TF@substr
 POPFRAME
 RETURN
 
+
+
+LABEL ord
+# uses hashtag operator and substr
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@s
+DEFVAR TF@i
+POPS TF@s
+POPS TF@i
+
+# checks if any parameter is nil
+DEFVAR TF@nil_check
+EQ TF@nil_check TF@s nil@nil
+JUMPIFEQ end_ord_error_8 TF@nil_check bool@true
+EQ TF@nil_check TF@i nil@nil
+JUMPIFEQ end_ord_error_8 TF@nil_check bool@true
+
+# check if i isnt out of bounds 1 to #s
+DEFVAR TF@out_of_bounds
+DEFVAR TF@len
+PUSHS TF@s
+CALL hashtag
+POPS TF@len
+LT TF@out_of_bounds TF@i int@1
+JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@i TF@len
+JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
+
+PUSHS TF@i
+PUSHS TF@i
+PUSHS TF@s
+CALL substr
+POPS TF@s
+
+DEFVAR TF@ord
+STRI2INT TF@ord TF@s int@0
+PUSHS TF@ord
+POPFRAME
+RETURN
+
+
+LABEL end_ord_nil
+PUSHS nil@nil
+POPFRAME
+RETURN
+
+LABEL end_ord_error_8
+EXIT int@8
+
+
+
+LABEL chr
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@i
+POPS TF@i
+
+# checks if i isnt nil
+JUMPIFEQ end_chr_error_8 TF@i nil@nil
+DEFVAR TF@out_of_bounds
+
+# checks if i isnt out of bounds
+LT TF@out_of_bounds TF@i int@0
+JUMPIFEQ end_chr_nil TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@i int@255
+JUMPIFEQ end_chr_nil TF@out_of_bounds bool@true
+
+DEFVAR TF@c
+INT2CHAR TF@c TF@i
+PUSHS TF@c
+POPFRAME
+RETURN
+
+LABEL end_chr_nil
+PUSHS nil@nil
+POPFRAME
+RETURN
+
+LABEL end_chr_error_8
+EXIT int@8
+
+
+
 # OPERATORS
 
 LABEL hashtag
@@ -224,6 +318,8 @@ CREATEFRAME
 
 # TOINTEGER TEST
 WRITE string@TOINTEGER\032TEST:\010
+DEFVAR TF@num
+READ TF@num float
 PUSHS float@0x4.2p+0
 CALL tointeger
 DEFVAR TF@i
@@ -287,6 +383,33 @@ PUSHS TF@j
 PUSHS TF@i
 PUSHS TF@string
 CALL substr
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
+WRITE string@\010\010
+CREATEFRAME
+
+# ord TEST
+WRITE string@ORD\032TEST:\010
+DEFVAR TF@string
+READ TF@string string
+DEFVAR TF@i
+READ TF@i int
+PUSHS TF@i
+PUSHS TF@string
+CALL ord
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
+WRITE string@\010\010
+CREATEFRAME
+
+# chr TEST
+WRITE string@CHR\032TEST:\010
+DEFVAR TF@i
+READ TF@i int
+PUSHS TF@i
+CALL chr
 DEFVAR TF@test
 POPS TF@test
 WRITE TF@test
