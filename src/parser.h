@@ -57,22 +57,22 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
  * simulating nonterminal for if/else structure
  * @param *d system data
  */
-void LLif(systemData *d);
+void LLif(systemData *d,STFuncData *fData);
 /**
  * simulating nonterminal for else structure
  * @param *d system data
  */
-void LLelse(systemData *d);
+void LLelse(systemData *d,STFuncData *fData);
 /**
  * simulating nonterminal for return
  * @param *d system data
  */
-void LLreturn(systemData *d);
+void LLreturn(systemData *d,STFuncData *fData);
 /**
  * simulating nonterminal for N return args
  * @param *d system data
  */
-void LLreturnArgN(systemData *d);
+void LLreturnArgN(systemData *d,STFuncData *fData,int order);
 /**
  * simulating nonterminal for declaration function/var
  * @param *d system data
@@ -97,7 +97,7 @@ void LLfuncDecNRet(systemData *d,STData *funcData,int argNum,bool checkOnly);
  * simulating nonterminal for while structure
  * @param *d system data
  */
-void LLwhile(systemData *d);
+void LLwhile(systemData *d,STFuncData *fData);
 /**
  * simulating nonterminal for function call
  * @param *d system data
@@ -112,7 +112,7 @@ void LLprolog(systemData * d);
  * simulating nonterminal for main body of program
  * @param *d system data
  */
-void LLprog(systemData * d);
+void LLprog(systemData * d,STFuncData *fData);
 /**
  * simulating nonterminal for id asigen
  * @param *d system data
