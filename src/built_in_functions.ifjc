@@ -1,4 +1,11 @@
+#
+# @brief Built in functions and operators
+#
+# @authors Jakub Křivánek (xkriva30)
+#
+
 JUMP main
+
 # BUILT IN FUNCTIONS
 
 LABEL tointeger
@@ -60,6 +67,110 @@ PUSHS TF@string
 POPFRAME
 RETURN
 
+LABEL substr
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@s
+DEFVAR TF@i
+DEFVAR TF@j
+POPS TF@s
+POPS TF@i
+POPS TF@j
+
+# checks if any parameter is nil
+DEFVAR TF@nil_check
+EQ TF@nil_check TF@s nil@nil
+JUMPIFEQ end_substr_error_8 TF@nil_check bool@true
+EQ TF@nil_check TF@i nil@nil
+JUMPIFEQ end_substr_error_8 TF@nil_check bool@true
+EQ TF@nil_check TF@j nil@nil
+JUMPIFEQ end_substr_error_8 TF@nil_check bool@true
+
+# checks if j < i
+DEFVAR TF@jlti
+LT TF@jlti TF@j TF@i
+JUMPIFEQ end_substr_empty TF@jlti bool@true
+
+# check if i and j arent out of bounds 1 to #s
+DEFVAR TF@in_bounds
+DEFVAR TF@len
+PUSHS TF@s
+CALL hashtag
+POPS TF@len
+LT TF@in_bounds TF@i int@1
+JUMPIFEQ end_substr_empty TF@in_bounds bool@true
+LT TF@in_bounds TF@j int@1
+JUMPIFEQ end_substr_empty TF@in_bounds bool@true
+GT TF@in_bounds TF@i TF@len
+JUMPIFEQ end_substr_empty TF@in_bounds bool@true
+GT TF@in_bounds TF@i TF@len
+JUMPIFEQ end_substr_empty TF@in_bounds bool@true
+
+# sub i to be have the index from 0
+SUB TF@i TF@i int@1
+
+DEFVAR TF@substr
+MOVE TF@substr TF@s
+
+DEFVAR TF@loopi
+DEFVAR TF@last_escaped
+DEFVAR TF@substr_i
+DEFVAR TF@esc
+DEFVAR TF@c
+MOVE TF@last_escaped bool@false
+STRLEN TF@len TF@s
+MOVE TF@substr_i int@0
+MOVE TF@loopi TF@i
+
+# loops throught the string and moves chars to substr
+LABEL substr_loop
+JUMPIFEQ end_substr TF@loopi TF@j
+
+GETCHAR TF@c TF@s TF@i
+ADD TF@i TF@i int@1
+ADD TF@loopi TF@loopi int@1
+
+JUMPIFEQ substr_not_escaped TF@last_escaped bool@false
+SETCHAR TF@substr TF@substr_i TF@c
+ADD TF@substr_i TF@substr_i int@1
+MOVE TF@last_escaped bool@false
+JUMP substr_loop
+
+LABEL substr_not_escaped
+EQ TF@esc TF@c string@\092
+JUMPIFEQ substr_esc TF@esc bool@true
+
+SETCHAR TF@substr TF@substr_i TF@c
+ADD TF@substr_i TF@substr_i int@1
+JUMP substr_loop
+
+LABEL substr_esc
+MOVE TF@last_escaped bool@true
+SUB TF@loopi TF@loopi int@1
+JUMP substr_loop
+
+
+LABEL end_substr_empty
+DEFVAR TF@empty_str
+MOVE TF@empty_str string@\000
+PUSHS TF@empty_str
+POPFRAME
+RETURN
+
+LABEL end_substr_error_8
+EXIT int@8
+
+LABEL end_substr
+SETCHAR TF@substr TF@substr_i string@\003
+ADD TF@substr_i TF@substr_i int@1
+JUMPIFNEQ end_substr TF@substr_i TF@len
+PUSHS TF@substr
+
+POPFRAME
+RETURN
+
 # OPERATORS
 
 LABEL hashtag
@@ -88,11 +199,11 @@ JUMPIFEQ end_hashtag TF@i TF@len
 GETCHAR TF@c TF@str TF@i
 ADD TF@i TF@i int@1
 
-JUMPIFEQ not_escaped TF@last_escaped bool@false
+JUMPIFEQ hastag_not_escaped TF@last_escaped bool@false
 MOVE TF@last_escaped bool@false
 JUMP hashtag_loop
 
-LABEL not_escaped
+LABEL hastag_not_escaped
 JUMPIFNEQ hashtag_loop TF@c string@\092
 SUB TF@escaped_len TF@escaped_len int@1
 MOVE TF@last_escaped bool@true
@@ -128,11 +239,11 @@ CREATEFRAME
 # READS TEST
 WRITE string@READS\032TEST:\010
 CALL reads
-DEFVAR TF@tst
-POPS TF@tst
-WRITE TF@tst
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
 DEFVAR TF@types
-TYPE TF@types TF@tst
+TYPE TF@types TF@test
 WRITE string@\010
 WRITE TF@types
 WRITE string@\010\010
@@ -141,11 +252,11 @@ CREATEFRAME
 # READI TEST
 WRITE string@READI\032TEST:\010
 CALL readi
-DEFVAR TF@tst
-POPS TF@tst
-WRITE TF@tst
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
 DEFVAR TF@types
-TYPE TF@types TF@tst
+TYPE TF@types TF@test
 WRITE string@\010
 WRITE TF@types
 WRITE string@\010\010
@@ -154,13 +265,31 @@ CREATEFRAME
 # READN TEST
 WRITE string@READN\032TEST:\010
 CALL readn
-DEFVAR TF@tst
-POPS TF@tst
-WRITE TF@tst
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
 DEFVAR TF@types
-TYPE TF@types TF@tst
+TYPE TF@types TF@test
 WRITE string@\010
 WRITE TF@types
+WRITE string@\010\010
+CREATEFRAME
+
+# substr TEST
+WRITE string@SUBSTR\032TEST:\010
+DEFVAR TF@string
+READ TF@string string
+DEFVAR TF@i
+READ TF@i int
+DEFVAR TF@j
+READ TF@j int
+PUSHS TF@j
+PUSHS TF@i
+PUSHS TF@string
+CALL substr
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
 WRITE string@\010\010
 CREATEFRAME
 
@@ -170,8 +299,8 @@ DEFVAR TF@string
 READ TF@string string
 PUSHS TF@string
 CALL hashtag
-DEFVAR TF@tst
-POPS TF@tst
-WRITE TF@tst
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
 WRITE string@\010\010
 CREATEFRAME
