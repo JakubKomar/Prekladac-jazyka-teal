@@ -61,7 +61,7 @@ bool isOperator(tokenType toCompere);
  * reuduction of expresion
  * @param *s stack to operate whith
  */
-void reduction(stack *s);
+void reduction(stack *s,bool ignor);
 /**
  * generating expresion - WIP
  */

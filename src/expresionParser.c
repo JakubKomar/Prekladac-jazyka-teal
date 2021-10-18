@@ -43,7 +43,7 @@ tokenType expresionParse(systemData *sData,bool ignor)
                 actual=nextTokenExpParser(&separatorF,sData,false);
                 break; 
             case '>':
-                reduction(stack);
+                reduction(stack,ignor);
                 break;
             case ' ':
                 if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
@@ -115,7 +115,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         return (token){T_EOF};
 }
 
-void reduction(stack *s)
+void reduction(stack *s,bool ignor)
 {
     token id1=(token){O_NONE};
     token op=(token){O_NONE};

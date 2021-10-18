@@ -102,7 +102,7 @@ void LLwhile(systemData *d);
  * simulating nonterminal for function call
  * @param *d system data
  */
-void LLfuncCall(systemData *d);
+void LLfuncCall(systemData *d,int numOfAsigens);
 /**
  * simulating nonterminal for header of program
  * @param *d system data
@@ -142,7 +142,7 @@ void LLfArgN(systemData *d);
  * simulating nonterminal for 
  * @param *d system data
  */
-void LLexpresionN(systemData *d,int numOfAsigens,int iteration);
+void LLexpresionN(systemData *d,int numOfAsigens);
 /**
  * simulating nonterminal for 
  * @param *d system data

@@ -10,8 +10,8 @@
 #define STACK_BASE_SIZE 100  //počateční velkost zásobníku
 
 typedef struct {
-    unsigned int capacity;   //Velikost zásobníku
-    unsigned int last;    //Spodek zásobníku
+    int capacity;   //Velikost zásobníku
+    int last;    //Spodek zásobníku
     token *array;   //Pole pro zásobník
 }stack;
 

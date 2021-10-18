@@ -41,7 +41,7 @@ void LLprog(systemData * d)
                 LLid(d);
             break;  
             case T_FUNC_CALL:
-                LLfuncCall(d);
+                LLfuncCall(d,0);
             break;
             case K_WHILE:
                 LLwhile(d); 
@@ -346,7 +346,10 @@ void LLdeclaration(systemData *d)
             ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
+            {
+                stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
                 LLexp_or_func(d,1);
+            }
         break;  
         case K_FUNCTION: 
             ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -548,10 +551,10 @@ void LLexp_or_func(systemData *d,int numOfAsigens)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            LLexpresionN(d,numOfAsigens,0);
+            LLexpresionN(d,numOfAsigens);
         break;  
         case T_FUNC_CALL: 
-            LLfuncCall(d);
+            LLfuncCall(d,numOfAsigens);
         break;  
         default:
             LLerr();
@@ -559,7 +562,7 @@ void LLexp_or_func(systemData *d,int numOfAsigens)
     }
 }
 
-void LLexpresionN(systemData *d,int numOfAsigens,int iteration)
+void LLexpresionN(systemData *d,int numOfAsigens)
 {
     token t=d->pData.actualToken;
     tokenType typeOfresult;
@@ -575,7 +578,10 @@ void LLexpresionN(systemData *d,int numOfAsigens,int iteration)
             if(numOfAsigens>0)
             {
                 typeOfresult=expresionParse(d,false);
-                assigenCompCheck(d->pData.expresionBuffer.array[iteration].type,typeOfresult);
+                if(d->pData.expresionBuffer.last-numOfAsigens>0)
+                {
+                    assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens].type,typeOfresult);
+                }
             }
             else
                 expresionParse(d,true);
@@ -587,11 +593,12 @@ void LLexpresionN(systemData *d,int numOfAsigens,int iteration)
     if(d->pData.actualToken.type==T_COMMA)
     {
         t=next(d);
-        LLexpresionN(d,numOfAsigens-1,iteration+1);
+        LLexpresionN(d,numOfAsigens-1);
     }
     else if(numOfAsigens>1)
         errorD(3,"počet výrazů je menší než počet identifikátorů v příkazu přiřazení");
-    stackClear(&d->pData.expresionBuffer);
+    else if(numOfAsigens>0)
+        stackPop(&d->pData.expresionBuffer);
 
 }
 
@@ -617,14 +624,19 @@ void assigenCompCheck(tokenType a,tokenType b)
 
 }
 
-void LLfuncCall(systemData *d)
+void LLfuncCall(systemData *d,int numOfAsigens)
 {
     STData * data=frameStackSearchFunc(&d->pData.dataModel,d->sData.fullToken.str);
     if(!data)
         errorD(3,"funkce není deklarována");
     if(data->type!=ST_FUNC)
         errorD(3,"proměnná nelze zavolat");
-        
+    if(numOfAsigens>data->funcData->retNum)
+        errorD(6,"Funkce nevrací tolik parametů");
+    for(int i=0;i<numOfAsigens;i++)
+    {
+        assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-i-1].type,data->funcData->retTypes[i]);
+    }    
     token t=next(d);
     switch (t.type)
     {   
