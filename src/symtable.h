@@ -25,9 +25,9 @@ typedef struct {
 
 typedef struct {
     tokenType *paramTypes; //array of parameter types
-    unsigned short paramNum; //number of parameters
+    int paramNum; //number of parameters
     tokenType *retTypes; //array of returning types
-    unsigned short retNum; //number of returning types
+    int retNum; //number of returning types
     bool declared;
     bool defined;
 } STFuncData;

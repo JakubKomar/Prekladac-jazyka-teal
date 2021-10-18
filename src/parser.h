@@ -137,7 +137,7 @@ void LLfArg(systemData *d);
  * simulating nonterminal for 
  * @param *d system data
  */
-void LLfArgN(systemData *d);
+void LLfArgN(systemData *d,int order,STData * Fdata);
 /**
  * simulating nonterminal for 
  * @param *d system data

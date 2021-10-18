@@ -349,6 +349,7 @@ void LLdeclaration(systemData *d)
             {
                 stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
                 LLexp_or_func(d,1);
+                ptr->varData->defined=true;
             }
         break;  
         case K_FUNCTION: 
@@ -536,7 +537,7 @@ void LLid_next(systemData *d,int order)
             LLerr();
         break;
     }
-    
+    data->varData->defined=true;
 }
 
 void LLexp_or_func(systemData *d,int numOfAsigens)
@@ -641,12 +642,11 @@ void LLfuncCall(systemData *d,int numOfAsigens)
     switch (t.type)
     {   
         case T_ID: 
-            //kontrola v tabulce symbolu
         case T_INT:
         case T_STR:
         case K_NIL:
         case T_DOUBLE:
-            LLfArg(d);
+            LLfArgN(d,0,data);
         case T_RBR: 
 
         break;  
@@ -659,37 +659,40 @@ void LLfuncCall(systemData *d,int numOfAsigens)
     next(d);
 }
 
-void LLfArg(systemData *d)
-{   
-    //kontrola v tabulce symbolu
-    expresionParse(d,false);
-    LLfArgN(d);
-}
-
-void LLfArgN(systemData *d)
+void LLfArgN(systemData *d,int order,STData * Fdata)
 {   
     token t=d->pData.actualToken;
-    if(t.type==T_RBR)
-        return;
-    else if(t.type==T_COMMA)
-    {
-        t=next(d);
-        switch (t.type)
-        {   
-            case T_ID: 
-                //kontrola v tabulce symbolu
-            case T_INT:
-            case T_STR:
-            case K_NIL:
-            case T_DOUBLE:
-                expresionParse(d,false);
-                LLfArgN(d);
-            break;  
-            default:
-                LLerr();
-            break;
-        }
+    tokenType expT;
+    switch (t.type)
+    {   
+        case T_INT:
+        case T_STR_LEN:
+        case T_STR:
+        case K_NIL:
+        case T_DOUBLE:
+        case T_ID: 
+        case T_LBR: 
+            expT =expresionParse(d,false);
+            if(Fdata->funcData->paramNum>=0)
+            {
+                if(!(Fdata->funcData->paramNum>order))
+                    errorD(3,"počty argumentů ve volání funkce nesouhlasí");
+                assigenCompCheck(expT,Fdata->funcData->paramTypes[order]);
+            }
+        break;  
+        default:
+            LLerr();
+        break;
     }
+    if(d->pData.actualToken.type==T_RBR)
+        return;
+    else if(d->pData.actualToken.type==T_COMMA)
+    {
+        next(d);
+        LLfArgN(d,order+1,Fdata);
+    }
+    else
+        LLerr();
 }
 
 token next(systemData *d)
