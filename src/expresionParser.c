@@ -87,7 +87,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
             errorD(3,"Proměnná ve výrazu je typu funkce");
         else if(!varData->varData->defined)
             debugS("proměnná požitá ve výrazu není definována\n");
-        //printf("PUSHS tf@%s",(*ptr)->id);
+        printf("PUSHS tf@%s\n",(*ptr)->id);
         return (token){new,varData->varData->type,(*ptr)->id};
     }
     else if(isOperator(new)||isConstant(new)||new==T_RBR||new==T_LBR)
@@ -95,19 +95,19 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         switch (new)
         {
         case T_DOUBLE:
-            printf("PUSHS float@%f",strtod(sData->sData.fullToken.str,NULL));
+            printf("PUSHS float@%f\n",strtod(sData->sData.fullToken.str,NULL));
             return (token){new,K_NUMBER};
         break;
         case T_INT:
-            printf("PUSHS int@%s",sData->sData.fullToken.str);
+            printf("PUSHS int@%s\n",sData->sData.fullToken.str);
             return (token){new,K_INTEGER};
         break;
         case T_STR:
-            printf("PUSHS string@%s",sData->sData.fullToken.str);
+            printf("PUSHS string@%s\n",sData->sData.fullToken.str);
             return (token){new,K_STRING};     
         break;
         case K_NIL:
-            printf("PUSHS nil@nil");
+            printf("PUSHS nil@nil\n");
             return (token){new,K_NIL};
         break;
         default:
@@ -238,12 +238,12 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
         {
             if(id1.typeOfValue!=K_NUMBER)
             {
-                //přetypování
+                //přetypování 2operátoru- asi vestavěnou funkcí
                 id1.typeOfValue=K_NUMBER;
             }
             if(id2.typeOfValue!=K_NUMBER)
             {
-                //přetypování
+                genInst("INT2FLOATS");
                 id2.typeOfValue=K_NUMBER;
             }
         }
@@ -286,6 +286,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         case T_EQ:
             comperzionComCheck(id1,id2,true);
             type=K_BOOL;
+            genInst("EQS");
         break;
         case T_NOT_EQ:
             comperzionComCheck(id1,id2,true);
@@ -294,6 +295,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         case T_GT:
             comperzionComCheck(id1,id2,false);
             type=K_BOOL;
+            genInst("GTS");
         break;
         case T_GTE:
             comperzionComCheck(id1,id2,false);
@@ -302,6 +304,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         case T_LT:
             comperzionComCheck(id1,id2,false);
             type=K_BOOL;
+            genInst("LTS");
         break;
         case T_LTE:
             comperzionComCheck(id1,id2,false);
