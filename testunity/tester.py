@@ -12,8 +12,8 @@ import argparse
 testFolder="./tests/"   
 testTypeRegex=r"\.lua$"       #koncovka testovaných souborů
 programToTest="./../ifj21"
-ifjCode="./programs/ifjCode"     #strojový interpret cílového jazyka
-ifj21="./programs/ifj21interpret"         #interpret počátečního jazyka  
+ifjCode="./ic21int"     #strojový interpret cílového jazyka
+ifj21="./ic21int"         #interpret počátečního jazyka  
 makefile="./../makefile"
 f_noOut=False
 f_scannerOnly=False
@@ -21,7 +21,7 @@ tests=[]
 
 # progress bar převzat z :https://gist.github.com/vladignatyev/06860ec2040cb497f0f3
 def progress(count, total, status=''):
-    bar_len = 60
+    bar_len = 96
     filled_len = int(round(bar_len * count / float(total)))
 
     percents = round(100.0 * count / float(total), 1)
@@ -67,9 +67,9 @@ def printResults():
         else:
             counterFailed+=1
     print("\n\nTest results:")
-    print("passed/failed:\t"+str(counterPassed)+"/"+str(counterFailed)+"\n")
+    print("passed/failed: \033[0;32m"+str(counterPassed)+"\033[0m/\033[0;31m"+str(counterFailed)+"\033[0m\n")
     if(counterFailed):
-        print("Failed:")
+        print("\033[0;31mFailed:\033[0m")
         for i in range(98):
             print("_",end="")
         print("\n%-60s  | %-3s |%-5s| %-20s |" % (" Path ", "ret","E.ret","Fail reason"))
@@ -83,7 +83,7 @@ def printResults():
             print("_",end="")
         print("")
     if(counterPassed):
-        print("Passed:")
+        print("\033[0;32mPassed:\033[0m")
         for i in range(98):
             print("_",end="")
         print("\n%-60s  | %-3s |%-5s| %-20s |" % (" Path ", "ret","E.ret","Fail reason"))

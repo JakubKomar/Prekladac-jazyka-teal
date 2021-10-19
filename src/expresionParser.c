@@ -73,7 +73,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         return (token){T_EOF};
     else if(isConstant(new))
         *separatorF=true;
-    else if(new!=T_LBR|| new!=T_RBR)
+    else if(new!=T_LBR&& new!=T_RBR)
         *separatorF=false;
 
 
@@ -86,7 +86,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         else if(varData->type!=ST_VAR)
             errorD(3,"Proměnná ve výrazu je typu funkce");
         else if(!varData->varData->defined)
-            debugS("proměnná požitá ve výrazu není definována\n");
+            fprintf(stderr,"proměnná požitá ve výrazu není definována\n");
         printf("PUSHS tf@%s\n",(*ptr)->id);
         return (token){new,varData->varData->type,(*ptr)->id};
     }
@@ -95,7 +95,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         switch (new)
         {
         case T_DOUBLE:
-            printf("PUSHS float@%f\n",strtod(sData->sData.fullToken.str,NULL));
+            printf("PUSHS float@%a\n",strtod(sData->sData.fullToken.str,NULL));
             return (token){new,K_NUMBER};
         break;
         case T_INT:
@@ -212,12 +212,12 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
-            //přetypování
+            //přetypování 2operátoru- asi vestavěnou funkcí
             id1.typeOfValue=K_NUMBER;
         }
         if(id2.typeOfValue!=K_NUMBER)
         {
-            //přetypování
+            genInst("INT2FLOATS");
             id2.typeOfValue=K_NUMBER;
         }
         return K_NUMBER;
