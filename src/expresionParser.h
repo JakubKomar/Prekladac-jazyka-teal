@@ -8,6 +8,7 @@
 #include "programData.h"
 
 #include "./scaner.h"
+#include "./generator.h"
 #include "./baseDeclarations.h"
 #include "./stack.h"
 

@@ -5,7 +5,19 @@
  */
 #include "generator.h"
 
-int doNotihing()
+void genereteProgramHeader()
+{/*
+    FILE* file=fopen("built_in_functions.ifjc","r");
+    if(!file)
+        errorD(99,"basefunction error");
+    char c;
+    while ((c = getc(file)) != EOF)
+        putchar(c);
+    fclose(file);
+*/
+}
+
+void genInst(char * inst)
 {
-    return 0;
+    fprintf(stdout,"%s\n",inst);
 }

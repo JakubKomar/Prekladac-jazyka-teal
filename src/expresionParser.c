@@ -87,7 +87,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
             errorD(3,"Proměnná ve výrazu je typu funkce");
         else if(!varData->varData->defined)
             debugS("proměnná požitá ve výrazu není definována\n");
-
+        //printf("PUSHS tf@%s",(*ptr)->id);
         return (token){new,varData->varData->type,(*ptr)->id};
     }
     else if(isOperator(new)||isConstant(new)||new==T_RBR||new==T_LBR)
@@ -95,19 +95,23 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         switch (new)
         {
         case T_DOUBLE:
+            printf("PUSHS float@%f",strtod(sData->sData.fullToken.str,NULL));
             return (token){new,K_NUMBER};
         break;
         case T_INT:
+            printf("PUSHS int@%s",sData->sData.fullToken.str);
             return (token){new,K_INTEGER};
         break;
         case T_STR:
+            printf("PUSHS string@%s",sData->sData.fullToken.str);
             return (token){new,K_STRING};     
         break;
         case K_NIL:
+            printf("PUSHS nil@nil");
             return (token){new,K_NIL};
         break;
         default:
-             return (token){new,new};
+            return (token){new,new};
         break;
         }
     }
@@ -131,7 +135,6 @@ void reduction(stack *s,bool ignor)
         case K_NIL:
             stackRemoveHande(s);
             stackPush(s,(token){NE_EXP,aux.typeOfValue});
-            //natlačit hodnotu z proměnné/konstanty na zásobník
             return;
         break;
         case NE_EXP:
@@ -150,6 +153,7 @@ void reduction(stack *s,bool ignor)
         default:
             errorD(2,"sa reduction err");
     }
+
     aux=stackPop(s);
     switch (aux.type)
     {
@@ -165,6 +169,23 @@ void reduction(stack *s,bool ignor)
             else
                 errorD(2,"sa reduction err");
     }
+
+    if(stackHead(s).type==O_HANDLE)
+    {
+        if(op.type==T_SUB)
+        {
+            //negace na zásobníku
+            stackPush(s,(token){NE_EXP,id2.typeOfValue});
+        }
+        else if(op.type==T_ADD)
+        {
+            stackPush(s,(token){NE_EXP,id2.typeOfValue});
+        }
+        else
+            errorD(2,"sa reduction err");
+        return;
+    }
+    
     aux=stackPop(s);
     switch (aux.type)
     {
@@ -240,11 +261,11 @@ tokenType generateExpresion(token id1, token op ,token id2)
     {
         case T_MUL:
             type=aritmeticComCheck(id1,id2,false);
-            //generování kódu
+            genInst("MULS");
         break;
         case T_DIV:
             type=aritmeticComCheck(id1,id2,true);
-
+            genInst("");//naše instrukce bezpečného dělení
         break;
         case T_DIV2:
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
@@ -252,15 +273,15 @@ tokenType generateExpresion(token id1, token op ,token id2)
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
                 errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
             type=K_INTEGER;
-
+            genInst("");//naše instrukce bezpečného dělení
         break;
         case T_ADD:
             type=aritmeticComCheck(id1,id2,false);
-
+            genInst("ADDS");
         break;
         case T_SUB:
             type=aritmeticComCheck(id1,id2,false);
-
+            genInst("SUBS");
         break;
         case T_EQ:
             comperzionComCheck(id1,id2,true);

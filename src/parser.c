@@ -8,6 +8,7 @@
 void parserMain(systemData * d)
 {
     LLprolog(d);
+    genereteProgramHeader();
     LLprog(d,NULL);
     if(d->pData.actualToken.type!=T_EOF)
         LLerr();
@@ -21,7 +22,6 @@ void LLprolog(systemData * d)
     token t=next(d); 
     if(t.type!=K_REQUIRE)
         LLerr();
-
     t=next(d);
     if(t.type!=T_STR)
         LLerr(); 
@@ -308,6 +308,8 @@ void LLreturnArgN(systemData *d,STFuncData *fData,int order)
         case K_NIL:
         case T_DOUBLE:
         case T_ID: 
+        case T_ADD:
+        case T_SUB:
             retType=expresionParse(d,false);
             if(fData!=NULL)
             {
@@ -574,6 +576,8 @@ void LLexp_or_func(systemData *d,int numOfAsigens)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
+        case T_ADD:
+        case T_SUB:
             LLexpresionN(d,numOfAsigens);
         break;  
         case T_FUNC_CALL: 
@@ -598,6 +602,8 @@ void LLexpresionN(systemData *d,int numOfAsigens)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
+        case T_ADD:
+        case T_SUB:
             if(numOfAsigens>0)
             {
                 typeOfresult=expresionParse(d,false);
@@ -669,8 +675,14 @@ void LLfuncCall(systemData *d,int numOfAsigens)
         case K_NIL:
         case T_DOUBLE:
             LLfArgN(d,0,data);
+        break;
         case T_RBR: 
-
+            if(data->funcData->paramNum>0)
+                errorD(5,"počty argumentů ve volání funkce nesouhlasí");
+            else if(data->funcData->paramNum<0)
+            {
+                //push zero on stack
+            }
         break;  
         default:
             LLerr();
@@ -678,6 +690,7 @@ void LLfuncCall(systemData *d,int numOfAsigens)
     }
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();
+
     next(d);
 }
 
@@ -694,6 +707,8 @@ void LLfArgN(systemData *d,int order,STData * Fdata)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
+        case T_ADD:
+        case T_SUB:
             expT =expresionParse(d,false);
             if(Fdata->funcData->paramNum>=0)
             {
@@ -707,7 +722,13 @@ void LLfArgN(systemData *d,int order,STData * Fdata)
         break;
     }
     if(d->pData.actualToken.type==T_RBR)
+    {
+        if(Fdata->funcData->paramNum<0)
+        {
+            //push order+1
+        }
         return;
+    }
     else if(d->pData.actualToken.type==T_COMMA)
     {
         next(d);
@@ -740,6 +761,7 @@ void systemDataInit(systemData * data)
     initScanerData(&data->sData);
     initParserData(&data->pData);
     initExpresionData(&data->epData);
+    data->dekorator=0;
 }
 
 void systemDataDestruct(systemData * data)

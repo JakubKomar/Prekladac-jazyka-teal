@@ -288,7 +288,10 @@ STData * frameStackSearchFunc(frameStack *f,char * key)
 			return &(*data)->data;
 	}
 	data=symtable_search(&f->globalF.bTree,key);
-	return &(*data)->data;
+	if(data)
+		return &(*data)->data;
+	else
+		return NULL;
 }
 
 STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal)

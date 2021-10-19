@@ -11,6 +11,7 @@
 #include "stack.h"
 #include "symtable.h"
 #include "programData.h"
+#include "generator.h"
 
 /**
  * inicialization function for parser data
