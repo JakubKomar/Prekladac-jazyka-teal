@@ -5,6 +5,7 @@
 #tester překladače IFJ-2021
 
 import os
+import sys
 import re
 import subprocess 
 import argparse
@@ -17,6 +18,17 @@ makefile="./../makefile"
 f_noOut=False
 f_scannerOnly=False
 tests=[]
+
+# progress bar převzat z :https://gist.github.com/vladignatyev/06860ec2040cb497f0f3
+def progress(count, total, status=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush() 
 
 def main():
     programInit()
@@ -39,8 +51,12 @@ def programInit():
                 error("testing program cant be made")
 
 def startTesting():
+    i=0
     for test in tests:
+        progress(i, len(tests)-1, status='Testing')
         test.startTest()
+        i+=1
+
 
 def printResults():
     counterPassed=0
@@ -50,16 +66,36 @@ def printResults():
             counterPassed+=1
         else:
             counterFailed+=1
-    print("Test results:")
-    print("passed/failed:\t"+str(counterPassed)+"/"+str(counterFailed))
-    print("Failed:")
-    for test in tests:
-        if test.pased==False:
-            print(test)
-    print("Passed:")
-    for test in tests:
-        if test.pased==True:
-            print(test)
+    print("\n\nTest results:")
+    print("passed/failed:\t"+str(counterPassed)+"/"+str(counterFailed)+"\n")
+    if(counterFailed):
+        print("Failed:")
+        for i in range(98):
+            print("_",end="")
+        print("\n%-60s  | %-3s |%-5s| %-20s |" % (" Path ", "ret","E.ret","Fail reason"))
+        for i in range(98):
+            print("_",end="")
+        print("")
+        for test in tests:
+            if test.pased==False:
+                print(test)
+        for i in range(98):
+            print("_",end="")
+        print("")
+    if(counterPassed):
+        print("Passed:")
+        for i in range(98):
+            print("_",end="")
+        print("\n%-60s  | %-3s |%-5s| %-20s |" % (" Path ", "ret","E.ret","Fail reason"))
+        for i in range(98):
+            print("_",end="")
+        print("")
+        for test in tests:
+            if test.pased==True:
+                print(test)
+        for i in range(98):
+            print("_",end="")
+        print("")
 
 def initTests():
     fname = []
@@ -81,7 +117,7 @@ class test(object):
     pased=None
     exRetCode=0
     RetCode=0
-    failReson=0
+    failReson=""
 
     def __init__(self,path,Name):
         self.path=path
@@ -123,12 +159,17 @@ class test(object):
                 self.pased=True
             else:
                 self.pased=False
+                self.failReson="wrong return code"
         except subprocess.TimeoutExpired:
             self.pased=False
-            self.failReson=1
+            self.failReson="time out"
 
     def __repr__(self):
         return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
+
+    def __str__(self):
+        return " %-60s | %-3d | %-3d | %-20s |" % (self.path, self.RetCode,self.exRetCode,self.failReson)
+
 
 parser = argparse.ArgumentParser(description='Tester pro ifj překaldač.')
 parser.add_argument("-p", "--path",type=str,default=testFolder,help="Path to tests")    
