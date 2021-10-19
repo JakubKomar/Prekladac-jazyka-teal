@@ -28,6 +28,7 @@ typedef struct {
     parserData pData;
     expresionParserData epData;
     STSymbolPtr symTable;
-    unsigned long int dekorator;
+    unsigned long int dekoratorJumps;
+    unsigned long int dekoratorIds;
 }systemData;
 

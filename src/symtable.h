@@ -36,6 +36,7 @@ typedef struct {
     STType type;
     STVarData *varData;
     STFuncData *funcData;
+    unsigned long int dekorator;
 } STData;
 
 typedef struct BTNode {

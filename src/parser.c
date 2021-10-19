@@ -77,7 +77,7 @@ void LLfunction(systemData *d)
     bool checkOnly;
     char *key=strCpyWhithMalloc(&d->sData.fullToken);
     data=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
-    frameStack_pushFrame(&d->pData.dataModel,true);
+    changeRangeScope(d,true);
     //generate function header
     t=next(d);
     switch (t.type)
@@ -104,7 +104,6 @@ void LLfunction(systemData *d)
         errorD(5,"počty návratových parametů v deklaraci neodpovídají");
 
     LLprog(d,data->funcData);
-
     if(d->pData.actualToken.type!=K_END)
         LLerr();
     frameStack_popFrame(&d->pData.dataModel);
@@ -233,7 +232,9 @@ void LLif(systemData *d,STFuncData *fData)
     if(t.type!=K_THEN)
         LLerr();
     next(d);
+    changeRangeScope(d,false);
     LLprog(d,fData);
+    frameStack_popFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
     switch (t.type)
     {
@@ -253,7 +254,9 @@ void LLif(systemData *d,STFuncData *fData)
 void LLelse(systemData *d,STFuncData *fData)
 {
     next(d);
+    changeRangeScope(d,false);
     LLprog(d,fData);
+    frameStack_popFrame(&d->pData.dataModel);
     switch (d->pData.actualToken.type)
     {
         case K_END:
@@ -368,6 +371,7 @@ void LLdeclaration(systemData *d)
         case K_STRING: 
         case K_NIL:
             ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
+            decorId(d,ptr);
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
@@ -378,6 +382,8 @@ void LLdeclaration(systemData *d)
         break;  
         case K_FUNCTION: 
             ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
+            if(!checkOnly)
+                decorId(d,ptr);
             LLfuncDecParam(d,ptr,checkOnly);           
         break;      
         default:
@@ -521,7 +527,9 @@ void LLwhile(systemData *d,STFuncData *fData)
     if(t.type!=K_DO)
         LLerr();
     t=next(d); 
+    changeRangeScope(d,false);
     LLprog(d,fData);
+    frameStack_popFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
     if(t.type!=K_END)
         LLerr();
@@ -761,7 +769,8 @@ void systemDataInit(systemData * data)
     initScanerData(&data->sData);
     initParserData(&data->pData);
     initExpresionData(&data->epData);
-    data->dekorator=0;
+    data->dekoratorIds=0;
+    data->dekoratorJumps=0;
 }
 
 void systemDataDestruct(systemData * data)
@@ -769,6 +778,17 @@ void systemDataDestruct(systemData * data)
     destructScanerData(&data->sData);
     destructParserData(&data->pData);
     destructExpresionData(&data->epData);
+}
+
+void decorId(systemData * data,STData * toDecorate)
+{
+    toDecorate->dekorator=data->dekoratorIds;
+}
+
+void changeRangeScope(systemData * d,bool IsFunc)
+{
+    frameStack_pushFrame(&d->pData.dataModel,IsFunc);
+    d->dekoratorIds++;
 }
 
 void LLerr()

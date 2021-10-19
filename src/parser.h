@@ -153,5 +153,6 @@ token next(systemData *d);
  * error handeling from "useLLtable" function
  */
 void LLerr();
-
+void changeRangeScope(systemData * d,bool IsFunc);
+void decorId(systemData * data,STData * toDecorate);
 void assigenCompCheck(tokenType a,tokenType b);
