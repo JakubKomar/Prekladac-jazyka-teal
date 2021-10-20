@@ -73,12 +73,13 @@ void LLfunction(systemData *d)
     if(t.type!=T_FUNC_CALL)
         LLerr();
         
-    STData * data;
     bool checkOnly;
     char *key=strCpyWhithMalloc(&d->sData.fullToken);
-    data=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
+    STSymbolPtr* node=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
+    STData * data=&(*node)->data;
+    decorId(d,data);
     changeRangeScope(d,true);
-    genFuncHeader(data,key);//chyba-v key-disalokace v případě definice
+    genFuncHeader(data,(*node)->id);
     t=next(d);
     switch (t.type)
     {
@@ -169,6 +170,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     if(type.type!=T_COLON)
         LLerr();
     STData *varData;
+    STSymbolPtr* node;
     type=next(d);
     switch (type.type)
     {
@@ -176,7 +178,8 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            varData=frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            node=frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            varData=&(*node)->data;
             decorId(d,varData);
             if(checkOnly)
             {
@@ -287,17 +290,18 @@ void LLreturn(systemData *d,STFuncData *fData)
             if(fData!=NULL)
                 for(int i=0;i<fData->retNum;i++)
                 {
-                    //generate Nill
+                    genInst("PUSHS nil@nil");
                 }
             else
             {
-                //generet exit
+                genInst("EXIT int@0");
             }
         break;
     }
     t=d->pData.actualToken;
     if(t.type!=K_END&&t.type!=K_ELSE&& t.type!=T_EOF)
         LLerr();
+    genReturn();
 }
 void LLreturnArgN(systemData *d,STFuncData *fData,int order)
 {
@@ -326,7 +330,7 @@ void LLreturnArgN(systemData *d,STFuncData *fData,int order)
                 if(order==0)
                 {
                     assigenCompCheck(retType,K_INTEGER);
-                    //generate exit výraz na zásobníku
+                    genInst("EXIT int@0");//nějak dostat ze zásobnínku todo
                 }
                 else
                     errorD(5,"počty návratových argumentů v reodpovídajá deklaraci/definici");
@@ -339,14 +343,17 @@ void LLreturnArgN(systemData *d,STFuncData *fData,int order)
     if(d->pData.actualToken.type!=T_COMMA)
     {
         if(fData!=NULL)
-            for(int i=0;i<fData->retNum;i++)
+            for(int i=order+1;i<fData->retNum;i++)
             {
-                //generate Nill
+                genInst("PUSHS nil@nil");
             }
         return;
     }
     else
+    {
+        next(d);
         LLreturnArgN(d,fData,order+1);
+    }
 }
 
 void LLdeclaration(systemData *d)
@@ -363,6 +370,7 @@ void LLdeclaration(systemData *d)
         LLerr();
     
     STData *ptr;
+    STSymbolPtr *node;
     type=next(d);   //type of declaration 
     bool checkOnly;
     switch (d->pData.actualToken.type)
@@ -371,7 +379,8 @@ void LLdeclaration(systemData *d)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
+            node =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
+            ptr=&(*node)->data;
             if(pozition.type!=K_GLOBAL)
                 decorId(d,ptr);
             printf("DEFVAR ");genVar(ptr,name);
@@ -385,7 +394,8 @@ void LLdeclaration(systemData *d)
             }
         break;  
         case K_FUNCTION: 
-            ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
+            node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
+            ptr=&(*node)->data;
             if((!checkOnly)&&pozition.type!=K_GLOBAL)
                 decorId(d,ptr);
             LLfuncDecParam(d,ptr,checkOnly);           
@@ -668,9 +678,10 @@ void assigenCompCheck(tokenType a,tokenType b)
 
 void LLfuncCall(systemData *d,int numOfAsigens)
 {
-    STData * data=frameStackSearchFunc(&d->pData.dataModel,d->sData.fullToken.str);
-    if(!data)
+    STSymbolPtr *node=frameStackSearchFunc(&d->pData.dataModel,d->sData.fullToken.str);
+    if(!node)
         errorD(3,"funkce není deklarována");
+    STData * data=&(*node)->data;
     if(data->type!=ST_FUNC)
         errorD(3,"proměnná nelze zavolat");
     if(numOfAsigens>data->funcData->retNum)
@@ -694,7 +705,7 @@ void LLfuncCall(systemData *d,int numOfAsigens)
                 errorD(5,"počty argumentů ve volání funkce nesouhlasí");
             else if(data->funcData->paramNum<0)
             {
-                //push zero on stack
+                printf("PUSHS int@0\n");
             }
         break;  
         default:
@@ -703,7 +714,7 @@ void LLfuncCall(systemData *d,int numOfAsigens)
     }
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();
-
+    printf("JUMP FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
     next(d);
 }
 
@@ -738,7 +749,7 @@ void LLfArgN(systemData *d,int order,STData * Fdata)
     {
         if(Fdata->funcData->paramNum<0)
         {
-            //push order+1
+            printf("PUSHS int@%d\n",order+1);
         }
         return;
     }

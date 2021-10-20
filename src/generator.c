@@ -30,10 +30,21 @@ void genVar(STData * data,char * id)
         printf("tf@%ld$%s\n",data->dekorator,id);
 }
 
+void genFuncCall(STData * data,char * id)
+{
+    if(data->dekorator==0)
+        printf("gf@%s\n",id);
+    else
+        printf("tf@%ld$%s\n",data->dekorator,id);
+}
+
+
 void genFuncHeader(STData * data,char * id)
 {
     printf("JUMP FCEND$%ld$%s\n",data->dekorator,id);
     printf("LABEL FCSTART$%ld$%s\n",data->dekorator,id);
+    printf("CREATEFRAME\n");
+    printf("PUSHFRAME\n");
 }
 void genFuncFoter(STData * data,char * id)
 {
@@ -42,4 +53,9 @@ void genFuncFoter(STData * data,char * id)
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL FCEND$%ld$%s\n",data->dekorator,id);
+}
+void genReturn()
+{
+    printf("POPFRAME\n");
+    printf("RETURN\n");
 }

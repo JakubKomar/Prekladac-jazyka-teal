@@ -28,7 +28,7 @@ STSymbolPtr* symtable_search (STSymbolPtr* RootPtr, char *id)
 		return symtable_search(&(*RootPtr)->rPtr, id);
 }
 
-STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id) 
+STSymbolPtr* symtable_insert_woData (STSymbolPtr* RootPtr, char *id) 
 {
 	if((*RootPtr) == NULL)
 	{
@@ -38,12 +38,12 @@ STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id)
 		(*RootPtr)->id = id;
 		(*RootPtr)->lPtr = NULL;
 		(*RootPtr)->rPtr = NULL;
-		return &(*RootPtr)->data; //data to fill
+		return &(*RootPtr); //data to fill
 	}
 
 	if((*RootPtr)->id == NULL){ //first insert case
 		(*RootPtr)->id = id;
-		return &(*RootPtr)->data;
+		return &(*RootPtr);
 	}
 
 	if(strcmp((*RootPtr)->id, id) == 0)
@@ -278,30 +278,25 @@ STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)
 	return data;
 }
 
-STData * frameStackSearchFunc(frameStack *f,char * key)
+STSymbolPtr * frameStackSearchFunc(frameStack *f,char * key)
 {
 	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)
 	{
 		data=symtable_search(&f->localF[i].bTree,key);
 		if(data!=NULL)
-			return &(*data)->data;
+			return data;
 	}
-	data=symtable_search(&f->globalF.bTree,key);
-	if(data)
-		return &(*data)->data;
-	else
-		return NULL;
+	return symtable_search(&f->globalF.bTree,key);
 }
 
-STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal)
+STSymbolPtr * frameStackSearchActual(frameStack *f,char * key,bool isGolobal)
 {
-	STSymbolPtr *ptr=symtable_search(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
-	return ptr?&(*ptr)->data:NULL;
+	return symtable_search(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
 }
 
 
-STData * frameStackInsert(frameStack *f,char *key,bool isGlobal)
+STSymbolPtr * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 {
 	if(isGlobal)
 		return symtable_insert_woData(&f->globalF.bTree,key);
@@ -312,9 +307,10 @@ STData * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 	return NULL;
 }
 
-STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly)
+STSymbolPtr * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly)
 {
-	STData *ptr= frameStackSearchActual(f,key,isGlobal);
+	STSymbolPtr *node= frameStackSearchActual(f,key,isGlobal);
+	STData * ptr=node?&(*node)->data:NULL;
 	if(ptr)
 	{
 		free(key);
@@ -327,7 +323,8 @@ STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlob
 	}
 	else
 	{
-		ptr=frameStackInsert(f, key,isGlobal);
+		node=frameStackInsert(f, key,isGlobal);
+		ptr=&(*node)->data;
 		ptr->type=ST_FUNC;
 		ptr->varData=NULL;
 
@@ -345,7 +342,7 @@ STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlob
 		ptr->dekorator=0;
 		*checkOnly=false;
 	}
-	return ptr;
+	return node;
 }
 
 void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int parN,tokenType *retTypes,int retN)
@@ -362,8 +359,9 @@ void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int p
 		error(100);
 	strcpy(copy,key);
 
-	STData *ptr;
-	ptr =frameStackInsert(f,copy,true);
+	STSymbolPtr *node;
+	node =frameStackInsert(f,copy,true);
+	STData *ptr=&(*node)->data;
 	ptr->type=ST_FUNC;
 	ptr->varData=NULL;
 
@@ -402,16 +400,18 @@ void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int p
 		ptr->funcData->retTypes=NULL;
 }
 
-STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly)
+STSymbolPtr * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly)
 {
+	STSymbolPtr *node;
 	STData *ptr;
-	if((ptr=frameStackSearchActual(f,key,false)))
+	if((node=frameStackSearchActual(f,key,false)))
 	{}
-	else if((ptr=frameStackSearchActual(f,key,true)))
+	else if((node=frameStackSearchActual(f,key,true)))
 	{}
 	else
 	{
-		ptr =frameStackInsert(f,key,false);
+		node =frameStackInsert(f,key,false);
+		ptr=&(*node)->data;
 		ptr->type=ST_FUNC;
 		ptr->varData=NULL;
 
@@ -427,8 +427,9 @@ STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkO
 		ptr->funcData->declared=false;
 		ptr->funcData->defined=true;
 		*checkOnly=false;
-		return ptr;
+		return node;
 	}
+	ptr=&(*node)->data;
 	free(key);
 	*checkOnly=true;
 	if(ptr->type!=ST_FUNC)
@@ -436,13 +437,14 @@ STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkO
 	else if(ptr->funcData->defined)
 		errorD(3,"tato funkce již byla definována");
 	ptr->funcData->defined=true;	
-	return ptr;
+	return node;
 }
 
 
-STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype)
+STSymbolPtr * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype)
 {
-	STData *ptr=frameStackInsert(f, key,isGlobal);
+	STSymbolPtr *node=frameStackInsert(f, key,isGlobal);;
+	STData *ptr=&(*node)->data;
 	ptr->type=ST_VAR;
 	ptr->funcData=NULL;
 	ptr->varData=malloc(sizeof(STVarData));	
@@ -451,7 +453,7 @@ STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Tty
 	ptr->varData->type=Ttype;
 	ptr->varData->defined=false;
 	ptr->dekorator=0;
-	return ptr;
+	return node;
 }
 
 void frameStackPrint(frameStack *f)

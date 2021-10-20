@@ -66,7 +66,7 @@ STSymbolPtr* symtable_search (STSymbolPtr* RootPtr, char *id);
  * @param id Id to insert.
  * @return Pointer to data struct of symbol. NULL if unsuccessful malloc or symbol already exists.
  */
-STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id);
+STSymbolPtr* symtable_insert_woData (STSymbolPtr* RootPtr, char *id);
 
 /** @brief Auxiliary function for copying and deallocation the rightmost node in a subtree.
  *
@@ -175,7 +175,7 @@ void frameDisporse(frame *f);
  */
 STSymbolPtr * frameStackSearchVar(frameStack *f,char * key);
 
-STData * frameStackSearchFunc(frameStack *f,char * key);
+STSymbolPtr * frameStackSearchFunc(frameStack *f,char * key);
 
 /** @brief inserting new item in memory model
  *
@@ -183,7 +183,7 @@ STData * frameStackSearchFunc(frameStack *f,char * key);
  *  @param *key key which is searched
  *  @param *isGlobal is item in global frame
  */
-STData * frameStackInsert(frameStack *f,char *key,bool isGlobal);
+STSymbolPtr * frameStackInsert(frameStack *f,char *key,bool isGlobal);
 
 /** @brief printing whole memory model
  *
@@ -198,7 +198,7 @@ void frameStackPrint(frameStack *f);
  *  @param isGlobal where to search- true:global frame, false:local frame on the top of stack
  *  @return pointer to finded data, if not finded null
  */
-STData * frameStackSearchActual(frameStack *f,char * key,bool isGlobal);
+STSymbolPtr * frameStackSearchActual(frameStack *f,char * key,bool isGlobal);
 
 /** @brief inserting function definition to memory model
  *
@@ -207,7 +207,7 @@ STData * frameStackSearchActual(frameStack *f,char * key,bool isGlobal);
  *  @param isGlobal where to inset- true:global frame, false:local frame on the top of stack
  *  @return pointer to inserted data
  */
-STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly);
+STSymbolPtr * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly);
 
 /** @brief inserting function declaration to memory model
  *
@@ -216,7 +216,7 @@ STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkO
  *  @param *checkOnly if there is a declaration record, param will be set on true, else false
  *  @return pointer to inserted data
  */
-STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly);
+STSymbolPtr * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly);
 
 /** @brief inserting var declaration to memory model
  *
@@ -226,7 +226,7 @@ STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlob
  *  @param *checkOnly if there is a definition record, param will be set on true, else false
  *  @return pointer to inserted data
  */
-STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
+STSymbolPtr * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
 
 void frameStack_initPreFunctions(frameStack * f);
 void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int parN,tokenType *retTypes,int retN);
