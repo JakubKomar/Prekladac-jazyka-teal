@@ -342,6 +342,7 @@ STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlob
 
 		ptr->funcData->declared=true;
 		ptr->funcData->defined=false;
+		ptr->dekorator=0;
 		*checkOnly=false;
 	}
 	return ptr;
@@ -449,6 +450,7 @@ STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Tty
 		errorD(100,"var sym table insert malloc error");
 	ptr->varData->type=Ttype;
 	ptr->varData->defined=false;
+	ptr->dekorator=0;
 	return ptr;
 }
 

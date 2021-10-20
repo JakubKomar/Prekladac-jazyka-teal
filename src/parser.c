@@ -78,7 +78,7 @@ void LLfunction(systemData *d)
     char *key=strCpyWhithMalloc(&d->sData.fullToken);
     data=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
     changeRangeScope(d,true);
-    //generate function header
+    genFuncHeader(data,key);//chyba-v key-disalokace v případě definice
     t=next(d);
     switch (t.type)
     {
@@ -107,7 +107,7 @@ void LLfunction(systemData *d)
     if(d->pData.actualToken.type!=K_END)
         LLerr();
     frameStack_popFrame(&d->pData.dataModel);
-    //generete function footer
+    genFuncFoter(data,key);
     t=next(d);
 }
 
@@ -168,7 +168,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     token type=next(d);
     if(type.type!=T_COLON)
         LLerr();
-
+    STData *varData;
     type=next(d);
     switch (type.type)
     {
@@ -176,7 +176,8 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            varData=frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            decorId(d,varData);
             if(checkOnly)
             {
                 if(!(Fdata->funcData->paramNum>argNum))
@@ -188,7 +189,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             {
                 Fdata->funcData->paramNum++;
             }
-            //generete param
+            printf("DEFVAR ");genVar(varData,key);
         break;   
         default:
             free(key);
@@ -371,18 +372,21 @@ void LLdeclaration(systemData *d)
         case K_STRING: 
         case K_NIL:
             ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
-            decorId(d,ptr);
+            if(pozition.type!=K_GLOBAL)
+                decorId(d,ptr);
+            printf("DEFVAR ");genVar(ptr,name);
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
                 stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
                 LLexp_or_func(d,1);
+                printf("POPS ");genVar(ptr,name);
                 ptr->varData->defined=true;
             }
         break;  
         case K_FUNCTION: 
             ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
-            if(!checkOnly)
+            if((!checkOnly)&&pozition.type!=K_GLOBAL)
                 decorId(d,ptr);
             LLfuncDecParam(d,ptr,checkOnly);           
         break;      
@@ -569,6 +573,7 @@ void LLid_next(systemData *d,int order)
             LLerr();
         break;
     }
+    printf("POPS ");genVar(data,(*ptr)->id);
     data->varData->defined=true;
 }
 
@@ -769,7 +774,7 @@ void systemDataInit(systemData * data)
     initScanerData(&data->sData);
     initParserData(&data->pData);
     initExpresionData(&data->epData);
-    data->dekoratorIds=0;
+    data->dekoratorIds=1;//0 is for global vars
     data->dekoratorJumps=0;
 }
 
