@@ -108,7 +108,7 @@ void LLfunction(systemData *d)
     if(d->pData.actualToken.type!=K_END)
         LLerr();
     frameStack_popFrame(&d->pData.dataModel);
-    genFuncFoter(data,key);
+    genFuncFoter(data,(*node)->id);
     t=next(d);
 }
 
@@ -180,6 +180,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
         case K_NIL:
             node=frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
             varData=&(*node)->data;
+            varData->varData->defined=true;
             decorId(d,varData);
             if(checkOnly)
             {
@@ -231,10 +232,11 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
 void LLif(systemData *d,STFuncData *fData)
 {
     token t=next(d);
-    expresionParse(d,false);
+    tokenType expT=expresionParse(d,false);
     t=d->pData.actualToken;
     if(t.type!=K_THEN)
         LLerr();
+    unsigned long int decor=genIfHeader(d,expT);
     next(d);
     changeRangeScope(d,false);
     LLprog(d,fData);
@@ -243,10 +245,12 @@ void LLif(systemData *d,STFuncData *fData)
     switch (t.type)
     {
         case K_END:
-
+            genIfFoter(decor);
         break;   
         case K_ELSE:
-            LLelse(d,fData);
+            genElseHeader(decor);
+            LLelse(d,fData,decor);
+            genElseFoter(decor);
         break; 
         default:
             LLerr();
@@ -255,7 +259,7 @@ void LLif(systemData *d,STFuncData *fData)
     next(d);
 }
 
-void LLelse(systemData *d,STFuncData *fData)
+void LLelse(systemData *d,STFuncData *fData,unsigned long int decorId)
 {
     next(d);
     changeRangeScope(d,false);
@@ -562,10 +566,10 @@ void LLid_next(systemData *d,int order)
         LLerr();
     order++;
     STSymbolPtr *ptr=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
-    STData *data=&(*ptr)->data;
-    if(data==NULL)
+    if(ptr==NULL)
         errorD(3,"přiřazení do nedeklarované proměnné");
-    else if(data->type==ST_FUNC)
+    STData *data=&(*ptr)->data;
+    if(data->type==ST_FUNC)
         errorD(3,"přiřazení do fukce není legální operace");
     stackPush(&d->pData.expresionBuffer,(token){data->varData->type});
 

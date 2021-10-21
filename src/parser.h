@@ -63,7 +63,7 @@ void LLif(systemData *d,STFuncData *fData);
  * simulating nonterminal for else structure
  * @param *d system data
  */
-void LLelse(systemData *d,STFuncData *fData);
+void LLelse(systemData *d,STFuncData *fData,unsigned long int decorId);
 /**
  * simulating nonterminal for return
  * @param *d system data

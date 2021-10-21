@@ -59,3 +59,54 @@ void genReturn()
     printf("POPFRAME\n");
     printf("RETURN\n");
 }
+
+unsigned long int genIfHeader(systemData *d,tokenType expT)
+{
+    genJumpExpresion(expT);
+    if(expT!=K_STRING)
+        printf("JUMPIFEQS IFEND$%ld\n",d->dekoratorIds);
+    else
+        printf("POPS\nJUMP IFEND$%ld\n",d->dekoratorIds);
+    d->dekoratorIds++;
+    return d->dekoratorIds-1;
+}
+
+void genIfFoter(unsigned long int decor)
+{
+    printf("LABEL IFEND$%ld\n",decor);
+}
+
+void genElseHeader(unsigned long int decor)
+{
+    printf("JUMP ELSEEND$%ld\n",decor);
+    printf("LABEL IFEND$%ld\n",decor);
+}
+
+void genElseFoter(unsigned long int decor)
+{
+    printf("LABEL ELSEEND$%ld\n",decor);
+}
+
+void genJumpExpresion(tokenType expT)
+{
+    switch (expT)
+    {
+    case K_BOOL:
+        printf("PUSHS bool@false\n");
+        break;
+    case K_STRING:
+        break;
+    case K_INTEGER:
+        printf("PUSHS int@0\n");
+        break;
+    case K_NUMBER:
+        printf("PUSHS float@0\n");
+        break;
+    case K_NIL:
+        printf("PUSHS nil@nil\n");
+        break;
+    default:
+        errorD(99,"if/while intern error");
+        break;
+    }
+}

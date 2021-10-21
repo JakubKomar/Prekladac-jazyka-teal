@@ -6,9 +6,15 @@
 #pragma once
 #include "baseDeclarations.h"
 #include "symtable.h"
+#include "programData.h"
 void genereteProgramHeader();
 void genVar(STData * data,char * id);
 void genInst(char * inst);
 void genFuncHeader(STData * data,char * id);
 void genFuncFoter(STData * data,char * id);
 void genReturn();
+unsigned long int genIfHeader(systemData *d,tokenType expT);
+void genIfFoter(unsigned long int decor);
+void genJumpExpresion(tokenType expT);
+void genElseHeader(unsigned long int decor);
+void genElseFoter(unsigned long int decor);
