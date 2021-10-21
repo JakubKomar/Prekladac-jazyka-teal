@@ -74,7 +74,7 @@ void LLfunction(systemData *d)
         LLerr();
         
     bool checkOnly;
-    char *key=strCpyWhithMalloc(&d->sData.fullToken);
+    char *key=stringCpyToChPtr(&d->sData.fullToken);
     STSymbolPtr* node=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
     STData * data=&(*node)->data;
     decorId(d,data);
@@ -164,7 +164,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     token id=d->pData.actualToken;
     if(id.type!=T_ID)
         LLerr();
-    char *key=strCpyWhithMalloc(&d->sData.fullToken);  
+    char *key=stringCpyToChPtr(&d->sData.fullToken);  
 
     token type=next(d);
     if(type.type!=T_COLON)
@@ -193,7 +193,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             {
                 Fdata->funcData->paramNum++;
             }
-            printf("DEFVAR ");genVar(varData,key);
+            printf("DEFVAR ");genVar(varData->dekorator,key);
         break;   
         default:
             free(key);
@@ -367,7 +367,7 @@ void LLdeclaration(systemData *d)
     token id=next(d); 
     if(id.type!=T_ID)   
         LLerr();
-    char *name=strCpyWhithMalloc(&d->sData.fullToken);
+    char *name=stringCpyToChPtr(&d->sData.fullToken);
 
     token type=next(d);     
     if(type.type!=T_COLON)
@@ -387,13 +387,26 @@ void LLdeclaration(systemData *d)
             ptr=&(*node)->data;
             if(pozition.type!=K_GLOBAL)
                 decorId(d,ptr);
-            printf("DEFVAR ");genVar(ptr,name);
+            if(d->pData.isInWhile)
+            {
+                varId * new=malloc(sizeof(varId));
+                if(!new)
+                    error(100);
+                new->decor=ptr->dekorator;
+                if(!(new->id=strdup((*node)->id)))
+                    error(100);
+                stackPush(&d->pData.varDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});
+            }
+            else
+            {
+                printf("DEFVAR ");genVar(ptr->dekorator,name);
+            }
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
                 stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
                 LLexp_or_func(d,1);
-                printf("POPS ");genVar(ptr,name);
+                printf("POPS ");genVar(ptr->dekorator,name);
                 ptr->varData->defined=true;
             }
         break;  
@@ -539,8 +552,14 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
 
 void LLwhile(systemData *d,STFuncData *fData)
 {
+    bool prevInWhile=d->pData.isInWhile;
+    if(!prevInWhile)
+        genWhileDecJump(d);
+    d->pData.isInWhile=true;
     token t=next(d); 
-    expresionParse(d,false);
+    unsigned long int decor=genWhileSlabel(d);
+    tokenType retT=expresionParse(d,false);
+    genWhileHeader(decor,retT);
     t=d->pData.actualToken;
     if(t.type!=K_DO)
         LLerr();
@@ -551,6 +570,9 @@ void LLwhile(systemData *d,STFuncData *fData)
     t=d->pData.actualToken;
     if(t.type!=K_END)
         LLerr();
+    genWhileFoter(decor);  
+    if(!prevInWhile)
+        genWhileDecFLUSH(d,decor);
     t=next(d); 
 }
 
@@ -587,7 +609,7 @@ void LLid_next(systemData *d,int order)
             LLerr();
         break;
     }
-    printf("POPS ");genVar(data,(*ptr)->id);
+    printf("POPS ");genVar(data->dekorator,(*ptr)->id);
     data->varData->defined=true;
 }
 
@@ -777,11 +799,15 @@ void initParserData(parserData * data)
     frameStack_init(&data->dataModel);
     frameStack_initPreFunctions(&data->dataModel);
     stackInit(&data->expresionBuffer);
+    stackInit(&data->varDeclarationBuffer);
+    data->isInWhile=false;
 }
 
 void destructParserData(parserData * data)
 {
     frameStack_disporse(&data->dataModel);
+    stackDestruct(&data->expresionBuffer);
+    stackDestruct(&data->varDeclarationBuffer);
 }
 
 void systemDataInit(systemData * data)

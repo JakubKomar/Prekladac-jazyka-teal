@@ -87,8 +87,8 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
             errorD(3,"Proměnná ve výrazu je typu funkce");
         else if(!varData->varData->defined)
             fprintf(stderr,"proměnná požitá ve výrazu není definována\n");
-        printf("PUSHS ");genVar(varData,(*ptr)->id);
-        return (token){new,varData->varData->type,(*ptr)->id};
+        printf("PUSHS ");genVar(varData->dekorator,(*ptr)->id);
+        return (token){new,varData->varData->type};
     }
     else if(isOperator(new)||isConstant(new)||new==T_RBR||new==T_LBR)
     {

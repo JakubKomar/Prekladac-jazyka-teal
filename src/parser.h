@@ -12,7 +12,7 @@
 #include "symtable.h"
 #include "programData.h"
 #include "generator.h"
-
+#include <string.h>
 /**
  * inicialization function for parser data
  * @param *data data to incializate

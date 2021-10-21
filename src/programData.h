@@ -16,6 +16,8 @@ typedef struct {
     token actualToken;   
     frameStack dataModel;
     stack expresionBuffer;
+    stack varDeclarationBuffer;
+    bool isInWhile;
 }parserData;
 
 typedef struct

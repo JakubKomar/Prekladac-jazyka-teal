@@ -66,9 +66,13 @@ typedef enum{
 
 #include "symtable.h"
 typedef struct {
+    char* id;
+    unsigned long int decor;
+}varId;
+typedef struct {
     tokenType type;
     tokenType typeOfValue;  //for usege in expresion part
-    char * id;//for usege in expresion part
+    varId *id;  //storing whole id 
 }token;
 
 /**

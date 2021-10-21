@@ -80,11 +80,24 @@ bool stringFull(string *s)
    return (s->length+1)>=s->capacity;
 }
 
-char* strCpyWhithMalloc(string *s)
+char* stringCpyToChPtr(string *s)
 {
    char * ptr=malloc((s->length+1)*sizeof(char)); 
    if(!ptr)
       errorD(100,"strCpyWhithMalloc error");
    strcpy(ptr,s->str);
    return ptr;
+}
+
+char* strdup (const char* s)
+{
+  size_t slen = strlen(s);
+  char* result = malloc(slen + 1);
+  if(result == NULL)
+  {
+    return NULL;
+  }
+
+  memcpy(result, s, slen+1);
+  return result;
 }

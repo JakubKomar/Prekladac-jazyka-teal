@@ -1,10 +1,12 @@
--- Program 1: Vypocet faktorialu (iterativne) 0
 require "ifj21"
-function main() -- uzivatelska funkce bez parametru
-    local a : integer;
-    local b: integer
-    local c : string
-    a,b,c=9.6,8,"ahoj"
 
+local a:integer=3
+
+while a do
+    local b:integer=5
+    while b do
+        
+        b=b-1
+    end
+    a=a-1
 end
-main() -- prikaz hlavniho tela programu
