@@ -290,6 +290,8 @@ void LLreturn(systemData *d,STFuncData *fData)
         case K_NIL:
         case T_DOUBLE:
         case T_ID: 
+        case T_SUB:
+        case T_ADD:
             LLreturnArgN(d,fData,0);
         break;   
         default:
@@ -720,6 +722,10 @@ int LLfuncCall(systemData *d,int numOfAsigens)
         case T_STR:
         case K_NIL:
         case T_DOUBLE:
+        case T_LBR:
+        case T_STR_LEN:
+        case T_SUB:
+        case T_ADD:
             LLfArgN(d,0,data);
         break;
         case T_RBR: 

@@ -212,12 +212,12 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
-            printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA");
+            printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA\n");
             id1.typeOfValue=K_NUMBER;
         }
         if(id2.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOATS");
+            genInst("INT2FLOATS\n");
             id2.typeOfValue=K_NUMBER;
         }
         return K_NUMBER;
@@ -238,12 +238,12 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
         {
             if(id1.typeOfValue!=K_NUMBER)
             {
-                printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA");
+                printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA\n");
                 id1.typeOfValue=K_NUMBER;
             }
             if(id2.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOATS");
+                genInst("INT2FLOATS\n");
                 id2.typeOfValue=K_NUMBER;
             }
         }

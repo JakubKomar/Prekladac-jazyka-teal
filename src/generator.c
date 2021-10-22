@@ -11,8 +11,11 @@ void genereteProgramHeader()
     if(!file)
     {
         file=fopen("./src/built_in_functions.ifjc","r");
-        if(!file)
-            errorD(99,"basefunction error");
+        if(!file){
+            file=fopen("./../src/built_in_functions.ifjc","r");
+            if(!file)
+                errorD(99,"basefunction error");
+        }
     }
     char c;
     while ((c = getc(file)) != EOF)
