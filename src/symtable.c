@@ -203,8 +203,8 @@ void frameStack_initPreFunctions(frameStack * f)
 	frameStack_initPreFunction(f,"readi",NULL,0,(tokenType []){K_INTEGER},1);
 	frameStack_initPreFunction(f,"readn",NULL,0,(tokenType []){K_NUMBER},1);
 	frameStack_initPreFunction(f,"tointeger",(tokenType []){K_NUMBER},1,(tokenType []){K_INTEGER},1);
-	frameStack_initPreFunction(f,"substr",(tokenType []){K_STRING,K_NUMBER,K_NUMBER},3,(tokenType []){K_STRING},1);
-	frameStack_initPreFunction(f,"ord",(tokenType []){K_STRING,K_STRING},2,(tokenType []){K_INTEGER},1);
+	frameStack_initPreFunction(f,"substr",(tokenType []){K_STRING,K_INTEGER,K_INTEGER},3,(tokenType []){K_STRING},1);
+	frameStack_initPreFunction(f,"ord",(tokenType []){K_STRING,K_INTEGER},2,(tokenType []){K_INTEGER},1);
 	frameStack_initPreFunction(f,"chr",(tokenType []){K_INTEGER},1,(tokenType []){K_STRING},1);
 	frameStack_initPreFunction(f,"write",NULL,-1,NULL,0);
 }
