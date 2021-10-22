@@ -3,6 +3,7 @@
 #
 # @authors Jakub Křivánek (xkriva30)
 #
+JUMP neg_test
 JUMP main
 
 # BUILT IN FUNCTIONS
@@ -401,6 +402,36 @@ EXIT int@9
 
 
 
+LABEL neg
+# function neg (i: integer,) : integer
+# function neg (i: number) : number
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@i
+
+POPS TF@i
+
+DEFVAR TF@type
+TYPE TF@type TF@i
+JUMPIFEQ neg_int TF@type string@int
+JUMPIFEQ neg_number TF@type string@float
+
+LABEL neg_int
+sub TF@i int@0 TF@i 
+PUSHS TF@i
+POPFRAME
+RETURN
+
+# number div
+LABEL neg_number
+sub TF@i float@0x0p+0 TF@i 
+PUSHS TF@i
+POPFRAME
+RETURN
+
+
+
 # MAIN FOR TESTING
 LABEL main
 
@@ -571,6 +602,32 @@ PUSHS TF@float2
 PUSHS TF@float1
 CALL safediv
 DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
+WRITE string@\010
+DEFVAR TF@testtoint
+FLOAT2INT TF@testtoint TF@test
+WRITE TF@testtoint
+WRITE string@\010\010
+CREATEFRAME
+
+LABEL neg_test
+CREATEFRAME
+# neg TEST 
+WRITE string@NEG\032TEST:\010
+DEFVAR TF@int
+READ TF@int int
+PUSHS TF@int
+CALL neg
+DEFVAR TF@test
+POPS TF@test
+WRITE TF@test
+WRITE string@\010\010
+
+DEFVAR TF@float
+READ TF@float float
+PUSHS TF@float
+CALL neg
 POPS TF@test
 WRITE TF@test
 WRITE string@\010
