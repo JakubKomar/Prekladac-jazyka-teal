@@ -7,7 +7,7 @@
 
 #include "baseDeclarations.h"
 #include "tokens.h"
-#define STACK_BASE_SIZE 100  //počateční velkost zásobníku
+#define STACK_BASE_SIZE 32  //počateční velkost zásobníku
 
 typedef struct {
     int capacity;   //Velikost zásobníku

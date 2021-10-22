@@ -7,16 +7,18 @@
 
 void genereteProgramHeader()
 {
-    printf(".IFJcode21\nCREATEFRAME\nDEFVAR gf@&JUMPVAR\n");
-    /*
     FILE* file=fopen("built_in_functions.ifjc","r");
     if(!file)
-        errorD(99,"basefunction error");
+    {
+        file=fopen("./src/built_in_functions.ifjc","r");
+        if(!file)
+            errorD(99,"basefunction error");
+    }
     char c;
     while ((c = getc(file)) != EOF)
         putchar(c);
     fclose(file);
-*/
+
 }
 
 void genInst(char * inst)
@@ -32,21 +34,12 @@ void genVar(unsigned long int decor,char * id)
         printf("tf@%s$%ld\n",id,decor);
 }
 
-void genFuncCall(unsigned long int decor,char * id)
-{
-    if(decor==0)
-        printf("gf@%s\n",id);
-    else
-        printf("tf@%ld$%s\n",decor,id);
-}
-
-
 void genFuncHeader(STData * data,char * id)
 {
     printf("JUMP FCEND$%ld$%s\n",data->dekorator,id);
     printf("LABEL FCSTART$%ld$%s\n",data->dekorator,id);
-    printf("CREATEFRAME\n");
     printf("PUSHFRAME\n");
+    printf("CREATEFRAME\n");
 }
 void genFuncFoter(STData * data,char * id)
 {
@@ -107,9 +100,11 @@ void genWhileHeader(unsigned long int decor,tokenType expT)
     printf("JUMPIFEQ WHILEEND$%ld gf@&JUMPVAR ",decor);genJumpExpresion(expT);printf("\n");
 }
 
-void genWhileFoter(unsigned long int decor)
+void genWhileFoter(systemData *d,unsigned long int decor,bool prevInWhile)
 {
     printf("JUMP WHILESTART$%ld\n",decor);
+    if(!prevInWhile)
+        genWhileDecFLUSH(d,decor);
     printf("LABEL WHILEEND$%ld\n",decor);
 }
 
@@ -151,4 +146,61 @@ void genJumpExpresion(tokenType expT)
         errorD(99,"if/while intern error");
         break;
     }
+}
+
+void genStringConstant(char * string)
+{
+    char aux=string[0];
+    int i=0;
+    while (aux!='\0')
+    {
+        if(aux=='\"')
+        {   
+            aux=string[++i];
+            continue;
+        }
+        else if(aux=='\\')
+        {
+            genEscapeSec(string,&i);
+            aux=string[i];
+            continue;
+        }
+        else if(aux=='\t'){
+            printf("\\009");}
+        else if(aux==' '){
+            printf("\\032");}
+        else
+            printf("%c",aux);
+        aux=string[++i];
+    }
+    
+}
+
+void genEscapeSec(char * string,int *i)
+{
+    (*i)++;
+    printf("\\");
+    if(string[(*i)]=='t')
+    {printf("009");}
+    else if (string[(*i)]=='n')
+    {printf("010");}
+    else if (string[(*i)]=='"')
+    {printf("034");}
+    else if (string[(*i)]=='\\')
+    {printf("092");}
+    else
+    {
+        for(int j=0;j<3;j++)
+        {
+            printf("%c",string[(*i)]);
+            (*i)++;
+        }
+        return;
+    }
+    (*i)++;
+}
+
+void genWrite()
+{
+    printf("POPS gf@&regA\nWRITE gf@&regA\n");
 }

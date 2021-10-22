@@ -103,7 +103,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
             return (token){new,K_INTEGER};
         break;
         case T_STR:
-            printf("PUSHS string@%s\n",sData->sData.fullToken.str);
+            printf("PUSHS string@");genStringConstant(sData->sData.fullToken.str);printf("\n");
             return (token){new,K_STRING};     
         break;
         case K_NIL:
@@ -212,7 +212,7 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
-            //přetypování 2operátoru- asi vestavěnou funkcí
+            printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA");
             id1.typeOfValue=K_NUMBER;
         }
         if(id2.typeOfValue!=K_NUMBER)
@@ -238,7 +238,7 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
         {
             if(id1.typeOfValue!=K_NUMBER)
             {
-                //přetypování 2operátoru- asi vestavěnou funkcí
+                printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA");
                 id1.typeOfValue=K_NUMBER;
             }
             if(id2.typeOfValue!=K_NUMBER)
