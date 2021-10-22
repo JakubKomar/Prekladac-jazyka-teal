@@ -7,6 +7,7 @@
 
 void genereteProgramHeader()
 {
+    if(!FORM_FILE){
     FILE* file=fopen("built_in_functions.ifjc","r");
     if(!file)
     {
@@ -21,7 +22,7 @@ void genereteProgramHeader()
     while ((c = getc(file)) != EOF)
         putchar(c);
     fclose(file);
-
+    }
 }
 
 void genInst(char * inst)

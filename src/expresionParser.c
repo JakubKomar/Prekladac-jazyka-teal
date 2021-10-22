@@ -174,7 +174,7 @@ void reduction(stack *s,bool ignor)
     {
         if(op.type==T_SUB)
         {
-            //negace na zásobníku
+            genInst("CALL neg");
             stackPush(s,(token){NE_EXP,id2.typeOfValue});
         }
         else if(op.type==T_ADD)
@@ -208,7 +208,7 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
         error(6);
     if(id2.typeOfValue!=K_INTEGER&&id2.typeOfValue!=K_NUMBER)
         error(6);
-    if(id1.typeOfValue==K_NUMBER||id1.typeOfValue==K_NUMBER||forcedNumber)
+    if(id1.typeOfValue==K_NUMBER||id2.typeOfValue==K_NUMBER||forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
@@ -217,7 +217,7 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
         }
         if(id2.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOATS\n");
+            genInst("INT2FLOATS");
             id2.typeOfValue=K_NUMBER;
         }
         return K_NUMBER;
@@ -243,7 +243,7 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
             }
             if(id2.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOATS\n");
+                genInst("INT2FLOATS");
                 id2.typeOfValue=K_NUMBER;
             }
         }
@@ -265,7 +265,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_DIV:
             type=aritmeticComCheck(id1,id2,true);
-            genInst("");//naše instrukce bezpečného dělení
+            genInst("CALL safediv");
         break;
         case T_DIV2:
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
@@ -273,7 +273,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
                 errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
             type=K_INTEGER;
-            genInst("");//naše instrukce bezpečného dělení
+            genInst("CALL safediv");
         break;
         case T_ADD:
             type=aritmeticComCheck(id1,id2,false);
@@ -290,7 +290,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_NOT_EQ:
             comperzionComCheck(id1,id2,true);
-            type=K_BOOL;
+            type=K_BOOL;    //to do
         break;
         case T_GT:
             comperzionComCheck(id1,id2,false);
@@ -299,7 +299,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_GTE:
             comperzionComCheck(id1,id2,false);
-            type=K_BOOL;
+            type=K_BOOL;    //to do
         break;
         case T_LT:
             comperzionComCheck(id1,id2,false);
@@ -307,7 +307,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
             genInst("LTS");
         break;
         case T_LTE:
-            comperzionComCheck(id1,id2,false);
+            comperzionComCheck(id1,id2,false);  //to do
             type=K_BOOL;
         break;
         case T_STR_LEN:
@@ -315,6 +315,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
                 errorD(8,"nepovolená operace s nil");
             if(id2.typeOfValue!=K_STRING)
                 errorD(6,"operace délka řetězce lze provádět pouze na stringu");
+            genInst("CALL hashtag");
             type=K_INTEGER;
 
         break;
