@@ -247,7 +247,8 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
                 id2.typeOfValue=K_NUMBER;
             }
         }
-        error(6);
+        else
+            error(6);
     }
     return K_BOOL;
 }
@@ -290,7 +291,8 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_NOT_EQ:
             comperzionComCheck(id1,id2,true);
-            type=K_BOOL;    //to do
+            genInst("EQS\nNOTS");
+            type=K_BOOL;   
         break;
         case T_GT:
             comperzionComCheck(id1,id2,false);
@@ -299,7 +301,14 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_GTE:
             comperzionComCheck(id1,id2,false);
-            type=K_BOOL;    //to do
+            genInst("POPS gf@&regB");
+            genInst("POPS gf@&regA");
+            genInst("GT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("ORS");
+            type=K_BOOL;    
         break;
         case T_LT:
             comperzionComCheck(id1,id2,false);
@@ -307,7 +316,14 @@ tokenType generateExpresion(token id1, token op ,token id2)
             genInst("LTS");
         break;
         case T_LTE:
-            comperzionComCheck(id1,id2,false);  //to do
+            comperzionComCheck(id1,id2,false);  
+            genInst("POPS gf@&regB");
+            genInst("POPS gf@&regA");
+            genInst("LT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("ORS");
             type=K_BOOL;
         break;
         case T_STR_LEN:

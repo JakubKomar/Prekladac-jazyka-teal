@@ -78,7 +78,8 @@ void LLfunction(systemData *d)
     char *key=stringCpyToChPtr(&d->sData.fullToken);
     STSymbolPtr* node=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
     STData * data=&(*node)->data;
-    decorId(d,data);
+    if(!checkOnly)
+        decorId(d,data);
     changeRangeScope(d,true);
     genFuncHeader(data,(*node)->id);
     t=next(d);
@@ -194,8 +195,6 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             {
                 Fdata->funcData->paramNum++;
             }
-            printf("DEFVAR ");genVar(varData->dekorator,key);
-            printf("POPS ");genVar(varData->dekorator,key);
         break;   
         default:
             free(key);
@@ -229,6 +228,8 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     }
     if(!checkOnly)
         Fdata->funcData->paramTypes[argNum]=type.type;
+    printf("DEFVAR ");genVar(varData->dekorator,key);
+    printf("POPS ");genVar(varData->dekorator,key);
 }
 
 void LLif(systemData *d,STFuncData *fData)
