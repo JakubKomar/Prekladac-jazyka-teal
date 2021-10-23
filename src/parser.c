@@ -90,7 +90,7 @@ void LLfunction(systemData *d)
         break;   
         case T_RBR:
             if(checkOnly&&data->funcData->paramNum>0)
-                errorD(5,"počty parametů v deklaraci neodpovídají");
+                errorD(3,"počty parametů v deklaraci neodpovídají");
         break; 
         default:
             LLerr();
@@ -104,7 +104,7 @@ void LLfunction(systemData *d)
     if(t.type==T_COLON)   
         LLreturnArg(d,checkOnly,0,data);
     else if(checkOnly&&data->funcData->retNum>0)
-        errorD(5,"počty návratových parametů v deklaraci neodpovídají");
+        errorD(3,"počty návratových parametů v deklaraci neodpovídají");
 
     LLprog(d,data->funcData);
     if(d->pData.actualToken.type!=K_END)
@@ -126,9 +126,9 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(5,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                    errorD(3,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
                 else if(Fdata->funcData->retTypes[argNum]!=type.type)
-                    errorD(5,"typ n8vratového parametru neodpovídá typu v deklaracaci");
+                    errorD(3,"typ n8vratového parametru neodpovídá typu v deklaracaci");
             }
             else
             {
@@ -153,7 +153,7 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             }
             else if(Fdata->funcData->retNum!=(argNum+1))
             {
-                errorD(5,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                errorD(3,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
             }
         break;
     }
@@ -187,9 +187,9 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             if(checkOnly)
             {
                 if(!(Fdata->funcData->paramNum>argNum))
-                    errorD(5,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                    errorD(3,"počty argumentů v definici neodpovídají počtu v deklaracaci");
                 else if(Fdata->funcData->paramTypes[argNum]!=type.type)
-                    errorD(5,"typ parametru neodpovídá typu v deklaracaci");
+                    errorD(3,"typ parametru neodpovídá typu v deklaracaci");
             }
             else
             {
@@ -219,7 +219,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             }
             else if(Fdata->funcData->paramNum!=(argNum+1))
             {
-                errorD(5,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                errorD(3,"počty argumentů v definici neodpovídají počtu v deklaracaci");
             }
         break;
         default:
@@ -228,8 +228,8 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     }
     if(!checkOnly)
         Fdata->funcData->paramTypes[argNum]=type.type;
-    printf("DEFVAR ");genVar(varData->dekorator,key);
-    printf("POPS ");genVar(varData->dekorator,key);
+    printf("DEFVAR ");genVar(varData->dekorator,key);printf("\n");
+    printf("POPS ");genVar(varData->dekorator,key);printf("\n");
 }
 
 void LLif(systemData *d,STFuncData *fData)
@@ -404,15 +404,19 @@ void LLdeclaration(systemData *d)
             }
             else
             {
-                printf("DEFVAR ");genVar(ptr->dekorator,name);
+                printf("DEFVAR ");genVar(ptr->dekorator,name);printf("\n");
             }
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
                 stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
                 LLexp_or_func(d,1);
-                printf("POPS ");genVar(ptr->dekorator,name);
+                printf("POPS ");genVar(ptr->dekorator,name);printf("\n");
                 ptr->varData->defined=true;
+            }
+            else
+            {
+                printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
             }
         break;  
         case K_FUNCTION: 
@@ -441,7 +445,7 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
         break;   
         case T_RBR:
             if(checkOnly&&Fdata->funcData->paramNum>0)
-                errorD(5,"počty parametů v deklaraci neodpovídají");
+                errorD(3,"počty parametů v deklaraci neodpovídají");
         break;   
         default:
             LLerr();
@@ -463,7 +467,7 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
         break;   
         default:
             if(checkOnly&&Fdata->funcData->retNum>0)
-                errorD(5,"počty návratovýchparametů v deklaraci neodpovídají");
+                errorD(3,"počty návratovýchparametů v deklaraci neodpovídají");
         break;
     }
 }
@@ -480,9 +484,9 @@ void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(5,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(3,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->retTypes[argNum]!=Type.type)
-                    errorD(5,"typ návratového parametru neodpovídá typu v definici");
+                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
             }
             else
                 Fdata->funcData->retNum++;
@@ -522,9 +526,9 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->paramNum))
-                    errorD(5,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(3,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->paramTypes[argNum]!=Type.type)
-                    errorD(5,"typ návratového parametru neodpovídá typu v definici");
+                    errorD(3,"typ návratového parametru neodpovídá typu v definici");
             }
             else
                 Fdata->funcData->paramNum++;
@@ -612,7 +616,7 @@ void LLid_next(systemData *d,int order)
             LLerr();
         break;
     }
-    printf("POPS ");genVar(data->dekorator,(*ptr)->id);
+    printf("POPS ");genVar(data->dekorator,(*ptr)->id);printf("\n");
     //čištění zásobníku
     data->varData->defined=true;
 }
@@ -696,7 +700,7 @@ void assigenCompCheck(tokenType a,tokenType b)
         if(a==K_NUMBER&&b==K_INTEGER)
             printf("INT2FLOATS\n");
         else
-            errorD(4,"Typová nekompabilita v příkazu přiřazení");
+            errorD(5,"Typová nekompabilita v příkazu přiřazení");
     }
 
 }
@@ -710,7 +714,7 @@ int LLfuncCall(systemData *d,int numOfAsigens)
     if(data->type!=ST_FUNC)
         errorD(3,"proměnná nelze zavolat");
     if(numOfAsigens>data->funcData->retNum)
-        errorD(5,"Funkce nevrací tolik parametů");    
+        errorD(3,"Funkce nevrací tolik parametů");    
     token t=next(d);
     switch (t.type)
     {   

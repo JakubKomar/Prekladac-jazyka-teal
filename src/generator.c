@@ -33,9 +33,9 @@ void genInst(char * inst)
 void genVar(unsigned long int decor,char * id)
 {
     if(decor==0)
-        printf("gf@%s\n",id);
+        printf("gf@%s",id);
     else
-        printf("tf@%s$%ld\n",id,decor);
+        printf("tf@%s$%ld",id,decor);
 }
 
 void genFuncHeader(STData * data,char * id)

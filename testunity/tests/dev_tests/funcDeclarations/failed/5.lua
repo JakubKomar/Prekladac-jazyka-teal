@@ -1,4 +1,4 @@
--- bad function 5
+-- bad function 3
 require "ifj21"
 function a(a:integer,b:string,c:integer) 
     
