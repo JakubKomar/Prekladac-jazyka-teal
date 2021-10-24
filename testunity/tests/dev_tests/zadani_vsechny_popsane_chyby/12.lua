@@ -1,4 +1,4 @@
--- Pokud typy návratových hodnot neodpovídají hlavičce funkce, dojde k chybě 5
+-- Pokud typy navratovych hodnot neodpovidaji hlavicce funkce, dojde k chybe 5
 require "ifj21"
 
 global a:function(string):integer

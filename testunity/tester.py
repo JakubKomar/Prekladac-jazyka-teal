@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
-
+# -*- coding: utf-8 -*- 
 #autor: Jakub Komarek
 #login: xkomar33
 #tester překladače IFJ-2021
 
 import os
 import sys
+
+import filecmp
 import re
 import subprocess 
 import argparse
 testFolder="./tests/"   
 testTypeRegex=r"\.lua$"       #koncovka testovaných souborů
-programToTest="./../ifj21"
+programToTest="./ifj21"
 ifjCode="./ic21int"     #strojový interpret cílového jazyka
-ifj21="./ic21int"         #interpret počátečního jazyka  
-makefile="./../makefile"
 f_noOut=False
-f_scannerOnly=False
 tests=[]
 
 # progress bar převzat z :https://gist.github.com/vladignatyev/06860ec2040cb497f0f3
 def progress(count, total, status=''):
+    if total<=0:
+        total=1
     bar_len = 96
     filled_len = int(round(bar_len * count / float(total)))
 
@@ -39,16 +40,6 @@ def main():
 def programInit():
     if(not os.path.exists(ifjCode) ):
         error("ifjCode interpret is not existing")
-    if(not os.path.exists(ifj21)):
-        error("ifj21 interpret is not existing")
-    if(not os.path.exists(programToTest)):
-        if(not os.path.exists(makefile)):
-            error("program not existing and cant be made by makefile")
-        else:
-            print("testing program is not existing, trying makefile")
-            os.system("cd .. && make")
-            if(not os.path.exists(programToTest)):
-                error("testing program cant be made")
 
 def startTesting():
     i=0
@@ -136,21 +127,40 @@ class test(object):
 
     def startTest(self):
         try:
-            if f_scannerOnly:
-                output = subprocess.check_output(programToTest+" -d"+" -s"+" 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
-            else:
-                output = subprocess.check_output(programToTest+" 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+            subprocess.check_output(programToTest+" >temp.ifjc 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+            self.RetCode=0
             if(self.exRetCode!=0):
                 self.pased=False
                 return
-            self.RetCode=0
             if not f_noOut:
-                #to do-porovnání výstupů od vzorového interpretu
-                expectedOutput=output
-                if output==expectedOutput :
-                    self.pased=True
-                else:
+                try:
+                    if(not os.path.exists(self.path[:-3]+"in")):
+                        with open(self.path[:-3]+"in", 'w') as fp:
+                            pass
+                    subprocess.check_output(ifjCode+" temp.ifjc >output.txt 2>/dev/null <"+self.path[:-3]+"in",shell=True,stderr=subprocess.DEVNULL,timeout=1)
+                    try:
+                        subprocess.check_output("tl run >exoutput.txt 2>/dev/null <"+self.path[:-3]+"in "+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+                        if  filecmp.cmp("output.txt", "exoutput.txt") :
+                            self.pased=True
+                        else:
+                            self.pased=False
+                            self.failReson="outputs not same"
+                    except subprocess.CalledProcessError as grepexc:
+                        self.pased=False
+                        self.failReson="teal int. failed" 
+                    except subprocess.TimeoutExpired:
+                        self.pased=False
+                        self.failReson="teal int. time out"
+                except subprocess.CalledProcessError as grepexc:
+                    self.RetCode=grepexc.returncode
+                    if self.RetCode==self.exRetCode:
+                        self.pased=True
+                    else:
+                        self.pased=False
+                        self.failReson="wrong return code in runtime"
+                except subprocess.TimeoutExpired:
                     self.pased=False
+                    self.failReson="ifjcode in. timeout"
             else:
                 self.pased=True
         except subprocess.CalledProcessError as grepexc:
@@ -162,8 +172,8 @@ class test(object):
                 self.failReson="wrong return code"
         except subprocess.TimeoutExpired:
             self.pased=False
-            self.failReson="time out"
-
+            self.failReson="testing program timeout"
+         
     def __repr__(self):
         return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
 
@@ -171,14 +181,12 @@ class test(object):
         return " %-60s | %-3d | %-3d | %-20s |" % (self.path, self.RetCode,self.exRetCode,self.failReson)
 
 
-parser = argparse.ArgumentParser(description='Tester pro ifj překaldač.')
+parser = argparse.ArgumentParser(description='Tester pro ifj překaldac.')
 parser.add_argument("-p", "--path",type=str,default=testFolder,help="Path to tests")    
-parser.add_argument("-s",action="store_true", help="Scanner only mod")   
 parser.add_argument("-o", action="store_true",help="Dont compere outputs") 
 
 args = parser.parse_args()
 f_noOut=args.o 
-f_scannerOnly=args.s 
 
 testFolder=args.path
 main()

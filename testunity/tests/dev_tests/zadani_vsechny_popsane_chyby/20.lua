@@ -1,4 +1,4 @@
--- Je-li počet výrazů výsledných hodnot nekompatibilní s návratovými typy dané funkce, jsou chybějící hodnoty doplněny speciální hodnotou nil a přebývající způsobí chybu 5
+-- Je-li pocet vyrazu vyslednych hodnot nekompatibilni s navratovymi typy dane funkce, jsou chybejici hodnoty doplneny specialni hodnotou nil a prebyvajici zpusobi chybu 5
 
 require "ifj21"
 

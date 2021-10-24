@@ -1,4 +1,4 @@
---  Není-li typ inicializačního výrazu staticky (při překladu) kompatibilní s typem inicializované proměnné, jde o chybu 4
+--  Neni-li typ inicializacniho vyrazu staticky (pri prekladu) kompatibilni s typem inicializovane promenne, jde o chybu 4
 require "ifj21"
 
 local a:string=21

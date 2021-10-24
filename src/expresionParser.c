@@ -87,7 +87,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
             errorD(3,"Proměnná ve výrazu je typu funkce");
         else if(!varData->varData->defined)
             errorD(3,"Proměnná ve výrazu je typu funkce");
-        printf("PUSHS ");genVar(varData->dekorator,(*ptr)->id);
+        printf("PUSHS ");genVar(varData->dekorator,(*ptr)->id);printf("\n");
         return (token){new,varData->varData->type};
     }
     else if(isOperator(new)||isConstant(new)||new==T_RBR||new==T_LBR)
@@ -341,6 +341,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
             if(id1.typeOfValue!=K_STRING||id2.typeOfValue!=K_STRING)
                 errorD(6,"operace konkatenance řetězců lze provádět pouze na stringu");
             type=K_STRING;
+            printf("CALL concatenation\n");
 
         break;
         default:

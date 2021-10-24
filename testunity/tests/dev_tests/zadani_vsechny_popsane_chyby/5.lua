@@ -1,4 +1,4 @@
---  Každá proměnná musí být definována před jejím použitím, jinak se jedná o sémantickou chybu 3
+--  Kazda promenna musi byt definovana pred jejim pouzitim, jinak se jedna o semantickou chybu 3
 require "ifj21"
 
 local a:integer

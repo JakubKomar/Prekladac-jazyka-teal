@@ -1,4 +1,4 @@
--- Typová nekompatibilita mezi návratovou hodnotou a odpovídající proměnnou pro její uložení vede nachybu 5
+-- Typova nekompatibilita mezi navratovou hodnotou a odpovidajici promennou pro jeji ulozeni vede nachybu 5
 require "ifj21"
 
 function a():integer

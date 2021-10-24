@@ -1,4 +1,4 @@
--- řípadě, že příkazvolání funkce obsahuje jiný počet nebo typy parametrů, než funkce očekává (tedynež je uvedeno v její hlavičce, a to i u vestavěných funkcí), jedná se o chybu 5
+--v pripade, ze prikazvolani funkce obsahuje jiny pocet nebo typy parametru, nez funkce ocekava (tedynez je uvedeno v jeji hlavicce, a to i u vestavenych funkci), jedna se o chybu 5
 require "ifj21"
 
 function a(b:string)

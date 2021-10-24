@@ -1,4 +1,4 @@
---   K té také dochází, pokud u deklarace a definice funkce neodpovídají seznamy parametrů nebo seznamy návratových typů, či pokud deklarovaná funkce není nakonec definována. P 3
+--   K te take dochazi, pokud u deklarace a definice funkce neodpovidaji seznamy parametru nebo seznamy navratovych typu, ci pokud deklarovana funkce neni nakonec definovana. P 3
 require "ifj21"
 
 global a:function()
