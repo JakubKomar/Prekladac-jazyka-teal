@@ -41,8 +41,9 @@ doxygen:
 clean:
 	rm -rf $(BIN) build/ $(ZIP)
 test:
+	cp ifj21 ./testunity/ifj21 &&\
 	cd testunity && \
-	python3 tester.py 
+	python3 tester.py -o
 testScaner:
 	cd testunity && \
 	python3 tester.py -o -s

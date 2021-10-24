@@ -743,7 +743,7 @@ int LLfuncCall(systemData *d,int numOfAsigens)
         printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
     for(int i=0;i<numOfAsigens;i++)
     {
-        assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-i-1].type,data->funcData->retTypes[i]);
+        assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens+i].type,data->funcData->retTypes[i]);
     }
     next(d);
     return data->funcData->retNum;
