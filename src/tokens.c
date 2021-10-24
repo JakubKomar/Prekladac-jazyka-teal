@@ -1,3 +1,9 @@
+/**
+ * @brief   tokens for translator
+ *
+ * @authors Jakub Komárek (xkomar33)
+ */
+
 #include "tokens.h"
 
 char * tokenStr(token type)

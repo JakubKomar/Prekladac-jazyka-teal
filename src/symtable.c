@@ -9,12 +9,12 @@
 
 #include "symtable.h"
 
-void symtable_init (STSymbolPtr* RootPtr) 
+void symtableInit (STSymbolPtr* RootPtr) 
 {
 	*RootPtr= NULL;
 }
 
-STSymbolPtr* symtable_search (STSymbolPtr* RootPtr, char *id) 
+STSymbolPtr* symtableSearch (STSymbolPtr* RootPtr, char *id) 
 {
 	if(*RootPtr == NULL)
 		return NULL;
@@ -23,12 +23,12 @@ STSymbolPtr* symtable_search (STSymbolPtr* RootPtr, char *id)
 		return &(*RootPtr);
 
 	if(strcmp((*RootPtr)->id, id) > 0)
-		return symtable_search(&(*RootPtr)->lPtr, id);
+		return symtableSearch(&(*RootPtr)->lPtr, id);
 	else
-		return symtable_search(&(*RootPtr)->rPtr, id);
+		return symtableSearch(&(*RootPtr)->rPtr, id);
 }
 
-STSymbolPtr* symtable_insert_woData (STSymbolPtr* RootPtr, char *id) 
+STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id) 
 {
 	if((*RootPtr) == NULL)
 	{
@@ -54,9 +54,9 @@ STSymbolPtr* symtable_insert_woData (STSymbolPtr* RootPtr, char *id)
 	}
 
 	if(strcmp((*RootPtr)->id, id) > 0)
-		return symtable_insert_woData(&(*RootPtr)->lPtr, id);
+		return symtableInsertData(&(*RootPtr)->lPtr, id);
 	else
-		return symtable_insert_woData(&(*RootPtr)->rPtr, id);
+		return symtableInsertData(&(*RootPtr)->rPtr, id);
 }
 /*
 void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr) 
@@ -76,18 +76,18 @@ void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr)
 	ReplaceByRightmost(PtrReplaced, &(*RootPtr)->rPtr);
 }
 
-void symtable_delete (STSymbolPtr* RootPtr, char *id) 
+void symtableDelete (STSymbolPtr* RootPtr, char *id) 
 {
 	if((*RootPtr) == NULL)
 		return;
 
 	if(strcmp((*RootPtr)->id, id) > 0){
-		symtable_delete(&(*RootPtr)->lPtr, id);
+		symtableDelete(&(*RootPtr)->lPtr, id);
 		return;
 	}
 
 	if(strcmp((*RootPtr)->id, id) < 0){
-		symtable_delete(&(*RootPtr)->rPtr, id);
+		symtableDelete(&(*RootPtr)->rPtr, id);
 		return;
 	}
 
@@ -125,42 +125,42 @@ void symtable_delete (STSymbolPtr* RootPtr, char *id)
 	return;
 }
 */
-void symtable_dispose (STSymbolPtr* RootPtr) 
+void symtableDispose (STSymbolPtr* RootPtr) 
 {
 	if((*RootPtr) != NULL)
 	{
-		symtable_dispose(&(*RootPtr)->rPtr);
-		symtable_dispose(&(*RootPtr)->lPtr);
-		symtable_data_disporese(&(*RootPtr));
+		symtableDispose(&(*RootPtr)->rPtr);
+		symtableDispose(&(*RootPtr)->lPtr);
+		symtableDataDisporese(&(*RootPtr));
 		free ((*RootPtr));
 		(*RootPtr) = NULL;
 	}
 }
 
-void symtable_data_disporese (STSymbolPtr* RootPtr) 
+void symtableDataDisporese (STSymbolPtr* RootPtr) 
 {
 	if((*RootPtr)->data.type==ST_VAR)
 		free ((*RootPtr)->data.varData);
 	else if((*RootPtr)->data.type==ST_FUNC)
 	{
-		symtable_data_disporese_func((*RootPtr)->data.funcData);
+		symtableDataDisporeseFunc((*RootPtr)->data.funcData);
 		free ((*RootPtr)->data.funcData);
 	}
 	free ((*RootPtr)->id);
 }
 
-void symtable_data_disporese_func(STFuncData *data)
+void symtableDataDisporeseFunc(STFuncData *data)
 {
 	free(data->paramTypes);
 	free(data->retTypes);
 }
 
-void symtable_print (STSymbolPtr* RootPtr)
+void symtablePrint (STSymbolPtr* RootPtr)
 {
 	if((*RootPtr)==NULL)
 		return;
 	if((*RootPtr)->lPtr!=NULL)
-		symtable_print(&(*RootPtr)->lPtr);
+		symtablePrint(&(*RootPtr)->lPtr);
 	
 	debug("\t%10s %10s:",(*RootPtr)->id,(*RootPtr)->data.type==ST_FUNC?"Function":"Variable");
 	if((*RootPtr)->data.type==ST_FUNC)
@@ -177,13 +177,13 @@ void symtable_print (STSymbolPtr* RootPtr)
 		debug("%s",tokenStr((token){(*RootPtr)->data.varData->type}));
 	debugS("\n");
 	if((*RootPtr)->rPtr!=NULL)
-		symtable_print(&(*RootPtr)->rPtr);
+		symtablePrint(&(*RootPtr)->rPtr);
 }
 
 
 /******************frame model fuctions*********************/
 
-void frameStack_init(frameStack * s)
+void frameStackInit(frameStack * s)
 {
 	s->capacity=S_TABLE_FRAME_BASE;
 	s->last=-1;
@@ -193,7 +193,7 @@ void frameStack_init(frameStack * s)
 		errorD(100,"frameStack malloc error");
 
 	frameInit(&s->globalF,true);
-	frameStack_pushFrame(s,true);
+	frameStackPushFrame(s,true);
 
 }
 
@@ -210,7 +210,7 @@ void frameStack_initPreFunctions(frameStack * f)
 }
 
 
-void frameStack_realoc(frameStack * s)
+void frameStackRealoc(frameStack * s)
 {
 	s->capacity=s->capacity*2;
 	s->localF=realloc(s->localF,sizeof(frame)*s->capacity);
@@ -218,21 +218,21 @@ void frameStack_realoc(frameStack * s)
 		errorD(100,"frameStack realoc error");
 }
 
-void frameStack_disporse(frameStack * s)
+void frameStackDisporse(frameStack * s)
 {
-	symtable_dispose(&s->globalF.bTree);
+	symtableDispose(&s->globalF.bTree);
 	for(int i=0;i<=s->last;i++)
 	{
-		symtable_dispose(&s->localF[i].bTree);
+		symtableDispose(&s->localF[i].bTree);
 	}
 	free(s->localF);
 }
 
-void frameStack_pushFrame(frameStack * s,bool isFunc)
+void frameStackPushFrame(frameStack * s,bool isFunc)
 {	
 	s->last++;
 	if(!(s->last<s->capacity))
-		frameStack_realoc(s);
+		frameStackRealoc(s);
 	frameInit(&s->localF[s->last],isFunc);
 }
 
@@ -246,20 +246,20 @@ bool searchForNonDefinedFunction(STSymbolPtr* RootPtr)
 		return false;
 }
 
-void frameStack_popFrame(frameStack * s)
+void frameStackPopFrame(frameStack * s)
 {
 	if(s->last<0)
 		errorD(99,"podtečení zásobníku rámců");
 	if(searchForNonDefinedFunction(&s->localF[s->last].bTree))
 		errorD(3,"Byla nalezena deklarovaná funkce bez definice");
-	symtable_dispose(&s->localF[s->last].bTree);	
+	symtableDispose(&s->localF[s->last].bTree);	
 	s->last--;
 }
 
 void frameInit(frame *f,bool wedge)
 {
 	f->wedge=wedge;
-	symtable_init(&f->bTree);
+	symtableInit(&f->bTree);
 }
 
 STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)
@@ -267,14 +267,14 @@ STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)
 	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)
 	{
-		data=symtable_search(&f->localF[i].bTree,key);
+		data=symtableSearch(&f->localF[i].bTree,key);
 
 		if(data!=NULL)
 			return data;
 		else if(f->localF[i].wedge)
 			break;
 	}
-	data=symtable_search(&f->globalF.bTree,key);
+	data=symtableSearch(&f->globalF.bTree,key);
 	return data;
 }
 
@@ -283,25 +283,25 @@ STSymbolPtr * frameStackSearchFunc(frameStack *f,char * key)
 	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)
 	{
-		data=symtable_search(&f->localF[i].bTree,key);
+		data=symtableSearch(&f->localF[i].bTree,key);
 		if(data!=NULL)
 			return data;
 	}
-	return symtable_search(&f->globalF.bTree,key);
+	return symtableSearch(&f->globalF.bTree,key);
 }
 
 STSymbolPtr * frameStackSearchActual(frameStack *f,char * key,bool isGolobal)
 {
-	return symtable_search(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
+	return symtableSearch(isGolobal?&f->globalF.bTree:&f->localF[f->last].bTree,key);
 }
 
 
 STSymbolPtr * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 {
 	if(isGlobal)
-		return symtable_insert_woData(&f->globalF.bTree,key);
+		return symtableInsertData(&f->globalF.bTree,key);
 	else if(f->last>=0)
-		return symtable_insert_woData(&f->localF[f->last].bTree,key);
+		return symtableInsertData(&f->localF[f->last].bTree,key);
 	else
 		errorD(99,"cant insert into noexisting frame\n");
 	return NULL;
@@ -459,11 +459,11 @@ STSymbolPtr * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenTyp
 void frameStackPrint(frameStack *f)
 {
 	debugS("------------------Symtable print------------------\nGlobal:\n");
-	symtable_print(&f->globalF.bTree);
+	symtablePrint(&f->globalF.bTree);
 	debugS("Local Frames:\n");
 	for(int i=0;i<=f->last;i++)
 	{
-		symtable_print(&f->localF[i].bTree);
+		symtablePrint(&f->localF[i].bTree);
 		debugS("*****************\n");
 	}
 	debugS("------------------end of Symtable print------------------\n");

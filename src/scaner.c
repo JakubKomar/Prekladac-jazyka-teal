@@ -40,7 +40,7 @@ tokenType getNextToken(scanerData * data)
     }
     tokenType token= getTokenFromState(prevState);
     if(token==O_ERR)
-        errorD(1,"není koncový stav");  //zatím provizorní
+        errorD(1,"není koncový stav");  
     else if(token==T_ID||token==T_FUNC_CALL)
         token=checkKeywords(data,token);
     return token;

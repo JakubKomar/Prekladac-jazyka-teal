@@ -3,8 +3,7 @@
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#ifndef _TOKENS_H
-#define _TOKENS_H
+#pragma once
 
 #include "baseDeclarations.h"
 
@@ -81,5 +80,3 @@ typedef struct {
  * @return string name of token
 */
 char * tokenStr(token type);
-
-#endif 

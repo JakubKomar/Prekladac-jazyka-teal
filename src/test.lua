@@ -1,15 +1,16 @@
 -- ret params function test 0
 require "ifj21"
 
+function func(a:integer,b:string,c:number):integer,string,string
 
-function func(a:integer,b:number):number,integer,string,number
-    write(a,b)
-    return a,a,"ahoj",32.95
+    return a,"ahoj","ahoj"
 end
 
-local a:number
-local b:number
+local a:integer=95,85,45+55,"ahoj"
+
+local b:string
+
 local c:string
-local d:number
-a,b,c,d=func(1,25.6)
-write(a,b,c,d)
+
+a,b=func(2,"zmrd",2)
+write(a,b)

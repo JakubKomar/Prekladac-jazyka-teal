@@ -90,8 +90,6 @@ void stackClear(stack *s)
     s->last=0;
 }
 
-/************** expresion parser function **************/
-
 token stackTop(stack *s)
 {
     for (int i =s->last-1; i>=0 ;i--)

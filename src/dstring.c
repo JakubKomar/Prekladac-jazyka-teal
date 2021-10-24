@@ -34,16 +34,6 @@ void stringAddChar(string *s, char c)
    addEnd(s);
 }
 
-void stringAddString(string *s1, char *s2)
-{
-   int i=0;
-   while(s2[i]!='\0')
-   {
-      stringAddChar(s1,s2[i]);
-      i++;
-   }
-}
-
 void stringRealoc(string *s)
 {
    s->capacity=s->capacity*2;
@@ -70,6 +60,7 @@ void stringCopy(string *s1, string *s2)
    addEnd(s2);
 
 }
+
 void addEnd(string *s)
 {
    s->str[s->length]='\0';
@@ -82,22 +73,16 @@ bool stringFull(string *s)
 
 char* stringCpyToChPtr(string *s)
 {
-   char * ptr=malloc((s->length+1)*sizeof(char)); 
-   if(!ptr)
-      errorD(100,"strCpyWhithMalloc error");
-   strcpy(ptr,s->str);
-   return ptr;
+   return strdup(s->str);
 }
 
 char* strdup (const char* s)
 {
-  size_t slen = strlen(s);
-  char* result = malloc(slen + 1);
-  if(result == NULL)
-  {
-    return NULL;
-  }
+   size_t slen = strlen(s);
+   char* result = malloc(slen + 1);
+   if(result == NULL)
+      errorD(100,"Malloc error-cpy string");
+   strcpy(result,s);
 
-  memcpy(result, s, slen+1);
-  return result;
+   return result;
 }

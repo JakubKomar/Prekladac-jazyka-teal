@@ -12,7 +12,7 @@ void parserMain(systemData * d)
     LLprog(d,NULL);
     if(d->pData.actualToken.type!=T_EOF)
         LLerr();
-    frameStack_popFrame(&d->pData.dataModel);
+    frameStackPopFrame(&d->pData.dataModel);
     if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))
         errorD(3,"k některé uživatelské funci chybí definice");
 }
@@ -109,7 +109,7 @@ void LLfunction(systemData *d)
     LLprog(d,data->funcData);
     if(d->pData.actualToken.type!=K_END)
         LLerr();
-    frameStack_popFrame(&d->pData.dataModel);
+    frameStackPopFrame(&d->pData.dataModel);
     genFuncFoter(data,(*node)->id);
     t=next(d);
 }
@@ -235,7 +235,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
 void LLif(systemData *d,STFuncData *fData)
 {
     token t=next(d);
-    tokenType expT=expresionParse(d,false);
+    tokenType expT=expresionParse(d);
     t=d->pData.actualToken;
     if(t.type!=K_THEN)
         LLerr();
@@ -243,7 +243,7 @@ void LLif(systemData *d,STFuncData *fData)
     next(d);
     changeRangeScope(d,false);
     LLprog(d,fData);
-    frameStack_popFrame(&d->pData.dataModel);
+    frameStackPopFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
     switch (t.type)
     {
@@ -267,7 +267,7 @@ void LLelse(systemData *d,STFuncData *fData,unsigned long int decorId)
     next(d);
     changeRangeScope(d,false);
     LLprog(d,fData);
-    frameStack_popFrame(&d->pData.dataModel);
+    frameStackPopFrame(&d->pData.dataModel);
     switch (d->pData.actualToken.type)
     {
         case K_END:
@@ -327,18 +327,18 @@ void LLreturnArgN(systemData *d,STFuncData *fData,int order)
         case T_ID: 
         case T_ADD:
         case T_SUB:
-            retType=expresionParse(d,false);
+            retType=expresionParse(d);
             if(fData!=NULL)
             {
                 if(order>=fData->retNum)
                     errorD(5,"počty návratových argumentů v reodpovídajá deklaraci/definici");
-                assigenCompCheck(fData->retTypes[order],retType);
+                assigenCompCheck(fData->retTypes[order],retType,false);
             }
             else
             {
                 if(order==0)
                 {
-                    assigenCompCheck(K_INTEGER,retType);
+                    assigenCompCheck(K_INTEGER,retType,false);
                     genInst("POPS GF@&JUMPVAR\nEXIT GF@&JUMPVAR");
                 }
                 else
@@ -403,9 +403,7 @@ void LLdeclaration(systemData *d)
                 stackPush(&d->pData.varDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});
             }
             else
-            {
                 printf("DEFVAR ");genVar(ptr->dekorator,name);printf("\n");
-            }
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
@@ -415,9 +413,7 @@ void LLdeclaration(systemData *d)
                 ptr->varData->defined=true;
             }
             else
-            {
                 printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
-            }
         break;  
         case K_FUNCTION: 
             node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -567,7 +563,7 @@ void LLwhile(systemData *d,STFuncData *fData)
     d->pData.isInWhile=true;
     token t=next(d); 
     unsigned long int decor=genWhileSlabel(d);
-    tokenType retT=expresionParse(d,false);
+    tokenType retT=expresionParse(d);
     genWhileHeader(decor,retT);
     t=d->pData.actualToken;
     if(t.type!=K_DO)
@@ -575,7 +571,7 @@ void LLwhile(systemData *d,STFuncData *fData)
     t=next(d); 
     changeRangeScope(d,false);
     LLprog(d,fData);
-    frameStack_popFrame(&d->pData.dataModel);
+    frameStackPopFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
     if(t.type!=K_END)
         LLerr();
@@ -617,7 +613,6 @@ void LLid_next(systemData *d,int order)
         break;
     }
     printf("POPS ");genVar(data->dekorator,(*ptr)->id);printf("\n");
-    //čištění zásobníku
     data->varData->defined=true;
 }
 
@@ -662,16 +657,13 @@ void LLexpresionN(systemData *d,int numOfAsigens)
         case T_LBR: 
         case T_ADD:
         case T_SUB:
+            typeOfresult=expresionParse(d);
             if(numOfAsigens>0)
             {
-                typeOfresult=expresionParse(d,false);
-                if(d->pData.expresionBuffer.last-numOfAsigens>=0)
-                {
-                    assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens].type,typeOfresult);
-                }
+                assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens].type,typeOfresult,true);     
             }
             else
-                expresionParse(d,true);
+                genInst("POPS gf@&NULL");
         break;  
         default:
             LLerr();
@@ -689,7 +681,7 @@ void LLexpresionN(systemData *d,int numOfAsigens)
 
 }
 
-void assigenCompCheck(tokenType a,tokenType b)
+void assigenCompCheck(tokenType a,tokenType b,bool isAsigen)
 {
     if(a==b)
         return;
@@ -699,10 +691,11 @@ void assigenCompCheck(tokenType a,tokenType b)
     {
         if(a==K_NUMBER&&b==K_INTEGER)
             printf("INT2FLOATS\n");
+        else if(isAsigen)
+            errorD(4,"Typová nekompabilita v příkazu přiřazení");
         else
-            errorD(5,"Typová nekompabilita v příkazu přiřazení");
+            errorD(5,"Typová nekompabilita v návratových typů");
     }
-
 }
 
 int LLfuncCall(systemData *d,int numOfAsigens)
@@ -743,7 +736,7 @@ int LLfuncCall(systemData *d,int numOfAsigens)
         printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
     for(int i=0;i<numOfAsigens;i++)
     {
-        assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens+i].type,data->funcData->retTypes[i]);
+        assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens+i].type,data->funcData->retTypes[i],true);
     }
     next(d);
     return data->funcData->retNum;
@@ -764,12 +757,12 @@ void LLfArgN(systemData *d,int order,STData * Fdata)
         case T_LBR: 
         case T_ADD:
         case T_SUB:
-            expT =expresionParse(d,false);
+            expT =expresionParse(d);
             if(Fdata->funcData->paramNum>=0)
             {
                 if(!(Fdata->funcData->paramNum>order))
                     errorD(5,"počty argumentů ve volání funkce nesouhlasí");
-                assigenCompCheck(Fdata->funcData->paramTypes[order],expT);
+                assigenCompCheck(Fdata->funcData->paramTypes[order],expT,false);
             }
             else if(Fdata->funcData->paramNum<0)
             {
@@ -801,7 +794,7 @@ token next(systemData *d)
 
 void initParserData(parserData * data)
 {
-    frameStack_init(&data->dataModel);
+    frameStackInit(&data->dataModel);
     frameStack_initPreFunctions(&data->dataModel);
     stackInit(&data->expresionBuffer);
     stackInit(&data->varDeclarationBuffer);
@@ -810,7 +803,7 @@ void initParserData(parserData * data)
 
 void destructParserData(parserData * data)
 {
-    frameStack_disporse(&data->dataModel);
+    frameStackDisporse(&data->dataModel);
     stackDestruct(&data->expresionBuffer);
     stackDestruct(&data->varDeclarationBuffer);
 }
@@ -838,7 +831,7 @@ void decorId(systemData * data,STData * toDecorate)
 
 void changeRangeScope(systemData * d,bool IsFunc)
 {
-    frameStack_pushFrame(&d->pData.dataModel,IsFunc);
+    frameStackPushFrame(&d->pData.dataModel,IsFunc);
     d->dekoratorIds++;
 }
 

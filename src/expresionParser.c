@@ -19,9 +19,8 @@ const char precTable[10][10] =
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
 
-tokenType expresionParse(systemData *sData,bool ignor)
+tokenType expresionParse(systemData *sData)
 {
-    debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;
     bool separatorF=false;
     token actual =nextTokenExpParser(&separatorF,sData,true);
@@ -29,8 +28,6 @@ tokenType expresionParse(systemData *sData,bool ignor)
     stackPush(stack,(token){O_DOLAR});
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
-        debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
-        stackPrint(stack)  ; 
         switch (getSymFromPrecTable(actual.type,stackTop(stack).type))
         {
             case '=':
@@ -43,7 +40,7 @@ tokenType expresionParse(systemData *sData,bool ignor)
                 actual=nextTokenExpParser(&separatorF,sData,false);
                 break; 
             case '>':
-                reduction(stack,ignor);
+                reduction(stack);
                 break;
             case ' ':
                 if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
@@ -59,7 +56,6 @@ tokenType expresionParse(systemData *sData,bool ignor)
     if(stackHead(stack).type!=NE_EXP)
         errorD(2,"výraz nesmí být prázdný");
     return stackHead(stack).typeOfValue;
-    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
 } 
 
 token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
@@ -75,7 +71,6 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         *separatorF=true;
     else if(new!=T_LBR&& new!=T_RBR)
         *separatorF=false;
-
 
     if(new==T_ID)
     {
@@ -119,7 +114,7 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         return (token){T_EOF};
 }
 
-void reduction(stack *s,bool ignor)
+void reduction(stack *s)
 {
     token id1=(token){O_NONE};
     token op=(token){O_NONE};

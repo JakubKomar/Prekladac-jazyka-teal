@@ -16,53 +16,67 @@ typedef struct
   char* str;		          // pointer to string ended by '\0'
 } string;
 
-
 /**
- * string creation
+ * @brief string creation
  * @param *s string to init
  */
 void stringInit(string *s);
+
 /**
- * string destruction
+ * @brief string destruction
  * @param *s string to destruction
  */
 void stringDestruct(string *s);
+
 /**
- * realocating string 2 size of previus
+ * @brief realocating string to biger size  
  * @param *s string to realocate
  */ 
 void stringRealoc(string *s);
+
 /**
- * hardcopy of string
+ * @brief hardcopy of string
  * @param *s1 string to copy
  * @param *s2 target string
  */ 
 void stringCopy(string *s1, string *s2);
+
 /**
- * clear string
+ * @brief clear string
  * @param *s1 to clearing
  */ 
 void stringClear(string *s);
+
 /**
- * add one charakter to end of string
+ * @brief add one charakter to end of string
  * @param *s1 string for clearing
  * @param c charakter to add
  */ 
 void stringAddChar(string *s1, char c);
+
 /**
- * add end character to string
+ * @brief add end character to string
  * @param *s string to end
  */ 
 void addEnd(string *s);
+
 /**
- * checking if string is full
+ * @brief checking if string is full
  * @param *s string to check
  * @return true-is full false-not full
  */ 
 bool stringFull(string *s1);
 
-void stringAddString(string *s1, char *s2);
-
+/**
+ * @brief copy Dstring whith malloc
+ * @param *s Dstring to copy
+ * @return pointer to allocated string
+ */ 
 char* stringCpyToChPtr(string *s);
 
+/**
+ * @brief copy string whith malloc
+ * @param *s string to copy
+ * @return pointer to allocated string
+ */ 
 char* strdup (const char* s);

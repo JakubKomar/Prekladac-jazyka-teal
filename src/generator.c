@@ -45,6 +45,7 @@ void genFuncHeader(STData * data,char * id)
     printf("PUSHFRAME\n");
     printf("CREATEFRAME\n");
 }
+
 void genFuncFoter(STData * data,char * id)
 {
     for(int i=0;i<data->funcData->retNum;i++)
@@ -53,6 +54,7 @@ void genFuncFoter(STData * data,char * id)
     printf("RETURN\n");
     printf("LABEL FCEND$%ld$%s\n",data->dekorator,id);
 }
+
 void genReturn()
 {
     printf("POPFRAME\n");
