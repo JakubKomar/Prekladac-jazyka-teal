@@ -12,4 +12,4 @@ local b:integer
 local c:string
 local d:number
 a,b,c,d=func(1,25.6)
-write(a,b,c,d)
+write(a,b)

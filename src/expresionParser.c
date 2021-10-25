@@ -269,6 +269,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
             genInst("CALL safediv");
         break;
         case T_DIV2:
+            aritmeticComCheck(id1,id2,false);
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
                 errorD(6,"nepovolená operace s nil");
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)

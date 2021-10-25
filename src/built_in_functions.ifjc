@@ -275,6 +275,7 @@ CREATEFRAME
 
 DEFVAR TF@str
 POPS TF@str
+JUMPIFEQ end_substr_error_8 TF@str nil@nil
 DEFVAR TF@len
 STRLEN TF@len TF@str
 DEFVAR TF@escaped_len
