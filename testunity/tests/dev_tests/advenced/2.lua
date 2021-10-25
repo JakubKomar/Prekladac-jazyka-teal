@@ -2,7 +2,7 @@
 require "ifj21"
 
 function foo(b:number,c:number):number
-    local result:number;
+    local result:number
     if c==0 then
         return 
     else

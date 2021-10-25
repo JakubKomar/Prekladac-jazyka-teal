@@ -5,6 +5,6 @@ function main() --[[
     \5498;""
 
 ]]
-    local a : string = "dawdaw";
+    local a : string = "dawdaw"
 end
 main() -- prikaz hlavniho tela programu

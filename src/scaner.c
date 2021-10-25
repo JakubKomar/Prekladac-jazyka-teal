@@ -229,7 +229,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_DOT1;
             else if(sym==EOF)
                 next=S_EOF; 
-            else if(sym==' '||sym=='\t'||sym=='\n'||sym==';')
+            else if(sym==' '||sym=='\t'||sym=='\n')
                 next=S_SPACE; 
             else if(sym=='\"')
                 next=S_STR1; 
@@ -313,7 +313,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_GTE;
         break;        
         case S_SPACE:
-            if(sym==' '||sym=='\t'||sym=='\n'||sym==';')
+            if(sym==' '||sym=='\t'||sym=='\n')
                 next=S_SPACE;
         break;
         case S_STR1:
