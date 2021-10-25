@@ -12,7 +12,7 @@ import re
 import subprocess 
 import argparse
 testFolder="./tests/"   
-testTypeRegex=r"\.lua$"       #koncovka testovaných souborů
+testTypeRegex=r"\.tl$"       #koncovka testovaných souborů
 programToTest="./ifj21"
 ifjCode="./ic21int"     #strojový interpret cílového jazyka
 f_noOut=False
@@ -134,12 +134,12 @@ class test(object):
                 return
             if not f_noOut:
                 try:
-                    if(not os.path.exists(self.path[:-3]+"in")):
-                        with open(self.path[:-3]+"in", 'w') as fp:
+                    if(not os.path.exists(self.path[:-2]+"in")):
+                        with open(self.path[:-2]+"in", 'w') as fp:
                             pass
-                    subprocess.check_output(ifjCode+" temp.ifjc >output.txt 2>/dev/null <"+self.path[:-3]+"in",shell=True,stderr=subprocess.DEVNULL,timeout=1)
+                    subprocess.check_output(ifjCode+" temp.ifjc >output.txt 2>/dev/null <"+self.path[:-2]+"in",shell=True,stderr=subprocess.DEVNULL,timeout=1)
                     try:
-                        subprocess.check_output("tl run >exoutput.txt 2>/dev/null <"+self.path[:-3]+"in "+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+                        subprocess.check_output("tl run >exoutput.txt 2>/dev/null <"+self.path[:-2]+"in "+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
                         if  filecmp.cmp("output.txt", "exoutput.txt") :
                             self.pased=True
                         else:
