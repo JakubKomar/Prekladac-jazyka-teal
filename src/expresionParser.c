@@ -199,7 +199,7 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
 {
     genInst("CALL pairPrepTN");
     if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
-        errorD(8,"nepovolená operace s nil");   //asi chyba todo
+        errorD(6,"nepovolená operace s nil");   
     if(id1.typeOfValue!=K_INTEGER&&id1.typeOfValue!=K_NUMBER)
         error(6);
     if(id2.typeOfValue!=K_INTEGER&&id2.typeOfValue!=K_NUMBER)
@@ -230,7 +230,7 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
     if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
     {
         if(!nillEnable)
-            errorD(8,"nepovolená operace s nil");   //asi chyba todo
+            errorD(6,"nepovolená operace s nil");
     }
     else if(id1.typeOfValue!=id2.typeOfValue)
     {
@@ -270,7 +270,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_DIV2:
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
-                errorD(8,"nepovolená operace s nil");   //asi chyba todo
+                errorD(6,"nepovolená operace s nil");
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
                 errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
             type=K_INTEGER;
@@ -331,7 +331,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_STR_LEN:
             if(id2.typeOfValue==K_NIL)
-                errorD(8,"nepovolená operace s nil");   //asi chyba todo
+                errorD(6,"nepovolená operace s nil");   
             if(id2.typeOfValue!=K_STRING)
                 errorD(6,"operace délka řetězce lze provádět pouze na stringu");
             genInst("CALL hashtag");
@@ -340,7 +340,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_DOT2:
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
-                errorD(8,"nepovolená operace s nil"); //asi chyba todo
+                errorD(6,"nepovolená operace s nil"); 
             if(id1.typeOfValue!=K_STRING||id2.typeOfValue!=K_STRING)
                 errorD(6,"operace konkatenance řetězců lze provádět pouze na stringu");
             type=K_STRING;

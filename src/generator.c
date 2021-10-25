@@ -121,7 +121,7 @@ void genWhileDecFLUSH(systemData *d,unsigned long int decor)
     while (!stackEmpty(&d->pData.varDeclarationBuffer))
     {
         token aux=stackPop(&d->pData.varDeclarationBuffer);
-        printf("DEFVAR ");genVar(aux.id->decor,aux.id->id);
+        printf("DEFVAR ");genVar(aux.id->decor,aux.id->id);printf("\n");
         free(aux.id->id);
         free(aux.id);
     }

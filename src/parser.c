@@ -746,10 +746,6 @@ STFuncData* LLfuncCall(systemData *d,int numOfAsigens)
     if(!(data->funcData->paramNum<0))
         printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
     next(d);
-    for (int i = 0; i < data->funcData->retNum-numOfAsigens; i++)
-    {
-        genInst("POPS gf@&NULL");
-    }
     
     return data->funcData;
 }
