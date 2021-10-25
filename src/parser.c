@@ -41,8 +41,8 @@ void LLprog(systemData * d,STFuncData *fData)
                 LLid(d);
             break;  
             case T_FUNC_CALL:
-                if(LLfuncCall(d,0))
-                    printf("CLEARS\n");
+                LLfuncCall(d,0);
+                printf("CLEARS\n");
             break;
             case K_WHILE:
                 LLwhile(d,fData); 
@@ -403,7 +403,9 @@ void LLdeclaration(systemData *d)
                 stackPush(&d->pData.varDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});
             }
             else
+            {
                 printf("DEFVAR ");genVar(ptr->dekorator,name);printf("\n");
+            }
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
@@ -413,7 +415,9 @@ void LLdeclaration(systemData *d)
                 ptr->varData->defined=true;
             }
             else
+            {
                 printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
+            }
         break;  
         case K_FUNCTION: 
             node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -584,8 +588,9 @@ void LLid(systemData *d)
     LLid_next(d,0);
 }
 
-void LLid_next(systemData *d,int order)
+STFuncData * LLid_next(systemData *d,int order)
 {
+    STFuncData * fData;
     token t=d->pData.actualToken;
     if(t.type!=T_ID)
         LLerr();
@@ -602,22 +607,26 @@ void LLid_next(systemData *d,int order)
     switch (t.type)
     {
         case T_ASSIGEN: 
-            LLexp_or_func(d,order);
+            fData=LLexp_or_func(d,order);
         break;   
         case T_COMMA: 
             next(d);
-            LLid_next(d,order);
+            fData=LLid_next(d,order);
         break;  
         default:
             LLerr();
         break;
     }
+    if(fData)
+        assigenCompCheck(data->varData->type,fData->retTypes[order-1],true);
     printf("POPS ");genVar(data->dekorator,(*ptr)->id);printf("\n");
     data->varData->defined=true;
+    return fData;
 }
 
-void LLexp_or_func(systemData *d,int numOfAsigens)
+STFuncData * LLexp_or_func(systemData *d,int numOfAsigens)
 {
+    STFuncData * fData=NULL;
     token t=next(d);
     switch (t.type)
     {
@@ -633,13 +642,15 @@ void LLexp_or_func(systemData *d,int numOfAsigens)
             LLexpresionN(d,numOfAsigens);
         break;  
         case T_FUNC_CALL: 
-            for(int i=LLfuncCall(d,numOfAsigens);i>numOfAsigens;i--)
+            fData=LLfuncCall(d,numOfAsigens);
+            for(int i=fData->retNum;i>numOfAsigens;i--)
                 printf("POPS gf@&NULL\n");
         break;  
         default:
             LLerr();
         break;
     }
+    return fData;
 }
 
 void LLexpresionN(systemData *d,int numOfAsigens)
@@ -690,7 +701,7 @@ void assigenCompCheck(tokenType a,tokenType b,bool isAsigen)
     else
     {
         if(a==K_NUMBER&&b==K_INTEGER)
-            printf("INT2FLOATS\n");
+            printf("CALL sefeIntToFloat\n");
         else if(isAsigen)
             errorD(4,"Typová nekompabilita v příkazu přiřazení");
         else
@@ -698,7 +709,7 @@ void assigenCompCheck(tokenType a,tokenType b,bool isAsigen)
     }
 }
 
-int LLfuncCall(systemData *d,int numOfAsigens)
+STFuncData* LLfuncCall(systemData *d,int numOfAsigens)
 {
     STSymbolPtr *node=frameStackSearchFunc(&d->pData.dataModel,d->sData.fullToken.str);
     if(!node)
@@ -734,12 +745,13 @@ int LLfuncCall(systemData *d,int numOfAsigens)
         LLerr();
     if(!(data->funcData->paramNum<0))
         printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
-    for(int i=0;i<numOfAsigens;i++)
-    {
-        assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens+i].type,data->funcData->retTypes[i],true);
-    }
     next(d);
-    return data->funcData->retNum;
+    for (int i = 0; i < data->funcData->retNum-numOfAsigens; i++)
+    {
+        genInst("POPS gf@&NULL");
+    }
+    
+    return data->funcData;
 }
 
 void LLfArgN(systemData *d,int order,STData * Fdata)

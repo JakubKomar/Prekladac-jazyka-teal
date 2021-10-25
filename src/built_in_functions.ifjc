@@ -105,6 +105,7 @@ DEFVAR TF@len
 PUSHS TF@s
 CALL hashtag
 POPS TF@len
+JUMPIFEQ end_substr_error_8 TF@len nil@nil
 LT TF@out_of_bounds TF@i int@1
 JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 LT TF@out_of_bounds TF@j int@1
@@ -321,8 +322,9 @@ DEFVAR TF@str1
 DEFVAR TF@str2
 
 POPS TF@str1
+JUMPIFEQ end_substr_error_8 TF@str1 nil@nil
 POPS TF@str2
-
+JUMPIFEQ end_substr_error_8 TF@str2 nil@nil
 DEFVAR TF@con
 
 CONCAT TF@con TF@str1 TF@str2
@@ -345,8 +347,10 @@ CREATEFRAME
 DEFVAR TF@i
 DEFVAR TF@j
 
-POPS TF@j
-POPS TF@i
+MOVE TF@j gf@&regB
+JUMPIFEQ end_substr_error_8 TF@j nil@nil
+MOVE TF@i gf@&regA
+JUMPIFEQ end_substr_error_8 TF@i nil@nil
 
 DEFVAR TF@result
 
@@ -387,6 +391,7 @@ CREATEFRAME
 DEFVAR TF@i
 
 POPS TF@i
+JUMPIFEQ end_substr_error_8 TF@i nil@nil
 
 DEFVAR TF@type
 TYPE TF@type TF@i
@@ -406,8 +411,28 @@ PUSHS TF@i
 POPFRAME
 RETURN
 
+# 
+LABEL pairPrepTN
+POPS gf@&regB
+JUMPIFEQ end_substr_error_8 gf@&regB nil@nil
+POPS gf@&regA
+JUMPIFEQ end_substr_error_8 gf@&regA nil@nil
+RETURN
 
+LABEL pairPrep
+POPS gf@&regB
+POPS gf@&regA
+RETURN
 
+LABEL sefeIntToFloat
+POPS gf@&regC
+JUMPIFEQ sefeIntToFloatJ gf@&regC nil@nil
+INT2FLOAT gf@&regC gf@&regC
+PUSHS  gf@&regC
+RETURN
+LABEL sefeIntToFloatJ
+PUSHS  gf@&regC
+RETURN
 # MAIN FOR TESTING
 
 # reads TEST

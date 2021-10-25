@@ -197,8 +197,9 @@ void reduction(stack *s)
 
 tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
 {
+    genInst("CALL pairPrepTN");
     if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
-        errorD(8,"nepovolená operace s nil");
+        errorD(8,"nepovolená operace s nil");   //asi chyba todo
     if(id1.typeOfValue!=K_INTEGER&&id1.typeOfValue!=K_NUMBER)
         error(6);
     if(id2.typeOfValue!=K_INTEGER&&id2.typeOfValue!=K_NUMBER)
@@ -207,12 +208,12 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
-            printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA\n");
+            genInst("INT2FLOAT gf@&regA gf@&regA");
             id1.typeOfValue=K_NUMBER;
         }
         if(id2.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOATS");
+            genInst("INT2FLOAT gf@&regB gf@&regB");
             id2.typeOfValue=K_NUMBER;
         }
         return K_NUMBER;
@@ -222,10 +223,14 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
 
 tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
 {
+    if(nillEnable)
+        genInst("CALL pairPrep");
+    else
+        genInst("CALL pairPrepTN");
     if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
     {
         if(!nillEnable)
-            errorD(8,"nepovolená operace s nil");
+            errorD(8,"nepovolená operace s nil");   //asi chyba todo
     }
     else if(id1.typeOfValue!=id2.typeOfValue)
     {
@@ -233,12 +238,12 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
         {
             if(id1.typeOfValue!=K_NUMBER)
             {
-                printf("POPS gf@&regA\nINT2FLOATS\nPUSHS gf@&regA\n");
+                genInst("INT2FLOAT gf@&regA gf@&regA");
                 id1.typeOfValue=K_NUMBER;
             }
             if(id2.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOATS");
+                genInst("INT2FLOAT gf@&regB gf@&regB");
                 id2.typeOfValue=K_NUMBER;
             }
         }
@@ -251,13 +256,13 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
 
 tokenType generateExpresion(token id1, token op ,token id2)
 {
-    debug("generated: %s %s %s\n",tokenStr(id2),tokenStr(op),tokenStr(id1));
     tokenType type;
     switch (op.type)
     {
         case T_MUL:
             type=aritmeticComCheck(id1,id2,false);
-            genInst("MULS");
+            genInst("MUL gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
         break;
         case T_DIV:
             type=aritmeticComCheck(id1,id2,true);
@@ -265,7 +270,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_DIV2:
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
-                errorD(8,"nepovolená operace s nil");
+                errorD(8,"nepovolená operace s nil");   //asi chyba todo
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
                 errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
             type=K_INTEGER;
@@ -273,31 +278,35 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_ADD:
             type=aritmeticComCheck(id1,id2,false);
-            genInst("ADDS");
+            genInst("ADD gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
         break;
         case T_SUB:
             type=aritmeticComCheck(id1,id2,false);
-            genInst("SUBS");
+            genInst("SUB gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
         break;
         case T_EQ:
             comperzionComCheck(id1,id2,true);
             type=K_BOOL;
-            genInst("EQS");
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
         break;
         case T_NOT_EQ:
             comperzionComCheck(id1,id2,true);
-            genInst("EQS\nNOTS");
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("NOTS");
             type=K_BOOL;   
         break;
         case T_GT:
             comperzionComCheck(id1,id2,false);
             type=K_BOOL;
-            genInst("GTS");
+            genInst("GT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
         break;
         case T_GTE:
             comperzionComCheck(id1,id2,false);
-            genInst("POPS gf@&regB");
-            genInst("POPS gf@&regA");
             genInst("GT gf@&regC gf@&regA gf@&regB");
             genInst("PUSHS  gf@&regC");
             genInst("EQ gf@&regC gf@&regA gf@&regB");
@@ -308,12 +317,11 @@ tokenType generateExpresion(token id1, token op ,token id2)
         case T_LT:
             comperzionComCheck(id1,id2,false);
             type=K_BOOL;
-            genInst("LTS");
+            genInst("LT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
         break;
         case T_LTE:
             comperzionComCheck(id1,id2,false);  
-            genInst("POPS gf@&regB");
-            genInst("POPS gf@&regA");
             genInst("LT gf@&regC gf@&regA gf@&regB");
             genInst("PUSHS  gf@&regC");
             genInst("EQ gf@&regC gf@&regA gf@&regB");
@@ -323,7 +331,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_STR_LEN:
             if(id2.typeOfValue==K_NIL)
-                errorD(8,"nepovolená operace s nil");
+                errorD(8,"nepovolená operace s nil");   //asi chyba todo
             if(id2.typeOfValue!=K_STRING)
                 errorD(6,"operace délka řetězce lze provádět pouze na stringu");
             genInst("CALL hashtag");
@@ -332,7 +340,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_DOT2:
             if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
-                errorD(8,"nepovolená operace s nil");
+                errorD(8,"nepovolená operace s nil"); //asi chyba todo
             if(id1.typeOfValue!=K_STRING||id2.typeOfValue!=K_STRING)
                 errorD(6,"operace konkatenance řetězců lze provádět pouze na stringu");
             type=K_STRING;

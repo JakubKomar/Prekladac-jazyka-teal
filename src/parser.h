@@ -131,7 +131,7 @@ void LLwhile(systemData *d,STFuncData *fData);
  * @param *d system data
  * @param numOfAsigens how much parameters is assigent to this fuction call 0-N
  */
-int LLfuncCall(systemData *d,int numOfAsigens);
+STFuncData* LLfuncCall(systemData *d,int numOfAsigens);
 
 /**
  * @brief simulating nonterminal for header of program
@@ -157,14 +157,14 @@ void LLid(systemData *d);
  * @param *d system data
  * @param order pozition of id
  */
-void LLid_next(systemData * d,int order); 
+STFuncData* LLid_next(systemData * d,int order); 
 
 /**
  * @brief simulating nonterminal for asigen behind equlation
  * @param *d system data
  * @param numOfAsigens how much parameters is assigent to this fuction call 0-N
  */
-void LLexp_or_func(systemData *d,int numOfAsigens);
+STFuncData* LLexp_or_func(systemData *d,int numOfAsigens);
 
 /**
  * @brief simulating nonterminal for  parameter in function call
