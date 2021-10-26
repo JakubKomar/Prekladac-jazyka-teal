@@ -3,8 +3,7 @@
  *
  * @authors Jakub Komárek (xkomar33)
  */
-#ifndef _TOKENS_H
-#define _TOKENS_H
+#pragma once
 
 #include "baseDeclarations.h"
 
@@ -52,6 +51,7 @@ typedef enum{
     K_INTEGER,
     K_STRING,
     K_NUMBER,
+    K_BOOL,
     //other
     O_DOLAR,
     O_HANDLE,   //begining of handle
@@ -63,9 +63,15 @@ typedef enum{
     NE_EXP,
 }tokenType;
 
-
+#include "symtable.h"
+typedef struct {
+    char* id;
+    unsigned long int decor;
+}varId;
 typedef struct {
     tokenType type;
+    tokenType typeOfValue;  //for usege in expresion part
+    varId *id;  //storing whole id 
 }token;
 
 /**
@@ -74,5 +80,3 @@ typedef struct {
  * @return string name of token
 */
 char * tokenStr(token type);
-
-#endif 

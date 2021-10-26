@@ -19,61 +19,97 @@ const char precTable[10][10] =
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,' '	,'<'	,' '},// $
 };
 
-void expresionParse(systemData *sData,bool ignor)
+tokenType expresionParse(systemData *sData)
 {
-    debugS("\x1B[33m******************* analysys swich to expresion mode*************************\x1B[0m\n"); 
     stack * stack=&sData->epData.stack;
-    token actual =sData->pData.actualToken;
+    bool separatorF=false;
+    token actual =nextTokenExpParser(&separatorF,sData,true);
     stackClear(stack);
     stackPush(stack,(token){O_DOLAR});
-    bool separatorF=false;
     while (stackTop(stack).type!=O_DOLAR||actual.type!=T_EOF)
     {
-        debug("input:%-10s stack:%-10s\n",tokenStr(actual),tokenStr(stackTop(stack))); 
-        stackPrint(stack)  ; 
         switch (getSymFromPrecTable(actual.type,stackTop(stack).type))
         {
             case '=':
                 stackPush(stack,actual);
-                actual=nextTokenExpParser(&separatorF,sData);
+                actual=nextTokenExpParser(&separatorF,sData,false);
                 break;
             case '<':
                 stackInsertHanle(stack);
                 stackPush(stack,actual);
-                actual=nextTokenExpParser(&separatorF,sData);
+                actual=nextTokenExpParser(&separatorF,sData,false);
                 break; 
             case '>':
                 reduction(stack);
                 break;
             case ' ':
                 if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
-                {
-                    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
-                    return;
-                }
-                errorD(2,"syntax error in expresion");
+                    return stackHead(stack).typeOfValue;
+                else
+                    errorD(2,"syntax error in expresion");
                 break;
             default:
                 errorD(99,"precedence table error");
                 break;
         }
     }
-    debugS("\x1B[33m******************* analysys swich to normal mode*************************\x1B[0m\n"); 
+    if(stackHead(stack).type!=NE_EXP)
+        errorD(2,"výraz nesmí být prázdný");
+    return stackHead(stack).typeOfValue;
 } 
 
-token nextTokenExpParser(bool * separatorF,systemData * sData)
+token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
 {
-    sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+    if(!firstT)
+        sData->pData.actualToken=getNextUsefullToken(&sData->sData);
+
     tokenType new= sData->pData.actualToken.type;
 
     if(*separatorF==true && (new==T_ID))
         return (token){T_EOF};
-    else if(isId(new))
+    else if(isConstant(new))
         *separatorF=true;
-    else if(new!=T_LBR|| new!=T_RBR)
+    else if(new!=T_LBR&& new!=T_RBR)
         *separatorF=false;
-    if(isOperator(new)||isId(new)||new==T_RBR||new==T_LBR)
-        return sData->pData.actualToken;
+
+    if(new==T_ID)
+    {
+        STSymbolPtr * ptr= frameStackSearchVar(&sData->pData.dataModel,sData->sData.fullToken.str);
+        STData *varData=ptr?&(*ptr)->data:NULL;
+        if(!varData)
+            errorD(3,"Proměnná ve výrazu není definována");
+        else if(varData->type!=ST_VAR)
+            errorD(3,"Proměnná ve výrazu je typu funkce");
+        else if(!varData->varData->defined)
+            errorD(3,"Proměnná ve výrazu je typu funkce");
+        printf("PUSHS ");genVar(varData->dekorator,(*ptr)->id);printf("\n");
+        return (token){new,varData->varData->type};
+    }
+    else if(isOperator(new)||isConstant(new)||new==T_RBR||new==T_LBR)
+    {
+        switch (new)
+        {
+        case T_DOUBLE:
+            printf("PUSHS float@%a\n",strtod(sData->sData.fullToken.str,NULL));
+            return (token){new,K_NUMBER};
+        break;
+        case T_INT:
+            printf("PUSHS int@%s\n",sData->sData.fullToken.str);
+            return (token){new,K_INTEGER};
+        break;
+        case T_STR:
+            printf("PUSHS string@");genStringConstant(sData->sData.fullToken.str);printf("\n");
+            return (token){new,K_STRING};     
+        break;
+        case K_NIL:
+            printf("PUSHS nil@nil\n");
+            return (token){new,K_NIL};
+        break;
+        default:
+            return (token){new,new};
+        break;
+        }
+    }
     else
         return (token){T_EOF};
 }
@@ -84,57 +120,74 @@ void reduction(stack *s)
     token op=(token){O_NONE};
     token id2=(token){O_NONE};
 
-    tokenType aux=stackPop(s).type;
-    switch (aux)
+    token aux=stackPop(s);
+    switch (aux.type)
     {
+        case T_ID:
         case T_INT:
         case T_DOUBLE:
         case T_STR:
-        case T_ID:
         case K_NIL:
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});
+            stackPush(s,(token){NE_EXP,aux.typeOfValue});
             return;
         break;
         case NE_EXP:
-            id2.type=aux;
+            id2=aux;
         break;
         case T_RBR:
-            if(stackPop(s).type!=NE_EXP)
+            aux=stackPop(s);
+            if(aux.type!=NE_EXP)
                 errorD(2,"expresion in bracked err");
             if(stackPop(s).type!=T_LBR)
                 errorD(2,"expresion in bracked err");
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});    
+            stackPush(s,(token){NE_EXP,aux.typeOfValue});    
             return;
         break;
         default:
             errorD(2,"sa reduction err");
     }
-    aux=stackPop(s).type;
-    switch (aux)
+
+    aux=stackPop(s);
+    switch (aux.type)
     {
         case T_STR_LEN:
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});
-            op.type=aux;
-            generateExpresion(id1,op,id2);
+            op=aux;
+            stackPush(s,(token){NE_EXP,generateExpresion(id1,op,id2)});
             return;
         break;
         default:
-            if(isOperator(aux))
-                op.type=aux;
+            if(isOperator(aux.type))
+                op=aux;
             else
                 errorD(2,"sa reduction err");
     }
-    aux=stackPop(s).type;
-    switch (aux)
+
+    if(stackHead(s).type==O_HANDLE)
+    {
+        if(op.type==T_SUB)
+        {
+            genInst("CALL neg");
+            stackPush(s,(token){NE_EXP,id2.typeOfValue});
+        }
+        else if(op.type==T_ADD)
+        {
+            stackPush(s,(token){NE_EXP,id2.typeOfValue});
+        }
+        else
+            errorD(2,"sa reduction err");
+        return;
+    }
+    
+    aux=stackPop(s);
+    switch (aux.type)
     {
         case NE_EXP:
-            id1.type=aux;
+            id1=aux;
             stackRemoveHande(s);
-            stackPush(s,(token){NE_EXP});
-            generateExpresion(id1,op,id2);
+            stackPush(s,(token){NE_EXP,generateExpresion(id1,op,id2)});
             return;
         break;
         default:
@@ -142,9 +195,164 @@ void reduction(stack *s)
     }
 }
 
-void generateExpresion(token id1, token op ,token id2)
+tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
 {
-    debug("generated: %s %s %s\n",tokenStr(id2),tokenStr(op),tokenStr(id1));
+    genInst("CALL pairPrepTN");
+    if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+        errorD(6,"nepovolená operace s nil");   
+    if(id1.typeOfValue!=K_INTEGER&&id1.typeOfValue!=K_NUMBER)
+        error(6);
+    if(id2.typeOfValue!=K_INTEGER&&id2.typeOfValue!=K_NUMBER)
+        error(6);
+    if(id1.typeOfValue==K_NUMBER||id2.typeOfValue==K_NUMBER||forcedNumber)
+    {
+        if(id1.typeOfValue!=K_NUMBER)
+        {
+            genInst("INT2FLOAT gf@&regA gf@&regA");
+            id1.typeOfValue=K_NUMBER;
+        }
+        if(id2.typeOfValue!=K_NUMBER)
+        {
+            genInst("INT2FLOAT gf@&regB gf@&regB");
+            id2.typeOfValue=K_NUMBER;
+        }
+        return K_NUMBER;
+    }
+    return K_INTEGER;
+}
+
+tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
+{
+    if(nillEnable)
+        genInst("CALL pairPrep");
+    else
+        genInst("CALL pairPrepTN");
+    if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+    {
+        if(!nillEnable)
+            errorD(6,"nepovolená operace s nil");
+    }
+    else if(id1.typeOfValue!=id2.typeOfValue)
+    {
+        if(id1.typeOfValue==K_NUMBER||id1.typeOfValue==K_NUMBER)
+        {
+            if(id1.typeOfValue!=K_NUMBER)
+            {
+                genInst("INT2FLOAT gf@&regA gf@&regA");
+                id1.typeOfValue=K_NUMBER;
+            }
+            if(id2.typeOfValue!=K_NUMBER)
+            {
+                genInst("INT2FLOAT gf@&regB gf@&regB");
+                id2.typeOfValue=K_NUMBER;
+            }
+        }
+        else
+            error(6);
+    }
+    return K_BOOL;
+}
+
+
+tokenType generateExpresion(token id1, token op ,token id2)
+{
+    tokenType type;
+    switch (op.type)
+    {
+        case T_MUL:
+            type=aritmeticComCheck(id1,id2,false);
+            genInst("MUL gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+        break;
+        case T_DIV:
+            type=aritmeticComCheck(id1,id2,true);
+            genInst("CALL safediv");
+        break;
+        case T_DIV2:
+            aritmeticComCheck(id1,id2,false);
+            if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+                errorD(6,"nepovolená operace s nil");
+            if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
+                errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
+            type=K_INTEGER;
+            genInst("CALL safediv");
+        break;
+        case T_ADD:
+            type=aritmeticComCheck(id1,id2,false);
+            genInst("ADD gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+        break;
+        case T_SUB:
+            type=aritmeticComCheck(id1,id2,false);
+            genInst("SUB gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+        break;
+        case T_EQ:
+            comperzionComCheck(id1,id2,true);
+            type=K_BOOL;
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+        break;
+        case T_NOT_EQ:
+            comperzionComCheck(id1,id2,true);
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("NOTS");
+            type=K_BOOL;   
+        break;
+        case T_GT:
+            comperzionComCheck(id1,id2,false);
+            type=K_BOOL;
+            genInst("GT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+        break;
+        case T_GTE:
+            comperzionComCheck(id1,id2,false);
+            genInst("GT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("ORS");
+            type=K_BOOL;    
+        break;
+        case T_LT:
+            comperzionComCheck(id1,id2,false);
+            type=K_BOOL;
+            genInst("LT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+        break;
+        case T_LTE:
+            comperzionComCheck(id1,id2,false);  
+            genInst("LT gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("EQ gf@&regC gf@&regA gf@&regB");
+            genInst("PUSHS  gf@&regC");
+            genInst("ORS");
+            type=K_BOOL;
+        break;
+        case T_STR_LEN:
+            if(id2.typeOfValue==K_NIL)
+                errorD(6,"nepovolená operace s nil");   
+            if(id2.typeOfValue!=K_STRING)
+                errorD(6,"operace délka řetězce lze provádět pouze na stringu");
+            genInst("CALL hashtag");
+            type=K_INTEGER;
+
+        break;
+        case T_DOT2:
+            if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
+                errorD(6,"nepovolená operace s nil"); 
+            if(id1.typeOfValue!=K_STRING||id2.typeOfValue!=K_STRING)
+                errorD(6,"operace konkatenance řetězců lze provádět pouze na stringu");
+            type=K_STRING;
+            printf("CALL concatenation\n");
+
+        break;
+        default:
+            errorD(2,"porušeno rozkladové pravidlo");
+        break;
+    }
+    return type;
 }
 
 char getSymFromPrecTable(tokenType input, tokenType stack)
@@ -203,7 +411,7 @@ void destructExpresionData(expresionParserData *data)
     stackDestruct(&data->stack);
 }
 
-bool isId(tokenType toCompere)   
+bool isConstant(tokenType toCompere)   
 {
     return toCompere==T_STR||toCompere==T_INT||toCompere==K_NIL||toCompere==T_DOUBLE||toCompere==T_ID;
 }

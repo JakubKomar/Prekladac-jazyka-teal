@@ -1,3 +1,9 @@
+/**
+ * @brief   tokens for translator
+ *
+ * @authors Jakub Komárek (xkomar33)
+ */
+
 #include "tokens.h"
 
 char * tokenStr(token type)
@@ -134,10 +140,27 @@ char * tokenStr(token type)
         case NE_EXP:
             str="NE_EXP";
         break;
-        default:
-            str="Unknown token type";
+        case O_DOLAR:
+            str="O_DOLAR";
         break;
-
+        case O_HANDLE:
+            str="O_HANDLE";
+        break;
+        case O_ERR:
+            str="O_ERR";
+        break;
+        case O_UNIMPORTANT:
+            str="O_UNIMPORTANT";
+        break;
+        case S_EXPRESION:
+            str="S_EXPRESION";
+        break;
+        case K_BOOL:
+            str="K_BOOL";
+        break;
+        default:
+            str="UNKNOWN";
+        break;
     }
     return str;
 }

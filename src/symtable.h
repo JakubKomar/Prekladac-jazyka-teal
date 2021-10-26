@@ -6,8 +6,7 @@
  *
  * @authors
  */
-#ifndef _SYMTABLE_H
-#define _SYMTABLE_H
+#pragma once
 
 #include "tokens.h"
 #include "baseDeclarations.h"
@@ -16,25 +15,27 @@
 typedef enum {
     ST_VAR,
     ST_FUNC,
-} STType;
+} STType;   //type of record
 
 typedef struct {
     tokenType type;
+    bool defined;
 } STVarData;
 
 typedef struct {
-    tokenType *paramTypes; //array of parameter types
-    unsigned short paramNum; //number of parameters
-    tokenType *retTypes; //array of returning types
-    unsigned short retNum; //number of returning types
-    bool declared;
-    bool defined;
+    tokenType *paramTypes;   //array of parameter types
+    int paramNum;           //number of parameters
+    tokenType *retTypes;    //array of returning types
+    int retNum;             //number of returning types
+    bool declared;          //is recorde declared
+    bool defined;           //is recorde defined
 } STFuncData;
 
 typedef struct {
-    STType type;
-    STVarData *varData;
+    STType type;            
+    STVarData *varData;      
     STFuncData *funcData;
+    unsigned long int dekorator;    
 } STData;
 
 typedef struct BTNode {
@@ -48,7 +49,7 @@ typedef struct BTNode {
  *
  * @param RootPtr Root of tree.
  */
-void symtable_init (STSymbolPtr* RootPtr);
+void symtableInit (STSymbolPtr* RootPtr);
 
 /** @brief Searching data of specific symbol.
  *
@@ -56,7 +57,7 @@ void symtable_init (STSymbolPtr* RootPtr);
  * @param id Id to search.
  * @return Pointer to data struct of symbol. NULL if not found.
  */
-STData* symtable_search (STSymbolPtr* RootPtr, char *id);
+STSymbolPtr* symtableSearch (STSymbolPtr* RootPtr, char *id);
 
 /** @brief Inserts symbol and returns its data to fill.
  *
@@ -64,7 +65,7 @@ STData* symtable_search (STSymbolPtr* RootPtr, char *id);
  * @param id Id to insert.
  * @return Pointer to data struct of symbol. NULL if unsuccessful malloc or symbol already exists.
  */
-STData* symtable_insert_woData (STSymbolPtr* RootPtr, char *id);
+STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id);
 
 /** @brief Auxiliary function for copying and deallocation the rightmost node in a subtree.
  *
@@ -78,100 +79,108 @@ void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr);
  * @param RootPtr Root of tree.
  * @param id Id to delete.
  */
-void symtable_delete (STSymbolPtr* RootPtr, char *id);
+void symtableDelete (STSymbolPtr* RootPtr, char *id);
 
 /** @brief Disposes of entire symbol tree and deallocates memory.
  *
  * @param RootPtr Root of tree.
  */
-void symtable_dispose (STSymbolPtr* RootPtr);
+void symtableDispose (STSymbolPtr* RootPtr);
 
 /** @brief destructer to data in b tree
  *
  *  @param *RootPtr pointer to root item
  */
-void symtable_data_disporese (STSymbolPtr* RootPtr);
+void symtableDataDisporese (STSymbolPtr* RootPtr);
 
 /** @brief destructer to data of function in b tree
  *
  *  @param *data pointer to data
  */
-void symtable_data_disporese_func(STFuncData *data);
+void symtableDataDisporeseFunc(STFuncData *data);
 
 /** @brief Debug function print all tree
  *
  * @param RootPtr Root of tree.
  */
-void symtable_print (STSymbolPtr* RootPtr);
+void symtablePrint (STSymbolPtr* RootPtr);
 
 
 /******************************  memory model*********************************/
 
-#define S_TABLE_FRAME_BASE 100  //počateční velkost zásobníku
+#define S_TABLE_FRAME_BASE 32  //base size of stack
 
 typedef struct{
-    bool wedge;
-    STSymbol * bTree;
+    bool wedge;         
+    STSymbol * bTree;   
 }frame;
 
 typedef struct {
-    int capacity;   //Velikost zásobníku
-    int last;    //Spodek zásobníku
-    frame globalF;
-    frame *localF;   //Pole pro zásobník
+    int capacity;   //Capacity of stack
+    int last;       //Last item of stack
+    frame globalF;  //global frame
+    frame *localF;  //locals frames
 }frameStack;
 
 /** @brief Inicialization of memory model
  *
  *  @param *s pointer to memory model
  */
-void frameStack_init(frameStack * s);
+void frameStackInit(frameStack * s);
 
 /** @brief realocation of frame memory model
  *
  *  @param *s pointer to memory model
  */
-void frameStack_realoc(frameStack * s);
+void frameStackRealoc(frameStack * s);
 
 /** @brief destruction of frame memory model
  *
  *  @param *s pointer to memory model
  */
-void frameStack_disporse(frameStack * s);
+void frameStackDisporse(frameStack * s);
 
 /** @brief push frame to memory model
  *
  *  @param *s pointer to memory model
  *  @param isFunc if pushing is called from function definition 
  */
-void frameStack_pushFrame(frameStack * s,bool isFunc);
+void frameStackPushFrame(frameStack * s,bool isFunc);
 
 /** @brief pop frame from memory model
  *
  *  @param *s pointer to memory model
  */
-void frameStack_popFrame(frameStack * s);
-
-/** @brief push frame to memory model
- *
- *  @param *s pointer to memory model
- *  @param isFunc if pushing is called from function definition 
- */
-void frameInit(frame *f,bool wedge);
+void frameStackPopFrame(frameStack * s);
 
 /** @brief frame inicialization
  *
  *  @param *f pointer to frame
  *  @param wedge if true search will end on this frame-for function definition 
  */
+void frameInit(frame *f,bool wedge);
+
+/** @brief frame disporse
+ *
+ *  @param *f pointer to frame
+ */
 void frameDisporse(frame *f);
 
-/** @brief searching in memory model
+/** @brief searching var in memory model
  *
  *  @param *f pointer to memory model
  *  @param *key key which is searched
+ *  @return pointer to finded node or NULL
  */
-STData * frameStackSearch(frameStack *f,char * key);
+STSymbolPtr * frameStackSearchVar(frameStack *f,char * key);
+
+/** @brief searching fuction in memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key key which is searched
+ *  @return pointer to finded node or NULL
+ */
+STSymbolPtr * frameStackSearchFunc(frameStack *f,char * key);
 
 /** @brief inserting new item in memory model
  *
@@ -179,7 +188,7 @@ STData * frameStackSearch(frameStack *f,char * key);
  *  @param *key key which is searched
  *  @param *isGlobal is item in global frame
  */
-STData * frameStackInsert(frameStack *f,char *key,bool isGlobal);
+STSymbolPtr * frameStackInsert(frameStack *f,char *key,bool isGlobal);
 
 /** @brief printing whole memory model
  *
@@ -187,14 +196,63 @@ STData * frameStackInsert(frameStack *f,char *key,bool isGlobal);
  */
 void frameStackPrint(frameStack *f);
 
-/** @brief printing binary tree
+/** @brief searching in memory model
  *
- *  @param *RootPtr pointer to root item
+ *  @param *f pointer to memory model
+ *  @param *key name of searching the record
+ *  @param isGlobal where to search- true:global frame, false:local frame on the top of stack
+ *  @return pointer to finded data, if not finded null
  */
-void symtable_print (STSymbolPtr* RootPtr);
+STSymbolPtr * frameStackSearchActual(frameStack *f,char * key,bool isGlobal);
 
-STData * frameStackSearchActual(frameStack *f,char * key,bool isGolobal);
-STData * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly);
-STData * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly);
-STData * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
- #endif 
+/** @brief inserting function definition to memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of inserting the record
+ *  @param isGlobal where to inset- true:global frame, false:local frame on the top of stack
+ *  @return pointer to inserted data
+ */
+STSymbolPtr * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *checkOnly);
+
+/** @brief inserting function declaration to memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of inserting the record
+ *  @param *checkOnly if there is a declaration record, param will be set on true, else false
+ *  @return pointer to inserted data
+ */
+STSymbolPtr * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool isGlobal,bool *checkOnly);
+
+/** @brief inserting var declaration to memory model
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of inserting the record
+ *  @param isGlobal where to inset- true:global frame, false:local frame on the top of stack
+ *  @param *checkOnly if there is a definition record, param will be set on true, else false
+ *  @return pointer to inserted data
+ */
+STSymbolPtr * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenType Ttype);
+
+/** @brief inserting predefined functions
+ *
+ *  @param *f pointer to memory model
+ */
+void frameStack_initPreFunctions(frameStack * f);
+
+/** @brief inserting predefined function
+ *
+ *  @param *f pointer to memory model
+ *  @param *key name of function
+ *  @param *params array of params
+ *  @param parN number of params
+ *  @param *retTypes array of return params
+ *  @param retN number of ret params
+ */
+void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int parN,tokenType *retTypes,int retN);
+
+/** @brief searching for definition of function
+ *
+ *  @param *RootPtr root node
+ *  @return true-finded,false-not finded
+ */
+bool searchForNonDefinedFunction(STSymbolPtr* RootPtr);

@@ -8,9 +8,13 @@
 void parserMain(systemData * d)
 {
     LLprolog(d);
-    LLprog(d);
+    genereteProgramHeader();
+    LLprog(d,NULL);
     if(d->pData.actualToken.type!=T_EOF)
         LLerr();
+    frameStackPopFrame(&d->pData.dataModel);
+    if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))
+        errorD(3,"k některé uživatelské funci chybí definice");
 }
 
 void LLprolog(systemData * d)
@@ -18,7 +22,6 @@ void LLprolog(systemData * d)
     token t=next(d); 
     if(t.type!=K_REQUIRE)
         LLerr();
-
     t=next(d);
     if(t.type!=T_STR)
         LLerr(); 
@@ -27,7 +30,7 @@ void LLprolog(systemData * d)
     next(d);
 }
 
-void LLprog(systemData * d)
+void LLprog(systemData * d,STFuncData *fData)
 {
     token t=d->pData.actualToken;
     while (t.type!=T_EOF&&t.type!=K_END&&t.type!=K_ELSE)
@@ -38,19 +41,20 @@ void LLprog(systemData * d)
                 LLid(d);
             break;  
             case T_FUNC_CALL:
-                LLfuncCall(d);
+                LLfuncCall(d,0);
+                printf("CLEARS\n");
             break;
             case K_WHILE:
-                LLwhile(d); 
+                LLwhile(d,fData); 
             break;  
             case K_IF:
-                LLif(d); 
+                LLif(d,fData); 
             break; 
             case K_FUNCTION:
                 LLfunction(d);  
             break; 
             case K_RETURN:
-                LLreturn(d);
+                LLreturn(d,fData);
             break; 
             case K_LOCAL:
             case K_GLOBAL:
@@ -70,11 +74,14 @@ void LLfunction(systemData *d)
     if(t.type!=T_FUNC_CALL)
         LLerr();
         
-    STData * data;
     bool checkOnly;
-    char *key=strCpyWhithMalloc(&d->sData.fullToken);
-    data=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
-    frameStack_pushFrame(&d->pData.dataModel,true);
+    char *key=stringCpyToChPtr(&d->sData.fullToken);
+    STSymbolPtr* node=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
+    STData * data=&(*node)->data;
+    if(!checkOnly)
+        decorId(d,data);
+    changeRangeScope(d,true);
+    genFuncHeader(data,(*node)->id);
     t=next(d);
     switch (t.type)
     {
@@ -82,7 +89,8 @@ void LLfunction(systemData *d)
             LLfuncArg(d,checkOnly,0,data);
         break;   
         case T_RBR:
-
+            if(checkOnly&&data->funcData->paramNum>0)
+                errorD(3,"počty parametů v deklaraci neodpovídají");
         break; 
         default:
             LLerr();
@@ -95,13 +103,14 @@ void LLfunction(systemData *d)
     t=next(d);
     if(t.type==T_COLON)   
         LLreturnArg(d,checkOnly,0,data);
+    else if(checkOnly&&data->funcData->retNum>0)
+        errorD(3,"počty návratových parametů v deklaraci neodpovídají");
 
-    LLprog(d);
-
+    LLprog(d,data->funcData);
     if(d->pData.actualToken.type!=K_END)
         LLerr();
-    frameStack_popFrame(&d->pData.dataModel);
-
+    frameStackPopFrame(&d->pData.dataModel);
+    genFuncFoter(data,(*node)->id);
     t=next(d);
 }
 
@@ -117,7 +126,7 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(-1,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                    errorD(3,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
                 else if(Fdata->funcData->retTypes[argNum]!=type.type)
                     errorD(3,"typ n8vratového parametru neodpovídá typu v deklaracaci");
             }
@@ -144,7 +153,7 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             }
             else if(Fdata->funcData->retNum!=(argNum+1))
             {
-                errorD(-1,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
+                errorD(3,"počty návratových argumentů v definici neodpovídají počtu v deklaracaci");
             }
         break;
     }
@@ -157,12 +166,13 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     token id=d->pData.actualToken;
     if(id.type!=T_ID)
         LLerr();
-    char *key=strCpyWhithMalloc(&d->sData.fullToken);  
+    char *key=stringCpyToChPtr(&d->sData.fullToken);  
 
     token type=next(d);
     if(type.type!=T_COLON)
         LLerr();
-
+    STData *varData;
+    STSymbolPtr* node;
     type=next(d);
     switch (type.type)
     {
@@ -170,11 +180,14 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            node=frameStackInsertVar(&d->pData.dataModel,key,false,type.type);
+            varData=&(*node)->data;
+            varData->varData->defined=true;
+            decorId(d,varData);
             if(checkOnly)
             {
                 if(!(Fdata->funcData->paramNum>argNum))
-                    errorD(-1,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                    errorD(3,"počty argumentů v definici neodpovídají počtu v deklaracaci");
                 else if(Fdata->funcData->paramTypes[argNum]!=type.type)
                     errorD(3,"typ parametru neodpovídá typu v deklaracaci");
             }
@@ -206,7 +219,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
             }
             else if(Fdata->funcData->paramNum!=(argNum+1))
             {
-                errorD(-1,"počty argumentů v definici neodpovídají počtu v deklaracaci");
+                errorD(3,"počty argumentů v definici neodpovídají počtu v deklaracaci");
             }
         break;
         default:
@@ -215,25 +228,32 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
     }
     if(!checkOnly)
         Fdata->funcData->paramTypes[argNum]=type.type;
+    printf("DEFVAR ");genVar(varData->dekorator,key);printf("\n");
+    printf("POPS ");genVar(varData->dekorator,key);printf("\n");
 }
 
-void LLif(systemData *d)
+void LLif(systemData *d,STFuncData *fData)
 {
     token t=next(d);
-    expresionParse(d,false);
+    tokenType expT=expresionParse(d);
     t=d->pData.actualToken;
     if(t.type!=K_THEN)
         LLerr();
+    unsigned long int decor=genIfHeader(d,expT);
     next(d);
-    LLprog(d);
+    changeRangeScope(d,false);
+    LLprog(d,fData);
+    frameStackPopFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
     switch (t.type)
     {
         case K_END:
-
+            genIfFoter(decor);
         break;   
         case K_ELSE:
-            LLelse(d);
+            genElseHeader(decor);
+            LLelse(d,fData,decor);
+            genElseFoter(decor);
         break; 
         default:
             LLerr();
@@ -242,10 +262,12 @@ void LLif(systemData *d)
     next(d);
 }
 
-void LLelse(systemData *d)
+void LLelse(systemData *d,STFuncData *fData,unsigned long int decorId)
 {
     next(d);
-    LLprog(d);
+    changeRangeScope(d,false);
+    LLprog(d,fData);
+    frameStackPopFrame(&d->pData.dataModel);
     switch (d->pData.actualToken.type)
     {
         case K_END:
@@ -257,7 +279,7 @@ void LLelse(systemData *d)
     }
 }
 
-void LLreturn(systemData *d)
+void LLreturn(systemData *d,STFuncData *fData)
 {
     token t=next(d);
     switch (t.type)
@@ -269,26 +291,31 @@ void LLreturn(systemData *d)
         case K_NIL:
         case T_DOUBLE:
         case T_ID: 
-            //zparsovat a zkontrolovat
-            expresionParse(d,false);
-            LLreturnArgN(d);
+        case T_SUB:
+        case T_ADD:
+            LLreturnArgN(d,fData,0);
         break;   
-        case K_END:
-        case K_ELSE:
-        case T_EOF:
-
-        break; 
         default:
-            LLerr();
+            if(fData!=NULL)
+                for(int i=0;i<fData->retNum;i++)
+                {
+                    genInst("PUSHS nil@nil");
+                }
+            else
+            {
+                genInst("EXIT int@0");
+            }
         break;
     }
+    t=d->pData.actualToken;
+    if(t.type!=K_END&&t.type!=K_ELSE&& t.type!=T_EOF)
+        LLerr();
+    genReturn();
 }
-void LLreturnArgN(systemData *d)
+void LLreturnArgN(systemData *d,STFuncData *fData,int order)
 {
     token t=d->pData.actualToken;
-    if(t.type!=T_COMMA)
-        return;
-    t=next(d);
+    tokenType retType;
     switch (t.type)
     {
         case T_INT:
@@ -298,18 +325,43 @@ void LLreturnArgN(systemData *d)
         case K_NIL:
         case T_DOUBLE:
         case T_ID: 
-            //zparsovat a zkontrolovat
-            expresionParse(d,false);
-            LLreturnArgN(d);
+        case T_ADD:
+        case T_SUB:
+            retType=expresionParse(d);
+            if(fData!=NULL)
+            {
+                if(order>=fData->retNum)
+                    errorD(5,"počty návratových argumentů v reodpovídajá deklaraci/definici");
+                assigenCompCheck(fData->retTypes[order],retType,false);
+            }
+            else
+            {
+                if(order==0)
+                {
+                    assigenCompCheck(K_INTEGER,retType,false);
+                    genInst("POPS GF@&JUMPVAR\nEXIT GF@&JUMPVAR");
+                }
+                else
+                    errorD(5,"počty návratových argumentů v reodpovídajá deklaraci/definici");
+            }
         break;   
-        case K_END:
-        case K_ELSE:
-        case T_EOF:
-
-        break; 
         default:
             LLerr();
         break;
+    }
+    if(d->pData.actualToken.type!=T_COMMA)
+    {
+        if(fData!=NULL)
+            for(int i=order+1;i<fData->retNum;i++)
+            {
+                genInst("PUSHS nil@nil");
+            }
+        return;
+    }
+    else
+    {
+        next(d);
+        LLreturnArgN(d,fData,order+1);
     }
 }
 
@@ -320,13 +372,14 @@ void LLdeclaration(systemData *d)
     token id=next(d); 
     if(id.type!=T_ID)   
         LLerr();
-    char *name=strCpyWhithMalloc(&d->sData.fullToken);
+    char *name=stringCpyToChPtr(&d->sData.fullToken);
 
     token type=next(d);     
     if(type.type!=T_COLON)
         LLerr();
     
     STData *ptr;
+    STSymbolPtr *node;
     type=next(d);   //type of declaration 
     bool checkOnly;
     switch (d->pData.actualToken.type)
@@ -335,13 +388,42 @@ void LLdeclaration(systemData *d)
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            ptr =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
+            node =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
+            ptr=&(*node)->data;
+            if(pozition.type!=K_GLOBAL)
+                decorId(d,ptr);
+            if(d->pData.isInWhile)
+            {
+                varId * new=malloc(sizeof(varId));
+                if(!new)
+                    error(100);
+                new->decor=ptr->dekorator;
+                if(!(new->id=strdup((*node)->id)))
+                    error(100);
+                stackPush(&d->pData.varDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});
+            }
+            else
+            {
+                printf("DEFVAR ");genVar(ptr->dekorator,name);printf("\n");
+            }
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
-                LLexp_or_func(d);
+            {
+                stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
+                LLexp_or_func(d,1);
+                printf("POPS ");genVar(ptr->dekorator,name);printf("\n");
+                ptr->varData->defined=true;
+            }
+            else
+            {
+                printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
+            }
         break;  
-        case T_FUNC_CALL: 
-            ptr =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
+        case K_FUNCTION: 
+            node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
+            ptr=&(*node)->data;
+            if((!checkOnly)&&pozition.type!=K_GLOBAL)
+                decorId(d,ptr);
             LLfuncDecParam(d,ptr,checkOnly);           
         break;      
         default:
@@ -362,6 +444,8 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
             LLfuncDecNParam(d,Fdata,0,checkOnly);
         break;   
         case T_RBR:
+            if(checkOnly&&Fdata->funcData->paramNum>0)
+                errorD(3,"počty parametů v deklaraci neodpovídají");
         break;   
         default:
             LLerr();
@@ -382,7 +466,8 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
             LLfuncDecNRet(d,Fdata,0,checkOnly);
         break;   
         default:
-
+            if(checkOnly&&Fdata->funcData->retNum>0)
+                errorD(3,"počty návratovýchparametů v deklaraci neodpovídají");
         break;
     }
 }
@@ -399,7 +484,7 @@ void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->retNum))
-                    errorD(-1,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(3,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->retTypes[argNum]!=Type.type)
                     errorD(3,"typ návratového parametru neodpovídá typu v definici");
             }
@@ -441,7 +526,7 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
             if(checkOnly)
             {
                 if(!(argNum<Fdata->funcData->paramNum))
-                    errorD(-1,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
+                    errorD(3,"počty návratových argumentů v deklaraci neodpovídají počtu v definici");
                 else if(Fdata->funcData->paramTypes[argNum]!=Type.type)
                     errorD(3,"typ návratového parametru neodpovídá typu v definici");
             }
@@ -474,60 +559,74 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
         Fdata->funcData->paramTypes[argNum]=Type.type;
 }
 
-void LLwhile(systemData *d)
+void LLwhile(systemData *d,STFuncData *fData)
 {
+    bool prevInWhile=d->pData.isInWhile;
+    if(!prevInWhile)
+        genWhileDecJump(d);
+    d->pData.isInWhile=true;
     token t=next(d); 
-    expresionParse(d,false);
+    unsigned long int decor=genWhileSlabel(d);
+    tokenType retT=expresionParse(d);
+    genWhileHeader(decor,retT);
     t=d->pData.actualToken;
     if(t.type!=K_DO)
         LLerr();
     t=next(d); 
-    LLprog(d);
+    changeRangeScope(d,false);
+    LLprog(d,fData);
+    frameStackPopFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
     if(t.type!=K_END)
         LLerr();
+    genWhileFoter(d,decor,prevInWhile);  
     t=next(d); 
 }
 
 void LLid(systemData *d)
 {
-    LLid_next(d);
-    if(d->pData.actualToken.type!=T_ASSIGEN)
-        LLerr();
-    LLexp_or_func(d);
+    LLid_next(d,0);
 }
 
-void LLid_next(systemData *d)
+STFuncData * LLid_next(systemData *d,int order)
 {
+    STFuncData * fData;
     token t=d->pData.actualToken;
     if(t.type!=T_ID)
         LLerr();
-
-    STData *data=frameStackSearch(&d->pData.dataModel,d->sData.fullToken.str);
-    if(data==NULL)
+    order++;
+    STSymbolPtr *ptr=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
+    if(ptr==NULL)
         errorD(3,"přiřazení do nedeklarované proměnné");
-    else if(data->type==ST_FUNC)
+    STData *data=&(*ptr)->data;
+    if(data->type==ST_FUNC)
         errorD(3,"přiřazení do fukce není legální operace");
+    stackPush(&d->pData.expresionBuffer,(token){data->varData->type});
 
     t=next(d);
     switch (t.type)
     {
         case T_ASSIGEN: 
-            return;
+            fData=LLexp_or_func(d,order);
         break;   
         case T_COMMA: 
-        
+            next(d);
+            fData=LLid_next(d,order);
         break;  
         default:
             LLerr();
         break;
     }
-    t=next(d);
-    LLid_next(d);
+    if(fData)
+        assigenCompCheck(data->varData->type,fData->retTypes[order-1],true);
+    printf("POPS ");genVar(data->dekorator,(*ptr)->id);printf("\n");
+    data->varData->defined=true;
+    return fData;
 }
 
-void LLexp_or_func(systemData *d)
+STFuncData * LLexp_or_func(systemData *d,int numOfAsigens)
 {
+    STFuncData * fData=NULL;
     token t=next(d);
     switch (t.type)
     {
@@ -538,24 +637,26 @@ void LLexp_or_func(systemData *d)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            expresionParse(d,false);
-            LLexpresionN(d);
+        case T_ADD:
+        case T_SUB:
+            LLexpresionN(d,numOfAsigens);
         break;  
         case T_FUNC_CALL: 
-            LLfuncCall(d);
+            fData=LLfuncCall(d,numOfAsigens);
+            for(int i=fData->retNum;i>numOfAsigens;i--)
+                printf("POPS gf@&NULL\n");
         break;  
         default:
             LLerr();
         break;
     }
+    return fData;
 }
 
-void LLexpresionN(systemData *d)
+void LLexpresionN(systemData *d,int numOfAsigens)
 {
     token t=d->pData.actualToken;
-    if(t.type!=T_COMMA)
-        return;
-    t=next(d);
+    tokenType typeOfresult;
     switch (t.type)
     {
         case T_INT:
@@ -565,35 +666,76 @@ void LLexpresionN(systemData *d)
         case T_DOUBLE:
         case T_ID: 
         case T_LBR: 
-            expresionParse(d,false);
-            LLexpresionN(d);
+        case T_ADD:
+        case T_SUB:
+            typeOfresult=expresionParse(d);
+            if(numOfAsigens>0)
+            {
+                assigenCompCheck(d->pData.expresionBuffer.array[d->pData.expresionBuffer.last-numOfAsigens].type,typeOfresult,true);     
+            }
+            else
+                genInst("POPS gf@&NULL");
         break;  
         default:
             LLerr();
         break;
     }
+    if(d->pData.actualToken.type==T_COMMA)
+    {
+        t=next(d);
+        LLexpresionN(d,numOfAsigens-1);
+    }
+    else if(numOfAsigens>1)
+        errorD(5,"počet výrazů je menší než počet identifikátorů v příkazu přiřazení");
+    else if(numOfAsigens>0)
+        stackPop(&d->pData.expresionBuffer);
+
 }
 
-void LLfuncCall(systemData *d)
+void assigenCompCheck(tokenType a,tokenType b,bool isAsigen)
 {
-    STData * data=frameStackSearch(&d->pData.dataModel,d->sData.fullToken.str);
-    if(!data)
+    if(a==b)
+        return;
+    else if(b==K_NIL)
+        return;
+    else
+    {
+        if(a==K_NUMBER&&b==K_INTEGER)
+            printf("CALL sefeIntToFloat\n");
+        else if(isAsigen)
+            errorD(4,"Typová nekompabilita v příkazu přiřazení");
+        else
+            errorD(5,"Typová nekompabilita v návratových typů");
+    }
+}
+
+STFuncData* LLfuncCall(systemData *d,int numOfAsigens)
+{
+    STSymbolPtr *node=frameStackSearchFunc(&d->pData.dataModel,d->sData.fullToken.str);
+    if(!node)
         errorD(3,"funkce není deklarována");
+    STData * data=&(*node)->data;
     if(data->type!=ST_FUNC)
         errorD(3,"proměnná nelze zavolat");
-        
+    if(numOfAsigens>data->funcData->retNum)
+        errorD(3,"Funkce nevrací tolik parametů");    
     token t=next(d);
     switch (t.type)
     {   
         case T_ID: 
-            //kontrola v tabulce symbolu
         case T_INT:
         case T_STR:
         case K_NIL:
         case T_DOUBLE:
-            LLfArg(d);
+        case T_LBR:
+        case T_STR_LEN:
+        case T_SUB:
+        case T_ADD:
+            LLfArgN(d,0,data);
+        break;
         case T_RBR: 
-
+            if(data->funcData->paramNum>0)
+                errorD(5,"počty argumentů ve volání funkce nesouhlasí");
         break;  
         default:
             LLerr();
@@ -601,40 +743,55 @@ void LLfuncCall(systemData *d)
     }
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();
+    if(!(data->funcData->paramNum<0))
+        printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
     next(d);
+    
+    return data->funcData;
 }
 
-void LLfArg(systemData *d)
-{   
-    //kontrola v tabulce symbolu
-    expresionParse(d,false);
-    LLfArgN(d);
-}
-
-void LLfArgN(systemData *d)
+void LLfArgN(systemData *d,int order,STData * Fdata)
 {   
     token t=d->pData.actualToken;
-    if(t.type==T_RBR)
-        return;
-    else if(t.type==T_COMMA)
-    {
-        t=next(d);
-        switch (t.type)
-        {   
-            case T_ID: 
-                //kontrola v tabulce symbolu
-            case T_INT:
-            case T_STR:
-            case K_NIL:
-            case T_DOUBLE:
-                expresionParse(d,false);
-                LLfArgN(d);
-            break;  
-            default:
-                LLerr();
-            break;
-        }
+    tokenType expT;
+    switch (t.type)
+    {   
+        case T_INT:
+        case T_STR_LEN:
+        case T_STR:
+        case K_NIL:
+        case T_DOUBLE:
+        case T_ID: 
+        case T_LBR: 
+        case T_ADD:
+        case T_SUB:
+            expT =expresionParse(d);
+            if(Fdata->funcData->paramNum>=0)
+            {
+                if(!(Fdata->funcData->paramNum>order))
+                    errorD(5,"počty argumentů ve volání funkce nesouhlasí");
+                assigenCompCheck(Fdata->funcData->paramTypes[order],expT,false);
+            }
+            else if(Fdata->funcData->paramNum<0)
+            {
+                genWrite();
+            }
+        break;  
+        default:
+            LLerr();
+        break;
     }
+    if(d->pData.actualToken.type==T_RBR)
+    {
+        return;
+    }
+    else if(d->pData.actualToken.type==T_COMMA)
+    {
+        next(d);
+        LLfArgN(d,order+1,Fdata);
+    }
+    else
+        LLerr();
 }
 
 token next(systemData *d)
@@ -645,12 +802,18 @@ token next(systemData *d)
 
 void initParserData(parserData * data)
 {
-    frameStack_init(&data->dataModel);
+    frameStackInit(&data->dataModel);
+    frameStack_initPreFunctions(&data->dataModel);
+    stackInit(&data->expresionBuffer);
+    stackInit(&data->varDeclarationBuffer);
+    data->isInWhile=false;
 }
 
 void destructParserData(parserData * data)
 {
-    frameStack_disporse(&data->dataModel);
+    frameStackDisporse(&data->dataModel);
+    stackDestruct(&data->expresionBuffer);
+    stackDestruct(&data->varDeclarationBuffer);
 }
 
 void systemDataInit(systemData * data)
@@ -658,6 +821,8 @@ void systemDataInit(systemData * data)
     initScanerData(&data->sData);
     initParserData(&data->pData);
     initExpresionData(&data->epData);
+    data->dekoratorIds=1;//0 is for global vars
+    data->dekoratorJumps=0;
 }
 
 void systemDataDestruct(systemData * data)
@@ -665,6 +830,17 @@ void systemDataDestruct(systemData * data)
     destructScanerData(&data->sData);
     destructParserData(&data->pData);
     destructExpresionData(&data->epData);
+}
+
+void decorId(systemData * data,STData * toDecorate)
+{
+    toDecorate->dekorator=data->dekoratorIds;
+}
+
+void changeRangeScope(systemData * d,bool IsFunc)
+{
+    frameStackPushFrame(&d->pData.dataModel,IsFunc);
+    d->dekoratorIds++;
 }
 
 void LLerr()

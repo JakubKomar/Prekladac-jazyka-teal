@@ -14,11 +14,7 @@ token getNextUsefullToken(scanerData * data)
     } while (tType==O_UNIMPORTANT||tType==O_ERR);
     
     token next={tType};
-    if(tType==T_ID||tType==T_INT||tType==T_STR||tType==T_DOUBLE)
-    {
-        //vložit do tabulky symbolů
-    }
-
+    
     return next;
 }
 
@@ -44,13 +40,13 @@ tokenType getNextToken(scanerData * data)
     }
     tokenType token= getTokenFromState(prevState);
     if(token==O_ERR)
-        errorD(1,"není koncový stav");  //zatím provizorní
-    else if(token==T_ID)
-        token=checkKeywords(data);
+        errorD(1,"není koncový stav");  
+    else if(token==T_ID||token==T_FUNC_CALL)
+        token=checkKeywords(data,token);
     return token;
 }
 
-tokenType checkKeywords(scanerData *data)
+tokenType checkKeywords(scanerData *data,tokenType type)
 {
     char *s=data->fullToken.str;
     tokenType token;
@@ -61,7 +57,7 @@ tokenType checkKeywords(scanerData *data)
     else if(!strcmp(s,"end"))
         token=K_END;
     else if(!strcmp(s,"function"))
-        token=K_FUNCTION;
+        return K_FUNCTION;
     else if(!strcmp(s,"global"))
         token=K_GLOBAL;
     else if(!strcmp(s,"if"))
@@ -88,7 +84,16 @@ tokenType checkKeywords(scanerData *data)
         token=K_NUMBER;
     else
         token=T_ID;
-    return token;
+
+    if(type==T_FUNC_CALL&&token!=T_ID)
+    {
+        errorD(3,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
+        return O_ERR;
+    }
+    else if(type==T_FUNC_CALL&&token==T_ID)
+        return T_FUNC_CALL;
+    else
+        return token;
 }
 
 tokenType getTokenFromState(state state)
@@ -224,7 +229,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_DOT1;
             else if(sym==EOF)
                 next=S_EOF; 
-            else if(sym==' '||sym=='\t'||sym=='\n'||sym==';')
+            else if(sym==' '||sym=='\t'||sym=='\n')
                 next=S_SPACE; 
             else if(sym=='\"')
                 next=S_STR1; 
@@ -308,7 +313,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_GTE;
         break;        
         case S_SPACE:
-            if(sym==' '||sym=='\t'||sym=='\n'||sym==';')
+            if(sym==' '||sym=='\t'||sym=='\n')
                 next=S_SPACE;
         break;
         case S_STR1:

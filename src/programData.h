@@ -13,8 +13,11 @@
 #include "symtable.h"
 
 typedef struct {
-    token actualToken;   
-    frameStack dataModel;
+    token actualToken;          
+    frameStack dataModel;       
+    stack expresionBuffer;          
+    stack varDeclarationBuffer;     
+    bool isInWhile;
 }parserData;
 
 typedef struct
@@ -27,5 +30,7 @@ typedef struct {
     parserData pData;
     expresionParserData epData;
     STSymbolPtr symTable;
+    unsigned long int dekoratorJumps;
+    unsigned long int dekoratorIds;
 }systemData;
 

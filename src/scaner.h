@@ -14,8 +14,8 @@ typedef struct {
     int line;
     int colum;
     bool write;
-    string fullToken;
-    string fullLine;
+    string fullToken;   //whole text form of actual token
+    string fullLine;    //actual line-for debuging purperses
 }scanerData;
 
 /**states of state machine**/
@@ -72,65 +72,75 @@ typedef enum{
 }state;
 
 /**
- * checking if ID is a keyword
+ * @brief checking if ID is a keyword
  * @param *data scanner data
  * @return if ID-T_ID else keyword token
 */
-tokenType checkKeywords(scanerData *data);
+tokenType checkKeywords(scanerData *data,tokenType type);
+
 /**
- * geting next usefull token-ignoring commets, ...
+ * @brief geting next usefull token-ignoring commets, ...
  * @param *data scanner data
  * @return next usefull token
  */
 token getNextUsefullToken(scanerData * data);
+
 /**
- * geting next token
+ * @brief geting next token
  * @param *data scanner data
  * @return next token
  */
 tokenType getNextToken(scanerData * data);
+
 /**
- * geting token from state of state machine
+ * @brief geting token from state of state machine
  * @param state actual state of state machine
  * @return token from state
  */
 tokenType getTokenFromState(state state);
+
 /**
- * geting next state of state machine from actual charakter
+ * @brief geting next state of state machine from actual charakter
  * @param *data scanner data
  * @param curentState actual state of state machine 
  * @return next state
 */
 state nextState(scanerData*data, state curentState);
+
 /**
- * checking if charakter is letter
+ * @brief checking if charakter is letter
  * @param toCompare char to compering
  * @return true-is letter, false-isnt letter
 */
 bool isLetter(char toCompare);
+
 /**
- * checking if charakter is decimal 
+ * @brief checking if charakter is decimal 
  * @param toCompare char to compering
  * @return true-is decimal, false-isnt decimal
 */
 bool isDecimal(char toCompare);
+
 /**
- * inicialization function for scanner
+ * @brief inicialization function for scanner
  * @param *data data to incializate
 */ 
 void initScanerData(scanerData * data);
+
 /**
- * destriction function for scanner
+ * @brief destriction function for scanner
  * @param *data data to destruct
 */ 
 void destructScanerData(scanerData * data);
+
 /**
- * loading next char from input, menwhile harvesting actual pozition in file for error masseges
+ * @brief loading next char from input, menwhile harvesting actual pozition in file for error masseges
  * @param *data scanner data
 */
 void loadChar(scanerData * data);
+
 /**
- * visualization, where exactly is error
+ * @brief visualization, where exactly is error
  * @param *data scanner data
 */
 void errorVisualization(scanerData * data);

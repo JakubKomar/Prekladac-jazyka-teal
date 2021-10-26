@@ -11,144 +11,203 @@
 #include "stack.h"
 #include "symtable.h"
 #include "programData.h"
+#include "generator.h"
+#include <string.h>
+
 
 /**
- * inicialization function for parser data
+ * @brief inicialization function for parser data
  * @param *data data to incializate
 */ 
 void systemDataInit(systemData * data);
+
 /**
- * destruction function for parser data
+ * @brief destruction function for parser data
  * @param *data data to destruction
 */ 
 void systemDataDestruct(systemData * data);
+
 /**
- * main part of parsing program
- * @param *data data set for parser
+ * @brief main part of parsing program
+ * @param *data data for parser
 */ 
 void parserMain(systemData * data);
+
 /**
- * simulating LL(1)table for parsing
- * @param *actualToken actual token on input 
- * @param *stack stack from parser to operate whith
+ * @brief definition of function 
+ * @param *data data for parser
 */ 
-void useLLtable(token actualToken,stack *stack);
-/**
- * simulating nonterminal for function definition
- * @param *d system data
- */
 void LLfunction(systemData *d);
+
 /**
- * simulating nonterminal for function N parameter
+ * @brief simulating nonterminal for function N parameter
  * @param *d system data
- */
-void LLfuncArgN(systemData *d);
-/**
- * simulating nonterminal for function parameter
- * @param *d system data
+ * @param checkOnly function is declareted-only check
+ * @param argNum pozition of argument
+ * @param *Fdata function data from symtable
  */
 void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
+
 /**
- * simulating nonterminal for function return parameters
+ * @brief simulating nonterminal for function N retutn parameter
  * @param *d system data
+ * @param checkOnly function is declareted-only check
+ * @param argNum pozition of argument
+ * @param *Fdata function data from symtable
  */
 void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata);
+
 /**
- * simulating nonterminal for if/else structure
+ * @brief simulating nonterminal for if/else structure
  * @param *d system data
+ * @param *fData data of function in witch is this structure
  */
-void LLif(systemData *d);
+void LLif(systemData *d,STFuncData *fData);
+
 /**
- * simulating nonterminal for else structure
+ * @brief simulating nonterminal for else structure
  * @param *d system data
+ * @param *fData data of function in witch is this structure
+ * @param decorId decorator form if statement
  */
-void LLelse(systemData *d);
+void LLelse(systemData *d,STFuncData *fData,unsigned long int decorId);
+
 /**
- * simulating nonterminal for return
+ * @brief simulating nonterminal for return
  * @param *d system data
+ * @param *fData data of function in witch is this structure
  */
-void LLreturn(systemData *d);
+void LLreturn(systemData *d,STFuncData *fData);
+
 /**
- * simulating nonterminal for N return args
+ * @brief simulating nonterminal for N return args
  * @param *d system data
+ * @param *fData data of function in witch is this structure
+ * @param order pozition of argument
  */
-void LLreturnArgN(systemData *d);
+void LLreturnArgN(systemData *d,STFuncData *fData,int order);
+
 /**
- * simulating nonterminal for declaration function/var
+ * @brief simulating nonterminal for declaration function/var
  * @param *d system data
  */
 void LLdeclaration(systemData *d);
+
 /**
- * simulating nonterminal for declaration arg in fucntion
+ * @brief simulating nonterminal for declaration arg in fucntion
  * @param *d system data
+ * @param *fData data of function in witch is this structure
+ * @param checkOnly function is declareted-only check
  */
 void LLfuncDecParam(systemData *d,STData *funcData,bool checkOnly);
+
 /**
- * simulating nonterminal for declaration N args in fucntion
+ * @brief simulating nonterminal for declaration N args in fucntion
  * @param *d system data
+ * @param *funcData data of function in witch is this structure
+ * @param argNum pozition of argument
+ * @param checkOnly function is declareted-only check
  */
 void LLfuncDecNParam(systemData *d,STData *funcData,int argNum,bool checkOnly);
+
 /**
- * simulating nonterminal for declaration retrun arg in fucntion
+ * @brief simulating nonterminal for declaration retrun arg in fucntion
  * @param *d system data
+ * @param *funcData data of function in witch is this structure
+ * @param argNum pozition of argument
+ * @param checkOnly function is declareted-only check
  */
 void LLfuncDecNRet(systemData *d,STData *funcData,int argNum,bool checkOnly);
+
 /**
- * simulating nonterminal for while structure
+ * @brief simulating nonterminal for while structure
  * @param *d system data
+ * @param *funcData data of function in witch is this structure
  */
-void LLwhile(systemData *d);
+void LLwhile(systemData *d,STFuncData *fData);
+
 /**
- * simulating nonterminal for function call
+ * @brief simulating nonterminal for function call
  * @param *d system data
+ * @param numOfAsigens how much parameters is assigent to this fuction call 0-N
  */
-void LLfuncCall(systemData *d);
+STFuncData* LLfuncCall(systemData *d,int numOfAsigens);
+
 /**
- * simulating nonterminal for header of program
+ * @brief simulating nonterminal for header of program
  * @param *d system data
  */
 void LLprolog(systemData * d);
+
 /**
- * simulating nonterminal for main body of program
+ * @brief simulating nonterminal for main body of program
  * @param *d system data
+ * @param *funcData data of function in witch is this structure
  */
-void LLprog(systemData * d);
+void LLprog(systemData * d,STFuncData *fData);
+
 /**
- * simulating nonterminal for id asigen
+ * @brief simulating nonterminal for id asigen
  * @param *d system data
  */
 void LLid(systemData *d);
+
 /**
- * simulating nonterminal for next id asigen
+ * @brief simulating nonterminal for next id asigen
  * @param *d system data
+ * @param order pozition of id
  */
-void LLid_next(systemData * d); 
+STFuncData* LLid_next(systemData * d,int order); 
+
 /**
- * simulating nonterminal for asigen behind equlation
+ * @brief simulating nonterminal for asigen behind equlation
  * @param *d system data
+ * @param numOfAsigens how much parameters is assigent to this fuction call 0-N
  */
-void LLexp_or_func(systemData *d);
+STFuncData* LLexp_or_func(systemData *d,int numOfAsigens);
+
 /**
- * simulating nonterminal for  
+ * @brief simulating nonterminal for  parameter in function call
  * @param *d system data
+ * @param order pozition of argument
+ * @param *Fdata function data from symtable
  */
-void LLfArg(systemData *d);
+void LLfArgN(systemData *d,int order,STData * Fdata);
 /**
- * simulating nonterminal for 
+ * simulating nonterminal for N expresion behind assigen
  * @param *d system data
+ * @param numOfAsigens how much ids is behind assigeb
  */
-void LLfArgN(systemData *d);
+void LLexpresionN(systemData *d,int numOfAsigens);
+
 /**
- * simulating nonterminal for 
- * @param *d system data
- */
-void LLexpresionN(systemData *d);
-/**
- * simulating nonterminal for 
+ * @brief function for easy geting of tokens from scanner
  * @param *d system data
  */
 token next(systemData *d);
+
 /**
- * error handeling from "useLLtable" function
+ * @brief error handeling for syntax checks 
  */
 void LLerr();
+
+/**
+ * @brief  function for chenging scope of program typicaly when entering to if/else, while 
+ * @param *d system data
+ * @param IsFunc true-if chenging scope due to entering to function definition
+ */
+void changeRangeScope(systemData * d,bool IsFunc);
+
+/**
+ * @brief decoratin id 
+ * @param *d system data
+ * @param toDecorate symtable data of var
+ */
+void decorId(systemData * data,STData * toDecorate);
+
+/**
+ * @brief checking compabilyty between assigen
+ * @param a first type
+ * @param b second type
+ */
+void assigenCompCheck(tokenType a,tokenType b,bool isAsigen);
