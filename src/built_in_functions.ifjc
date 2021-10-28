@@ -81,9 +81,11 @@ CREATEFRAME
 DEFVAR TF@s
 DEFVAR TF@i
 DEFVAR TF@j
-POPS TF@s
-POPS TF@i
+
+
 POPS TF@j
+POPS TF@i
+POPS TF@s
 
 # checks if any parameter is nil
 DEFVAR TF@nil_check
@@ -188,8 +190,9 @@ CREATEFRAME
 
 DEFVAR TF@s
 DEFVAR TF@i
-POPS TF@s
+
 POPS TF@i
+POPS TF@s
 
 # checks if any parameter is nil
 DEFVAR TF@nil_check
@@ -209,10 +212,10 @@ JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
 GT TF@out_of_bounds TF@i TF@len
 JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
 
-PUSHS TF@i
-PUSHS TF@i
 PUSHS TF@s
-CALL substr
+PUSHS TF@i
+PUSHS TF@i
+CALL FCSTART$0$substr
 POPS TF@s
 
 DEFVAR TF@ord
