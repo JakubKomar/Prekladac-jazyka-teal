@@ -81,9 +81,11 @@ CREATEFRAME
 DEFVAR TF@s
 DEFVAR TF@i
 DEFVAR TF@j
-POPS TF@s
-POPS TF@i
+
+
 POPS TF@j
+POPS TF@i
+POPS TF@s
 
 # checks if any parameter is nil
 DEFVAR TF@nil_check
@@ -105,6 +107,7 @@ DEFVAR TF@len
 PUSHS TF@s
 CALL hashtag
 POPS TF@len
+JUMPIFEQ end_substr_error_8 TF@len nil@nil
 LT TF@out_of_bounds TF@i int@1
 JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 LT TF@out_of_bounds TF@j int@1
@@ -114,49 +117,28 @@ JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 GT TF@out_of_bounds TF@j TF@len
 JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 
-# sub i to be have the index from 0
+# sub i,j to be have the index from 0
 SUB TF@i TF@i int@1
 
-DEFVAR TF@substr
-MOVE TF@substr TF@s
+DEFVAR TF@ret
+MOVE TF@ret string@
+DEFVAR TF@aux
 
-DEFVAR TF@loopi
-DEFVAR TF@last_escaped
-DEFVAR TF@substr_i
-DEFVAR TF@esc
-DEFVAR TF@c
-MOVE TF@last_escaped bool@false
-STRLEN TF@len TF@s
-MOVE TF@substr_i int@0
-MOVE TF@loopi TF@i
+DEFVAR TF@jumpvar
+MOVE TF@jumpvar TF@i
 
-# loops throught the string and moves chars to substr
-LABEL substr_loop
-JUMPIFEQ end_substr TF@loopi TF@j
+    label cykleStart
+    LT TF@jumpvar TF@i TF@j
+    JUMPIFEQ cykleEnd TF@jumpvar bool@false
+    GETCHAR TF@aux TF@s TF@i
+    CONCAT TF@ret TF@ret TF@aux
+    ADD TF@i TF@i int@1
+    JUMP cykleStart
+    label cykleEnd
 
-GETCHAR TF@c TF@s TF@i
-ADD TF@i TF@i int@1
-ADD TF@loopi TF@loopi int@1
-
-JUMPIFEQ substr_not_escaped TF@last_escaped bool@false
-SETCHAR TF@substr TF@substr_i TF@c
-ADD TF@substr_i TF@substr_i int@1
-MOVE TF@last_escaped bool@false
-JUMP substr_loop
-
-LABEL substr_not_escaped
-EQ TF@esc TF@c string@\092
-JUMPIFEQ substr_esc TF@esc bool@true
-
-SETCHAR TF@substr TF@substr_i TF@c
-ADD TF@substr_i TF@substr_i int@1
-JUMP substr_loop
-
-LABEL substr_esc
-MOVE TF@last_escaped bool@true
-SUB TF@loopi TF@loopi int@1
-JUMP substr_loop
-
+PUSHS TF@ret
+POPFRAME
+RETURN
 
 LABEL end_substr_empty
 DEFVAR TF@empty_str
@@ -168,16 +150,6 @@ RETURN
 LABEL end_substr_error_8
 EXIT int@8
 
-LABEL end_substr
-SETCHAR TF@substr TF@substr_i string@\003
-ADD TF@substr_i TF@substr_i int@1
-JUMPIFNEQ end_substr TF@substr_i TF@len
-PUSHS TF@substr
-
-POPFRAME
-RETURN
-
-
 
 LABEL FCSTART$0$ord
 # uses hashtag operator and substr
@@ -187,8 +159,9 @@ CREATEFRAME
 
 DEFVAR TF@s
 DEFVAR TF@i
-POPS TF@s
+
 POPS TF@i
+POPS TF@s
 
 # checks if any parameter is nil
 DEFVAR TF@nil_check
@@ -208,10 +181,10 @@ JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
 GT TF@out_of_bounds TF@i TF@len
 JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
 
-PUSHS TF@i
-PUSHS TF@i
 PUSHS TF@s
-CALL substr
+PUSHS TF@i
+PUSHS TF@i
+CALL FCSTART$0$substr
 POPS TF@s
 
 DEFVAR TF@ord
@@ -274,6 +247,7 @@ CREATEFRAME
 
 DEFVAR TF@str
 POPS TF@str
+JUMPIFEQ end_substr_error_8 TF@str nil@nil
 DEFVAR TF@len
 STRLEN TF@len TF@str
 DEFVAR TF@escaped_len
@@ -320,9 +294,10 @@ CREATEFRAME
 DEFVAR TF@str1
 DEFVAR TF@str2
 
-POPS TF@str1
 POPS TF@str2
-
+JUMPIFEQ end_substr_error_8 TF@str2 nil@nil
+POPS TF@str1
+JUMPIFEQ end_substr_error_8 TF@str1 nil@nil
 DEFVAR TF@con
 
 CONCAT TF@con TF@str1 TF@str2
@@ -345,8 +320,10 @@ CREATEFRAME
 DEFVAR TF@i
 DEFVAR TF@j
 
-POPS TF@j
-POPS TF@i
+MOVE TF@j gf@&regB
+JUMPIFEQ end_substr_error_8 TF@j nil@nil
+MOVE TF@i gf@&regA
+JUMPIFEQ end_substr_error_8 TF@i nil@nil
 
 DEFVAR TF@result
 
@@ -387,6 +364,7 @@ CREATEFRAME
 DEFVAR TF@i
 
 POPS TF@i
+JUMPIFEQ end_substr_error_8 TF@i nil@nil
 
 DEFVAR TF@type
 TYPE TF@type TF@i
@@ -406,8 +384,28 @@ PUSHS TF@i
 POPFRAME
 RETURN
 
+# 
+LABEL pairPrepTN
+POPS gf@&regB
+JUMPIFEQ end_substr_error_8 gf@&regB nil@nil
+POPS gf@&regA
+JUMPIFEQ end_substr_error_8 gf@&regA nil@nil
+RETURN
 
+LABEL pairPrep
+POPS gf@&regB
+POPS gf@&regA
+RETURN
 
+LABEL sefeIntToFloat
+POPS gf@&regC
+JUMPIFEQ sefeIntToFloatJ gf@&regC nil@nil
+INT2FLOAT gf@&regC gf@&regC
+PUSHS  gf@&regC
+RETURN
+LABEL sefeIntToFloatJ
+PUSHS  gf@&regC
+RETURN
 # MAIN FOR TESTING
 
 # reads TEST
@@ -530,93 +528,4 @@ READ TF@string string
 PUSHS TF@string
 CALL hashtag
 DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
-WRITE string@\010\010
-CREATEFRAME
-
-# concatenation TEST
-WRITE string@CONCATENATION\032TEST:\010
-DEFVAR TF@string1
-READ TF@string1 string
-DEFVAR TF@string2
-READ TF@string2 string
-PUSHS TF@string2
-PUSHS TF@string1
-CALL concatenation
-DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
-WRITE string@\010\010
-CREATEFRAME
-
-# safediv TEST INT
-WRITE string@SAFEDIV\032INT\032TEST:\010
-DEFVAR TF@int1
-READ TF@int1 int
-DEFVAR TF@int2
-READ TF@int2 int
-PUSHS TF@int2
-PUSHS TF@int1
-CALL safediv
-DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
-WRITE string@\010\010
-CREATEFRAME
-
-# safediv TEST NUMBER
-WRITE string@SAFEDIV\032FLOAT\032TEST:\010
-DEFVAR TF@float1
-READ TF@float1 float
-DEFVAR TF@float2
-READ TF@float2 float
-PUSHS TF@float2
-PUSHS TF@float1
-CALL safediv
-DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
-WRITE string@\010
-DEFVAR TF@testtoint
-FLOAT2INT TF@testtoint TF@test
-WRITE TF@testtoint
-WRITE string@\010\010
-CREATEFRAME
-
-# neg TEST 
-WRITE string@NEG\032TEST:\010
-DEFVAR TF@int
-READ TF@int int
-PUSHS TF@int
-CALL neg
-DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
-WRITE string@\010\010
-DEFVAR TF@float
-READ TF@float float
-PUSHS TF@float
-CALL neg
-POPS TF@test
-WRITE TF@test
-WRITE string@\010
-DEFVAR TF@testtoint
-FLOAT2INT TF@testtoint TF@test
-WRITE TF@testtoint
-WRITE string@\010\010
-CREATEFRAME
-
-
-LABEL main
-
-CREATEFRAME
-DEFVAR gf@&JUMPVAR
-DEFVAR gf@&NULL
-DEFVAR gf@&regA
-DEFVAR gf@&regB
-DEFVAR gf@&regC
-JUMP FCEND$0$a
-LABEL FCSTART$0$a
-PUSHFRAME
-CREATEFRAME
+POPS 

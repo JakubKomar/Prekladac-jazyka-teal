@@ -127,7 +127,7 @@ class test(object):
 
     def startTest(self):
         try:
-            subprocess.check_output(programToTest+" >temp.ifjc 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+            subprocess.check_output(programToTest+" >tmp.transleted.ifjc 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
             self.RetCode=0
             if(self.exRetCode!=0 and self.exRetCode!=7 and self.exRetCode!=8):
                 self.pased=False
@@ -137,10 +137,10 @@ class test(object):
                     if(not os.path.exists(self.path[:-2]+"in")):
                         with open(self.path[:-2]+"in", 'w') as fp:
                             pass
-                    subprocess.check_output(ifjCode+" temp.ifjc >output.txt 2>/dev/null <"+self.path[:-2]+"in",shell=True,stderr=subprocess.DEVNULL,timeout=1)
+                    subprocess.check_output(ifjCode+" tmp.transleted.ifjc >tmp.out.txt 2>/dev/null <"+self.path[:-2]+"in",shell=True,stderr=subprocess.DEVNULL,timeout=1)
                     try:
-                        subprocess.check_output("tl run >exoutput.txt 2>/dev/null <"+self.path[:-2]+"in "+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
-                        if  filecmp.cmp("output.txt", "exoutput.txt") :
+                        subprocess.check_output("tl run >tmp.exout.txt 2>/dev/null <"+self.path[:-2]+"in "+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
+                        if  filecmp.cmp("tmp.out.txt", "tmp.exout.txt") :
                             self.pased=True
                         else:
                             self.pased=False
@@ -148,9 +148,11 @@ class test(object):
                     except subprocess.CalledProcessError as grepexc:
                         self.pased=False
                         self.failReson="teal int. failed" 
+                        return
                     except subprocess.TimeoutExpired:
                         self.pased=False
                         self.failReson="teal int. time out"
+                        return
                 except subprocess.CalledProcessError as grepexc:
                     self.RetCode=grepexc.returncode
                     if self.RetCode==self.exRetCode:
@@ -158,9 +160,11 @@ class test(object):
                     else:
                         self.pased=False
                         self.failReson="wrong return code in runtime"
+                    return
                 except subprocess.TimeoutExpired:
                     self.pased=False
                     self.failReson="ifjcode in. timeout"
+                    return
             else:
                 self.pased=True
         except subprocess.CalledProcessError as grepexc:
@@ -169,10 +173,10 @@ class test(object):
                 self.pased=True
             else:
                 self.pased=False
-                self.failReson="wrong return code"
+                self.failReson="wrong return code by translater"
         except subprocess.TimeoutExpired:
             self.pased=False
-            self.failReson="testing program timeout"
+            self.failReson="translater time out"
          
     def __repr__(self):
         return "<Test - name: %-25s, path: %-60s ,expected return code: %-3d,return code: %-3d,fail reson: %-2d>" % (self.name, self.path, self.exRetCode,self.RetCode,self.failReson)
@@ -181,7 +185,7 @@ class test(object):
         return " %-60s | %-3d | %-3d | %-20s |" % (self.path, self.RetCode,self.exRetCode,self.failReson)
 
 
-parser = argparse.ArgumentParser(description='Tester pro ifj překaldac.')
+parser = argparse.ArgumentParser(description='Tester pro ifj prekaldac.')
 parser.add_argument("-p", "--path",type=str,default=testFolder,help="Path to tests")    
 parser.add_argument("-o", action="store_true",help="Dont compere outputs") 
 
