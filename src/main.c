@@ -8,15 +8,6 @@
 
 int main(int argc, char** argv)
 {
-    if(FORM_FILE)
-    {
-        fp=fopen("C:\\letsCodeSomeShit\\IFJ-2021\\src\\test.lua","r");
-        if(!fp)
-        {
-            fprintf(stderr,"file not opened\n");
-            exit(1);
-        }
-    }
     argParse(argc,argv);
     
     systemData sData;
@@ -39,10 +30,7 @@ int main(int argc, char** argv)
             systemDataDestruct(&sData);
         break;
     }
-    
-    if(FORM_FILE)
-        fclose(fp);
-        
+            
     return errCode;
 }
 

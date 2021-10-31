@@ -129,3 +129,8 @@ void genEscapeSec(char * string,int *i);
  * @brief genereting write "function"
  */
 void genWrite();
+
+/**
+ * @brief genereting predefineted functions
+ */
+void buildInFuction();

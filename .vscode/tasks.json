@@ -2,17 +2,14 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: gcc.exe sestavit aktivní soubor",
-            "command": "C:\\MinGW\\bin\\gcc.exe",
+            "label": "C/C++: gcc-9 sestavit aktivní soubor",
+            "command": "/usr/bin/gcc-9",
             "args": [
+                "-fdiagnostics-color=always",
                 "-g",
                 "*.c",
-                "-D",
-                "DEBUG",
-                "-D",
-                "VCODE",
                 "-o",
-                "ifj21"
+                "${fileDirname}/ifj21"
             ],
             "options": {
                 "cwd": "${fileDirname}"
