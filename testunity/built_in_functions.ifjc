@@ -81,9 +81,11 @@ CREATEFRAME
 DEFVAR TF@s
 DEFVAR TF@i
 DEFVAR TF@j
-POPS TF@s
-POPS TF@i
+
+
 POPS TF@j
+POPS TF@i
+POPS TF@s
 
 # checks if any parameter is nil
 DEFVAR TF@nil_check
@@ -115,49 +117,28 @@ JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 GT TF@out_of_bounds TF@j TF@len
 JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
 
-# sub i to be have the index from 0
+# sub i,j to be have the index from 0
 SUB TF@i TF@i int@1
 
-DEFVAR TF@substr
-MOVE TF@substr TF@s
+DEFVAR TF@ret
+MOVE TF@ret string@
+DEFVAR TF@aux
 
-DEFVAR TF@loopi
-DEFVAR TF@last_escaped
-DEFVAR TF@substr_i
-DEFVAR TF@esc
-DEFVAR TF@c
-MOVE TF@last_escaped bool@false
-STRLEN TF@len TF@s
-MOVE TF@substr_i int@0
-MOVE TF@loopi TF@i
+DEFVAR TF@jumpvar
+MOVE TF@jumpvar TF@i
 
-# loops throught the string and moves chars to substr
-LABEL substr_loop
-JUMPIFEQ end_substr TF@loopi TF@j
+    label cykleStart
+    LT TF@jumpvar TF@i TF@j
+    JUMPIFEQ cykleEnd TF@jumpvar bool@false
+    GETCHAR TF@aux TF@s TF@i
+    CONCAT TF@ret TF@ret TF@aux
+    ADD TF@i TF@i int@1
+    JUMP cykleStart
+    label cykleEnd
 
-GETCHAR TF@c TF@s TF@i
-ADD TF@i TF@i int@1
-ADD TF@loopi TF@loopi int@1
-
-JUMPIFEQ substr_not_escaped TF@last_escaped bool@false
-SETCHAR TF@substr TF@substr_i TF@c
-ADD TF@substr_i TF@substr_i int@1
-MOVE TF@last_escaped bool@false
-JUMP substr_loop
-
-LABEL substr_not_escaped
-EQ TF@esc TF@c string@\092
-JUMPIFEQ substr_esc TF@esc bool@true
-
-SETCHAR TF@substr TF@substr_i TF@c
-ADD TF@substr_i TF@substr_i int@1
-JUMP substr_loop
-
-LABEL substr_esc
-MOVE TF@last_escaped bool@true
-SUB TF@loopi TF@loopi int@1
-JUMP substr_loop
-
+PUSHS TF@ret
+POPFRAME
+RETURN
 
 LABEL end_substr_empty
 DEFVAR TF@empty_str
@@ -169,16 +150,6 @@ RETURN
 LABEL end_substr_error_8
 EXIT int@8
 
-LABEL end_substr
-SETCHAR TF@substr TF@substr_i string@\003
-ADD TF@substr_i TF@substr_i int@1
-JUMPIFNEQ end_substr TF@substr_i TF@len
-PUSHS TF@substr
-
-POPFRAME
-RETURN
-
-
 
 LABEL FCSTART$0$ord
 # uses hashtag operator and substr
@@ -188,8 +159,9 @@ CREATEFRAME
 
 DEFVAR TF@s
 DEFVAR TF@i
-POPS TF@s
+
 POPS TF@i
+POPS TF@s
 
 # checks if any parameter is nil
 DEFVAR TF@nil_check
@@ -209,10 +181,10 @@ JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
 GT TF@out_of_bounds TF@i TF@len
 JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
 
-PUSHS TF@i
-PUSHS TF@i
 PUSHS TF@s
-CALL substr
+PUSHS TF@i
+PUSHS TF@i
+CALL FCSTART$0$substr
 POPS TF@s
 
 DEFVAR TF@ord
@@ -322,10 +294,10 @@ CREATEFRAME
 DEFVAR TF@str1
 DEFVAR TF@str2
 
-POPS TF@str1
-JUMPIFEQ end_substr_error_8 TF@str1 nil@nil
 POPS TF@str2
 JUMPIFEQ end_substr_error_8 TF@str2 nil@nil
+POPS TF@str1
+JUMPIFEQ end_substr_error_8 TF@str1 nil@nil
 DEFVAR TF@con
 
 CONCAT TF@con TF@str1 TF@str2
