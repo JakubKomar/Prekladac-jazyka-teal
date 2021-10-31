@@ -5,23 +5,14 @@ ZIP=xkomar33.zip
 CC=gcc
 RM=rm -f
 SRC=$(wildcard src/**/*.c) $(wildcard src/*.c)
-PATHS=$(addprefix ../, $(SRC))
-.PHONY: all build doxygen run pack clean
+.PHONY: all build d run pack clean test testNoOut
 
 all: build
 
 build: 
-	if [ -d "build" ]; then rm -r build; fi && \
-	mkdir build && \
-	cd build && \
-	$(CC) $(CFLAGS) -o $(BIN) $(PATHS) && \
-	cp $(BIN) ../
+	$(CC) $(CFLAGS) -o $(BIN) $(SRC) 
 d:
-	if [ -d "build" ]; then rm -r build; fi && \
-	mkdir build && \
-	cd build && \
-	$(CC) -DDEBUG $(CFLAGS) -o $(BIN) $(PATHS) && \
-	cp $(BIN) ../
+	$(CC) -DDEBUG $(CFLAGS) -o $(BIN) $(SRC) 
 
 pack: clean
 	cd src && \
@@ -33,17 +24,13 @@ run:
 valgrind:
 	test -f ifj21 && valgrind ./ifj21
 
-doxygen:
-	if [ -d "doc" ]; then rm -r doc; fi && \
-	mkdir doxygen && \
-	doxygen Doxyfile
-
 clean:
 	rm -rf $(BIN) build/ $(ZIP)
 test:
 	cp ifj21 ./testunity/ifj21 &&\
 	cd testunity && \
-	python3 tester.py -o
-testScaner:
+	python3 tester.py 
+testNoOut :
+	cp ifj21 ./testunity/ifj21 &&\
 	cd testunity && \
-	python3 tester.py -o -s
+	python3 tester.py -o

@@ -410,7 +410,9 @@ void LLdeclaration(systemData *d)
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
                 stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
-                LLexp_or_func(d,1);
+                STFuncData * Fdata=LLexp_or_func(d,1);
+                if(Fdata)
+                    assigenCompCheck(ptr->varData->type,Fdata->retTypes[0],true);
                 printf("POPS ");genVar(ptr->dekorator,name);printf("\n");
                 ptr->varData->defined=true;
             }

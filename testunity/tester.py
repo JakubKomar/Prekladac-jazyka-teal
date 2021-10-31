@@ -140,7 +140,7 @@ class test(object):
                     subprocess.check_output(ifjCode+" temp.ifjc >output.txt 2>/dev/null <"+self.path[:-2]+"in",shell=True,stderr=subprocess.DEVNULL,timeout=1)
                     try:
                         subprocess.check_output("tl run >exoutput.txt 2>/dev/null <"+self.path[:-2]+"in "+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
-                        if  filecmp.cmp("output.txt", "exoutput.txt") :
+                        if  filecmp.cmp("output.txt", ".exoutput.txt") :
                             self.pased=True
                         else:
                             self.pased=False
