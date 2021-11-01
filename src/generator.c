@@ -160,6 +160,8 @@ void genStringConstant(char * string)
             printf("\\009");}
         else if(aux==' '){
             printf("\\032");}
+        else if(aux=='#'){
+            printf("\\035");}
         else
             printf("%c",aux);
         aux=string[++i];

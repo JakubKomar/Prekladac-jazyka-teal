@@ -142,7 +142,7 @@ RETURN
 
 LABEL end_substr_empty
 DEFVAR TF@empty_str
-MOVE TF@empty_str string@\000
+MOVE TF@empty_str string@
 PUSHS TF@empty_str
 POPFRAME
 RETURN

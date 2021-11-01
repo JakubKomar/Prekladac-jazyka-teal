@@ -129,7 +129,7 @@ class test(object):
         try:
             subprocess.check_output(programToTest+" >tmp.transleted.ifjc 2>/dev/null <"+self.path,shell=True,stderr=subprocess.DEVNULL,timeout=1)
             self.RetCode=0
-            if(self.exRetCode!=0 and self.exRetCode!=7 and self.exRetCode!=8):
+            if(self.exRetCode!=0 and self.exRetCode!=7 and self.exRetCode!=8 and self.exRetCode!=9):
                 self.pased=False
                 return
             if not f_noOut:
