@@ -173,7 +173,6 @@ tokenType getTokenFromState(state state)
         token=T_STR;
     break;
     case S_INT:
-    case S_INT0:
         token=T_INT;
     break;   
     case S_DOUBLE2:
@@ -233,10 +232,8 @@ state nextState(scanerData*data, state curentState)
                 next=S_SPACE; 
             else if(sym=='\"')
                 next=S_STR1; 
-            else if(sym>='1'&&sym<='9')
+            else if(isDecimal(sym))
                 next=S_INT; 
-            else if(sym=='0')
-                next=S_INT0;
         break;
         case S_DOT1:
             if(sym=='.')
@@ -357,14 +354,6 @@ state nextState(scanerData*data, state curentState)
                 next=S_EXP1;
             else if(isDecimal(sym))
                 next=S_INT;
-        break;
-        case S_INT0:
-            if(isDecimal(sym))
-                next=S_TRAP;
-            else if(sym=='e'||sym=='E')
-                next=S_EXP1;
-            else if(sym=='.')
-                next=S_DOUBLE1;
         break;
         case S_DOUBLE1:
             if(isDecimal(sym))

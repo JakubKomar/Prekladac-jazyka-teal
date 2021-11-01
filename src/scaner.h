@@ -57,8 +57,6 @@ typedef enum{
     S_ESC4,
     S_ESC5,
     S_INT,
-    S_INT0,
-    S_TRAP,
     S_DOUBLE1,
     S_DOUBLE2,
     S_EXP1,
