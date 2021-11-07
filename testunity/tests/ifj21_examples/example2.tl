@@ -1,4 +1,4 @@
--- Program 2: Vypocet faktorialu (rekurzivne)
+-- Program 2: Vypocet faktorialu (rekurzivne) 0
 require "ifj21"
 
 function factorial(n : integer) : integer

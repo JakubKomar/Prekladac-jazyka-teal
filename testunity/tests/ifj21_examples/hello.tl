@@ -1,4 +1,4 @@
--- Hello World example in IFJ21
+-- Hello World example in IFJ21 0
 -- run it on Merlin by: tl run hello.tl
 
 require "ifj21"

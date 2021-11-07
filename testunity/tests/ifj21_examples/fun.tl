@@ -1,3 +1,4 @@
+-- 0
 require "ifj21"
 
 global g : function (integer) : integer  -- deklarace funkce
@@ -15,9 +16,9 @@ end
 function g(x : integer) : integer
   if x > 0 then
     write("calling f with ", x, "\n")
-    local x : integer = f(x)  -- pøekryji parametr x, ale až po zavolání f(x) [Teal varuje!]
+    local x : integer = f(x)  -- pï¿½ekryji parametr x, ale aï¿½ po zavolï¿½nï¿½ f(x) [Teal varuje!]
     return x
-  else return 200 end  -- proè musí být pøed end bílý znak?
+  else return 200 end  -- proï¿½ musï¿½ bï¿½t pï¿½ed end bï¿½lï¿½ znak?
 end
 
 function main()

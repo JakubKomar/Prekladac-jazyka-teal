@@ -1,4 +1,4 @@
--- Program 3: Prace s retezci a vestavenymi funkcemi
+-- Program 3: Prace s retezci a vestavenymi funkcemi 0
 require "ifj21"
 function main()
   local s1 : string = "Toto je nejaky text"

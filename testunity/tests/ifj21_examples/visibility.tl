@@ -1,3 +1,4 @@
+-- 0
 require "ifj21"
 function program()
   local y : integer = 20
