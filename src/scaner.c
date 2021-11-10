@@ -246,13 +246,13 @@ state nextState(scanerData*data, state curentState)
             {   
                 if(sym=='(')
                     next=S_FUNC_CALL;
-                else if(sym==' ')
+                else if(sym==' '||sym=='\n')
                     next=S_IDS;
                 data->write=false;
             }
         break;
         case S_IDS:
-            if(sym==' ')
+            if(sym==' '||sym=='\n')
                 next=S_IDS;
             else if(sym=='(')
                 next=S_FUNC_CALL;
