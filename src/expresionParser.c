@@ -43,7 +43,7 @@ tokenType expresionParse(systemData *sData)
                 reduction(stack);
                 break;
             case ' ':
-                if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
+                if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right bracket can end the fuction call-no lexical error
                     return stackHead(stack).typeOfValue;
                 else
                     errorD(2,"syntax error in expresion");
@@ -195,7 +195,7 @@ void reduction(stack *s)
     }
 }
 
-tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
+tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)  //type check in aritmetic expresions
 {
     genInst("CALL pairPrepTN");
     if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
@@ -208,12 +208,12 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOAT gf@&regA gf@&regA");
+            genInst("INT2FLOAT gf@&regA gf@&regA");     //retype if needed
             id1.typeOfValue=K_NUMBER;
         }
         if(id2.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOAT gf@&regB gf@&regB");
+            genInst("INT2FLOAT gf@&regB gf@&regB");     //retype if needed
             id2.typeOfValue=K_NUMBER;
         }
         return K_NUMBER;
@@ -221,7 +221,7 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     return K_INTEGER;
 }
 
-tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
+tokenType comperzionComCheck(token id1,token id2,bool nillEnable)   //type check in comparzion 
 {
     if(nillEnable)
         genInst("CALL pairPrep");
@@ -238,12 +238,12 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
         {
             if(id1.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOAT gf@&regA gf@&regA");
+                genInst("INT2FLOAT gf@&regA gf@&regA"); //retype if needed
                 id1.typeOfValue=K_NUMBER;
             }
             if(id2.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOAT gf@&regB gf@&regB");
+                genInst("INT2FLOAT gf@&regB gf@&regB");//retype if needed
                 id2.typeOfValue=K_NUMBER;
             }
         }
@@ -254,7 +254,7 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
 }
 
 
-tokenType generateExpresion(token id1, token op ,token id2)
+tokenType generateExpresion(token id1, token op ,token id2) //generating aritmetic expresion + type check
 {
     tokenType type;
     switch (op.type)

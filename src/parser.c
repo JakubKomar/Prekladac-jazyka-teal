@@ -778,7 +778,7 @@ void LLfArgN(systemData *d,int order,STData * Fdata)
                     errorD(5,"počty argumentů ve volání funkce nesouhlasí");
                 assigenCompCheck(Fdata->funcData->paramTypes[order],expT,false);
             }
-            else if(Fdata->funcData->paramNum<0)
+            else if(Fdata->funcData->paramNum<0)    //negative num of args means write instruction
             {
                 genWrite();
             }
