@@ -4,14 +4,12 @@
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
-#include <ctype.h>
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <malloc.h>
 #include <string.h>
 #include <setjmp.h>
-#include <stdarg.h>
 
 #define INPUT stdin
 

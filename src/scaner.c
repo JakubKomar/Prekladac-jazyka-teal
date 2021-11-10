@@ -240,7 +240,7 @@ state nextState(scanerData*data, state curentState)
                 next=S_DOT2;
         break;
         case S_ID:
-            if(isLetter(sym)||isdigit(sym)||sym=='_')
+            if(isLetter(sym)||isDecimal(sym)||sym=='_')
                 next=S_ID;
             else 
             {   

@@ -58,73 +58,7 @@ STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id)
 	else
 		return symtableInsertData(&(*RootPtr)->rPtr, id);
 }
-/*
-void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr) 
-{
-	if((*RootPtr)->rPtr == NULL){
-		PtrReplaced->id = (*RootPtr)->id;
-		PtrReplaced->data = (*RootPtr)->data;
-		STSymbol *tmp = (*RootPtr);
-		(*RootPtr) = (*RootPtr)->lPtr;
-		free (tmp->data.funcData.paramTypes);
-		free (tmp->data.funcData.retTypes);
-		free (tmp->id);
-		free (tmp);
-		return;
-	}
 
-	ReplaceByRightmost(PtrReplaced, &(*RootPtr)->rPtr);
-}
-
-void symtableDelete (STSymbolPtr* RootPtr, char *id) 
-{
-	if((*RootPtr) == NULL)
-		return;
-
-	if(strcmp((*RootPtr)->id, id) > 0){
-		symtableDelete(&(*RootPtr)->lPtr, id);
-		return;
-	}
-
-	if(strcmp((*RootPtr)->id, id) < 0){
-		symtableDelete(&(*RootPtr)->rPtr, id);
-		return;
-	}
-
-
-	if(((*RootPtr)->lPtr == NULL) && ((*RootPtr)->rPtr == NULL)){
-		free ((*RootPtr)->data.funcData.paramTypes);
-		free ((*RootPtr)->data.funcData.retTypes);
-		free ((*RootPtr)->id);
-		free ((*RootPtr));
-		(*RootPtr) = NULL;
-		return;
-	}
-
-	STSymbol *tmp = (*RootPtr);
-
-	if((*RootPtr)->lPtr == NULL){
-		(*RootPtr) = (*RootPtr)->rPtr;
-		free (tmp->data.funcData.paramTypes);
-		free (tmp->data.funcData.retTypes);
-		free (tmp->id);
-		free (tmp);
-		return;
-	}
-
-	if((*RootPtr)->rPtr == NULL){
-		(*RootPtr) = (*RootPtr)->lPtr;
-		free (tmp->data.funcData.paramTypes);
-		free (tmp->data.funcData.retTypes);
-		free (tmp->id);
-		free (tmp);
-		return;
-	}
-
-	ReplaceByRightmost((*RootPtr), &(*RootPtr)->lPtr);
-	return;
-}
-*/
 void symtableDispose (STSymbolPtr* RootPtr) 
 {
 	if((*RootPtr) != NULL)
@@ -262,7 +196,7 @@ void frameInit(frame *f,bool wedge)
 	symtableInit(&f->bTree);
 }
 
-STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)
+STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)	
 {
 	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)

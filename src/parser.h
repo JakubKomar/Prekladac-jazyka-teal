@@ -12,7 +12,6 @@
 #include "symtable.h"
 #include "programData.h"
 #include "generator.h"
-#include <string.h>
 
 
 /**

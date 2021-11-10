@@ -7,13 +7,13 @@
 
 void parserMain(systemData * d)
 {
-    LLprolog(d);
+    LLprolog(d);    //"require "ifj21"
     genereteProgramHeader();
-    LLprog(d,NULL);
-    if(d->pData.actualToken.type!=T_EOF)
+    LLprog(d,NULL); //main body
+    if(d->pData.actualToken.type!=T_EOF)    //no input left
         LLerr();
-    frameStackPopFrame(&d->pData.dataModel);
-    if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))
+    frameStackPopFrame(&d->pData.dataModel);    //clean up
+    if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))  //searching for non defined functions
         errorD(3,"k některé uživatelské funci chybí definice");
 }
 
@@ -42,7 +42,7 @@ void LLprog(systemData * d,STFuncData *fData)
             break;  
             case T_FUNC_CALL:
                 LLfuncCall(d,0);
-                printf("CLEARS\n");
+                printf("CLEARS\n"); //cleaning of stack s
             break;
             case K_WHILE:
                 LLwhile(d,fData); 
@@ -68,7 +68,7 @@ void LLprog(systemData * d,STFuncData *fData)
     }
 }
 
-void LLfunction(systemData *d)
+void LLfunction(systemData *d)  //neterminal for definition of  function 
 {
     token t=next(d);
     if(t.type!=T_FUNC_CALL)
@@ -76,11 +76,11 @@ void LLfunction(systemData *d)
         
     bool checkOnly;
     char *key=stringCpyToChPtr(&d->sData.fullToken);
-    STSymbolPtr* node=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);
+    STSymbolPtr* node=frameStackInsertFunctionDefinition(&d->pData.dataModel,key,&checkOnly);   //try insert function to datamodel
     STData * data=&(*node)->data;
-    if(!checkOnly)
+    if(!checkOnly)  //function was declared - only checking params and ret params
         decorId(d,data);
-    changeRangeScope(d,true);
+    changeRangeScope(d,true);       //function body have its own range of vars
     genFuncHeader(data,(*node)->id);
     t=next(d);
     switch (t.type)
@@ -101,20 +101,20 @@ void LLfunction(systemData *d)
         LLerr();
     
     t=next(d);
-    if(t.type==T_COLON)   
+    if(t.type==T_COLON)     //control ret params if there is some
         LLreturnArg(d,checkOnly,0,data);
     else if(checkOnly&&data->funcData->retNum>0)
         errorD(3,"počty návratových parametů v deklaraci neodpovídají");
 
-    LLprog(d,data->funcData);
+    LLprog(d,data->funcData);   //main body of function
     if(d->pData.actualToken.type!=K_END)
         LLerr();
-    frameStackPopFrame(&d->pData.dataModel);
+    frameStackPopFrame(&d->pData.dataModel);        //pop frame from datamodel
     genFuncFoter(data,(*node)->id);
     t=next(d);
 }
 
-void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
+void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)    //neterminal for definition of ret args
 {
     token type=next(d);
     switch (type.type)
@@ -161,7 +161,7 @@ void LLreturnArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
         Fdata->funcData->retTypes[argNum]=type.type;
 }
 
-void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)
+void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)  //neterminal for arg of function
 {
     token id=d->pData.actualToken;
     if(id.type!=T_ID)
@@ -365,7 +365,7 @@ void LLreturnArgN(systemData *d,STFuncData *fData,int order)
     }
 }
 
-void LLdeclaration(systemData *d)
+void LLdeclaration(systemData *d)   //neterminal for declaration of funciton/var
 {
     token pozition=d->pData.actualToken;    //global/local
 
@@ -406,13 +406,14 @@ void LLdeclaration(systemData *d)
             {
                 printf("DEFVAR ");genVar(ptr->dekorator,name);printf("\n");
             }
+
             next(d);
             if(d->pData.actualToken.type==T_ASSIGEN)
             {
                 stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
                 STFuncData * Fdata=LLexp_or_func(d,1);
                 if(Fdata)
-                    assigenCompCheck(ptr->varData->type,Fdata->retTypes[0],true);
+                    assigenCompCheck(ptr->varData->type,Fdata->retTypes[0],true);               
                 printf("POPS ");genVar(ptr->dekorator,name);printf("\n");
                 ptr->varData->defined=true;
             }
@@ -420,6 +421,9 @@ void LLdeclaration(systemData *d)
             {
                 printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
             }
+
+
+            
         break;  
         case K_FUNCTION: 
             node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -474,7 +478,7 @@ void LLfuncDecParam(systemData *d,STData *Fdata,bool checkOnly)
     }
 }
 
-void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)
+void LLfuncDecNRet(systemData *d,STData *Fdata,int argNum,bool checkOnly)//neterminal for declaration retrun arg in fucntion
 {
     token Type=d->pData.actualToken;
     switch (Type.type)
@@ -561,21 +565,21 @@ void LLfuncDecNParam(systemData *d,STData *Fdata,int argNum,bool checkOnly)
         Fdata->funcData->paramTypes[argNum]=Type.type;
 }
 
-void LLwhile(systemData *d,STFuncData *fData)
+void LLwhile(systemData *d,STFuncData *fData)//neterminal for while
 {
     bool prevInWhile=d->pData.isInWhile;
-    if(!prevInWhile)
-        genWhileDecJump(d);
+    if(!prevInWhile)        //immersion in whiles
+        genWhileDecJump(d);     //jump to declaration of var in whole while body-its called only on start of while cykle
     d->pData.isInWhile=true;
     token t=next(d); 
-    unsigned long int decor=genWhileSlabel(d);
+    unsigned long int decor=genWhileSlabel(d);  //uniqe name for while cykle
     tokenType retT=expresionParse(d);
-    genWhileHeader(decor,retT);
+    genWhileHeader(decor,retT); 
     t=d->pData.actualToken;
     if(t.type!=K_DO)
         LLerr();
     t=next(d); 
-    changeRangeScope(d,false);
+    changeRangeScope(d,false);  //body of while cykle have its own scope of range
     LLprog(d,fData);
     frameStackPopFrame(&d->pData.dataModel);
     t=d->pData.actualToken;
@@ -590,14 +594,14 @@ void LLid(systemData *d)
     LLid_next(d,0);
 }
 
-STFuncData * LLid_next(systemData *d,int order)
+STFuncData * LLid_next(systemData *d,int order) 
 {
     STFuncData * fData;
     token t=d->pData.actualToken;
     if(t.type!=T_ID)
         LLerr();
     order++;
-    STSymbolPtr *ptr=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);
+    STSymbolPtr *ptr=frameStackSearchVar(&d->pData.dataModel,d->sData.fullToken.str);   
     if(ptr==NULL)
         errorD(3,"přiřazení do nedeklarované proměnné");
     STData *data=&(*ptr)->data;
