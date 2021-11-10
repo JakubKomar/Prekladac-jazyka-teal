@@ -195,7 +195,7 @@ void genEscapeSec(char * string,int *i)
 
 void genWrite()
 {
-    printf("POPS gf@&regA\nWRITE gf@&regA\n");
+    printf("CALL write\n");
 }
 
 void buildInFuction(){
@@ -343,7 +343,7 @@ RETURN\n\
 \n\
 LABEL end_substr_empty\n\
 DEFVAR TF@empty_str\n\
-MOVE TF@empty_str string@\\000\n\
+MOVE TF@empty_str string@\n\
 PUSHS TF@empty_str\n\
 POPFRAME\n\
 RETURN\n\
@@ -403,8 +403,7 @@ RETURN\n\
 LABEL end_ord_error_8\n\
 EXIT int@8\n\
 \n\
-");
-printf("\n\
+\n\
 \n\
 LABEL FCSTART$0$chr\n\
 \n\
@@ -607,6 +606,15 @@ PUSHS  gf@&regC\n\
 RETURN\n\
 LABEL sefeIntToFloatJ\n\
 PUSHS  gf@&regC\n\
+RETURN\n\
+\n\
+LABEL write\n\
+POPS gf@&regA\n\
+JUMPIFEQ writeNil gf@&regA nil@nil\n\
+write gf@&regA\n\
+RETURN\n\
+LABEL writeNil\n\
+write string@nil\n\
 RETURN\n\
 \n\
 LABEL main\n\

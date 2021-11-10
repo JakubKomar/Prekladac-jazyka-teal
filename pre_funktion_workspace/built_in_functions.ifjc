@@ -407,6 +407,15 @@ LABEL sefeIntToFloatJ
 PUSHS  gf@&regC
 RETURN
 
+LABEL write
+POPS gf@&regA
+JUMPIFEQ writeNil gf@&regA nil@nil
+write gf@&regA
+RETURN
+LABEL writeNil
+write string@nil
+RETURN
+
 LABEL main
 
 CREATEFRAME
