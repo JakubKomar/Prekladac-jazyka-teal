@@ -430,5 +430,5 @@ void loadChar(scanerData * data)
 
 void errorVisualization(scanerData * data)
 {
-    fprintf(stderr,"\nIn input: L:%d C:%d :\n%s \033[35m<-\033[31mERROR\033[0m is near by\n",data->line,data->colum,data->fullLine.str);
+    fprintf(stderr,"\nNa vstupu: L:%d C:%d :\n%s \033[35m<-\033[31mChyba\033[0m poblíž\n",data->line,data->colum,data->fullLine.str);
 }

@@ -33,7 +33,7 @@ STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id)
 	if((*RootPtr) == NULL)
 	{
 		if(!((*RootPtr) = malloc(sizeof(STSymbol))))
-			errorD(100,"btree maloc error\n");
+			errorD(100,"chyba binárního stromu - maloc error\n");
 
 		(*RootPtr)->id = id;
 		(*RootPtr)->lPtr = NULL;
@@ -49,7 +49,7 @@ STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id)
 	if(strcmp((*RootPtr)->id, id) == 0)
 	{
 		free(id);
-		errorD(3,"The symbol already exists in the symbol table.");
+		errorD(3,"Záznam již existuje v paměťovém modelu.");
 		return NULL;
 	}
 
@@ -124,7 +124,7 @@ void frameStackInit(frameStack * s)
 
 	s->localF=malloc(sizeof(frame)*s->capacity);
 	if(s->localF==NULL)
-		errorD(100,"frameStack malloc error");
+		errorD(100,"chyba zásobníku - malloc error");
 
 	frameInit(&s->globalF,true);
 	frameStackPushFrame(s,true);
@@ -149,7 +149,7 @@ void frameStackRealoc(frameStack * s)
 	s->capacity=s->capacity*2;
 	s->localF=realloc(s->localF,sizeof(frame)*s->capacity);
 	if(s->localF==NULL)
-		errorD(100,"frameStack realoc error");
+		errorD(100,"chyba zásobníku -  realoc error");
 }
 
 void frameStackDisporse(frameStack * s)
@@ -237,7 +237,7 @@ STSymbolPtr * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 	else if(f->last>=0)
 		return symtableInsertData(&f->localF[f->last].bTree,key);
 	else
-		errorD(99,"cant insert into noexisting frame\n");
+		errorD(99,"nelze vkládat do neexistujícího rámce");
 	return NULL;
 }
 
@@ -264,7 +264,7 @@ STSymbolPtr * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool i
 
 		ptr->funcData=malloc(sizeof(STFuncData));
 		if(!ptr->funcData)
-			errorD(100,"function sym table insert malloc error");
+			errorD(100,"chyba při vkládání do paměťového modelu - malloc error");
 
 		ptr->funcData->paramNum=0;
 		ptr->funcData->retNum=0;
@@ -301,7 +301,7 @@ void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int p
 
 	ptr->funcData=malloc(sizeof(STFuncData));
 	if(!ptr->funcData)
-		errorD(100,"function sym table insert malloc error");
+		errorD(100,"chyba při vkládání do paměťového modelu - malloc error");
 
 	ptr->funcData->paramNum=parN;
 	ptr->funcData->retNum=retN;
@@ -351,7 +351,7 @@ STSymbolPtr * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *c
 
 		ptr->funcData=malloc(sizeof(STFuncData));
 		if(!ptr->funcData)
-			errorD(100,"function sym table insert malloc error");
+			errorD(100,"chyba při vkládání do paměťového modelu - malloc error");
 
 		ptr->funcData->paramNum=0;
 		ptr->funcData->retNum=0;
@@ -383,7 +383,7 @@ STSymbolPtr * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenTyp
 	ptr->funcData=NULL;
 	ptr->varData=malloc(sizeof(STVarData));	
 	if(!ptr->varData)
-		errorD(100,"var sym table insert malloc error");
+		errorD(100,"chyba při vkládání proměnné do paměťového modelu - malloc error");
 	ptr->varData->type=Ttype;
 	ptr->varData->defined=false;
 	ptr->dekorator=0;

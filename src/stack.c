@@ -12,7 +12,7 @@ void stackInit(stack *s)
     s->last=0;
     s->array=malloc(sizeof(token)*STACK_BASE_SIZE);
     if(!s->array)
-        errorD(100,"Stack initialization error");
+        errorD(100,"Chybná alokace zásobníku");
 }
 
 void stackDestruct(stack *s)
@@ -25,7 +25,7 @@ void stackRealoc(stack *s)
     s->capacity=s->capacity*2;
     s->array=realloc(s->array,sizeof(token)* s->capacity);
     if(!s->array)
-        errorD(100,"Stack realoc error");
+        errorD(100,"Chyba realokace zásobníku");
 }
 
 void stackPush(stack *s, token token)
@@ -39,7 +39,7 @@ void stackPush(stack *s, token token)
 token stackPop(stack *s)
 {
     if(stackEmpty(s))
-        errorD(99,"Stack owerflow");
+        errorD(99,"Podtečení zásobníku");
     s->last--;
     return s->array[s->last];
 }
@@ -47,7 +47,7 @@ token stackPop(stack *s)
 token stackHead(stack *s)
 {
     if(stackEmpty(s))
-        errorD(99,"Stack is empty");
+        errorD(99,"Zásobník je prázdný");
     return s->array[s->last-1];
 }
 
@@ -62,7 +62,7 @@ void stackInsertHanle(stack *s)
         }
     }
     if(i>s->last-1)
-        errorD(99,"cant insert handle behind dolar");
+        errorD(99,"nelze vložit handle za dolar");
     stackShiftRight(s,i);
     s->array[i+1].type=O_HANDLE;
 }
@@ -105,7 +105,7 @@ token stackTop(stack *s)
 void stackRemoveHande(stack *s)
 {
     if(stackPop(s).type!=O_HANDLE)
-        errorD(99,"handle isnt on top of stack");
+        errorD(99,"hadnle není na vrcholu zásobníku");
 }
 
 void stackShiftRight(stack *s,int wege)

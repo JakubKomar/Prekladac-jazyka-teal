@@ -46,10 +46,10 @@ tokenType expresionParse(systemData *sData)
                 if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right bracket can end the fuction call-no lexical error
                     return stackHead(stack).typeOfValue;
                 else
-                    errorD(2,"syntax error in expresion");
+                    errorD(2,"syntaktická chyba ve výrazu");
                 break;
             default:
-                errorD(99,"precedence table error");
+                errorD(99,"chyba precedenční tabulky");
                 break;
         }
     }
@@ -138,15 +138,15 @@ void reduction(stack *s)
         case T_RBR:
             aux=stackPop(s);
             if(aux.type!=NE_EXP)
-                errorD(2,"expresion in bracked err");
+                errorD(2,"špatná posloupnost závorek ve výrazu");
             if(stackPop(s).type!=T_LBR)
-                errorD(2,"expresion in bracked err");
+                errorD(2,"špatná posloupnost závorek ve výrazu");
             stackRemoveHande(s);
             stackPush(s,(token){NE_EXP,aux.typeOfValue});    
             return;
         break;
         default:
-            errorD(2,"sa reduction err");
+            errorD(2,"chyba při redukci ve výrazu");
     }
 
     aux=stackPop(s);
@@ -162,7 +162,7 @@ void reduction(stack *s)
             if(isOperator(aux.type))
                 op=aux;
             else
-                errorD(2,"sa reduction err");
+                errorD(2,"chyba při redukci ve výrazu");
     }
 
     if(stackHead(s).type==O_HANDLE)
@@ -177,7 +177,7 @@ void reduction(stack *s)
             stackPush(s,(token){NE_EXP,id2.typeOfValue});
         }
         else
-            errorD(2,"sa reduction err");
+            errorD(2,"chyba při redukci ve výrazu");
         return;
     }
     
@@ -191,7 +191,7 @@ void reduction(stack *s)
             return;
         break;
         default:
-            errorD(2,"sa reduction err");
+            errorD(2,"chyba při redukci ve výrazu");
     }
 }
 

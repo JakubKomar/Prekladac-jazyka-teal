@@ -19,7 +19,7 @@ void errorD(int code,char * description)
     if(code)
     {
         printError(code);
-        fprintf(stderr,"\033[36mMore detailes: %s\033[0m\n",description);
+        fprintf(stderr,"\033[36mDetaily: %s\033[0m\n",description);
         longjmp(errorHandelingJump, code);
     } 
 }
@@ -63,8 +63,8 @@ void printError(int code)
             text="interní chyba překladače-chyba maloc/realoc.";
         break;
         default:
-            text="Unknown error";
+            text="Neznámá chyba";
     }
-    fprintf(stderr,"\033[31mError:\033[0m %s\n",text);
+    fprintf(stderr,"\033[31mChyba:\033[0m %s\n",text);
 }
 

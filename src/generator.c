@@ -134,7 +134,7 @@ void genJumpExpresion(tokenType expT)
         printf("nil@nil\n");
         break;
     default:
-        errorD(99,"if/while intern error");
+        errorD(99,"if/while interní chyba");
         break;
     }
 }
