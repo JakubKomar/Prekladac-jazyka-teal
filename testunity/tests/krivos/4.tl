@@ -3,7 +3,7 @@ require "ifj21"
 
 function foo() : string
     local str : string = reads()
-    return 
+    return str
 end
 
 global str1 : string = foo()

@@ -7,6 +7,8 @@ function foo(i: integer) : integer
             i = i - 1
             write(i)
         end
+        i = i - 1
     end
+    write(i)
 end
 foo(10)
