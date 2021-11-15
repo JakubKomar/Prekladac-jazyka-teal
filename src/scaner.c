@@ -13,8 +13,7 @@ token getNextUsefullToken(scanerData * data)
        tType=getNextToken(data);
     } while (tType==O_UNIMPORTANT||tType==O_ERR);
     
-    token next={tType};
-    
+    token next={tType};  
     return next;
 }
 
@@ -66,8 +65,6 @@ tokenType checkKeywords(scanerData *data,tokenType type)
         token=K_LOCAL;
     else if(!strcmp(s,"nil"))
         token=K_NIL;
-    else if(!strcmp(s,"read"))
-        token=K_READ;
     else if(!strcmp(s,"require"))
         token=K_REQUIRE;
     else if(!strcmp(s,"return"))
@@ -87,8 +84,17 @@ tokenType checkKeywords(scanerData *data,tokenType type)
 
     if(type==T_FUNC_CALL&&token!=T_ID)
     {
-        errorD(3,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
-        return O_ERR;
+        if(token==K_IF||token==K_WHILE||token==K_RETURN)
+        {
+            ungetc(data->curentSymbol,stdin);
+            data->curentSymbol='(';
+            return token;
+        }
+        else
+        {
+            errorD(3,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
+            return O_ERR;
+        }
     }
     else if(type==T_FUNC_CALL&&token==T_ID)
         return T_FUNC_CALL;

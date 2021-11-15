@@ -445,8 +445,8 @@ LABEL hashtag\n\
 \n\
 PUSHFRAME\n\
 CREATEFRAME\n\
-\n\
-DEFVAR TF@str\n\
+\n");
+printf("DEFVAR TF@str\n\
 POPS TF@str\n\
 JUMPIFEQ end_substr_error_8 TF@str nil@nil\n\
 DEFVAR TF@len\n\
