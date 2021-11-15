@@ -9,4 +9,4 @@ end
 global str1 : string = foo()
 global str2 : string = "world\n"
 
-write(st1, str2)
+write(str1, str2)

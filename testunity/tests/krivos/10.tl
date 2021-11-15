@@ -3,6 +3,6 @@ require "ifj21"
 
 global i : integer = 10
 global j : integer = 50
-global k : number = i + j / j - 1
 
-write(k, "\n")
+global k : number = ( i + j / j - 1)
+write(i, "\n")
