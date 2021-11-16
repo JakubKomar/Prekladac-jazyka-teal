@@ -311,41 +311,29 @@ RETURN
 # OUR FUNCTIONS
 
 LABEL safediv
-# function safediv (i: integer, j: integer) : integer
-# function safediv (i: number, j: number) : number
 
 PUSHFRAME
 CREATEFRAME
 
-DEFVAR TF@i
-DEFVAR TF@j
-
-MOVE TF@j gf@&regB
-JUMPIFEQ end_substr_error_8 TF@j nil@nil
-MOVE TF@i gf@&regA
-JUMPIFEQ end_substr_error_8 TF@i nil@nil
-
-DEFVAR TF@result
-
 DEFVAR TF@type
-TYPE TF@type TF@i
+TYPE TF@type gf@&regA
 JUMPIFEQ safediv_int TF@type string@int
 JUMPIFEQ safediv_number TF@type string@float
 
 # integer div
 LABEL safediv_int
-JUMPIFEQ safediv_div_zero TF@j int@0
-IDIV TF@result TF@i TF@j
-PUSHS TF@result
+JUMPIFEQ safediv_div_zero gf@&regB int@0
+IDIV gf@&regC gf@&regA gf@&regB
+PUSHS gf@&regC
 
 POPFRAME 
 RETURN
 
 # number div
 LABEL safediv_number
-JUMPIFEQ safediv_div_zero TF@j float@0x0p+0
-DIV TF@result TF@i TF@j
-PUSHS TF@result
+JUMPIFEQ safediv_div_zero gf@&regB float@0x0p+0
+DIV gf@&regC gf@&regA gf@&regB
+PUSHS gf@&regC
 
 POPFRAME 
 RETURN
@@ -550,35 +538,19 @@ CREATEFRAME
 
 # safediv TEST INT
 WRITE string@SAFEDIV\032INT\032TEST:\010
-DEFVAR TF@int1
-READ TF@int1 int
-DEFVAR TF@int2
-READ TF@int2 int
-PUSHS TF@int2
-PUSHS TF@int1
+READ gf@&regA int
+READ gf@&regB int
 CALL safediv
-DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
+WRITE gf@&regC
 WRITE string@\010\010
 CREATEFRAME
 
 # safediv TEST NUMBER
 WRITE string@SAFEDIV\032FLOAT\032TEST:\010
-DEFVAR TF@float1
-READ TF@float1 float
-DEFVAR TF@float2
-READ TF@float2 float
-PUSHS TF@float2
-PUSHS TF@float1
+READ gf@&regA float
+READ gf@&regB float
 CALL safediv
-DEFVAR TF@test
-POPS TF@test
-WRITE TF@test
-WRITE string@\010
-DEFVAR TF@testtoint
-FLOAT2INT TF@testtoint TF@test
-WRITE TF@testtoint
+WRITE gf@&regC
 WRITE string@\010\010
 CREATEFRAME
 

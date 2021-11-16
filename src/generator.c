@@ -445,8 +445,8 @@ LABEL hashtag\n\
 \n\
 PUSHFRAME\n\
 CREATEFRAME\n\
-\n");
-printf("DEFVAR TF@str\n\
+\n\
+DEFVAR TF@str\n\
 POPS TF@str\n\
 JUMPIFEQ end_substr_error_8 TF@str nil@nil\n\
 DEFVAR TF@len\n\
@@ -512,41 +512,29 @@ RETURN\n\
 # OUR FUNCTIONS\n\
 \n\
 LABEL safediv\n\
-# function safediv (i: integer, j: integer) : integer\n\
-# function safediv (i: number, j: number) : number\n\
 \n\
 PUSHFRAME\n\
 CREATEFRAME\n\
 \n\
-DEFVAR TF@i\n\
-DEFVAR TF@j\n\
-\n\
-MOVE TF@j gf@&regB\n\
-JUMPIFEQ end_substr_error_8 TF@j nil@nil\n\
-MOVE TF@i gf@&regA\n\
-JUMPIFEQ end_substr_error_8 TF@i nil@nil\n\
-\n\
-DEFVAR TF@result\n\
-\n\
 DEFVAR TF@type\n\
-TYPE TF@type TF@i\n\
+TYPE TF@type gf@&regA\n\
 JUMPIFEQ safediv_int TF@type string@int\n\
 JUMPIFEQ safediv_number TF@type string@float\n\
 \n\
 # integer div\n\
 LABEL safediv_int\n\
-JUMPIFEQ safediv_div_zero TF@j int@0\n\
-IDIV TF@result TF@i TF@j\n\
-PUSHS TF@result\n\
+JUMPIFEQ safediv_div_zero gf@&regB int@0\n\
+IDIV gf@&regC gf@&regA gf@&regB\n\
+PUSHS gf@&regC\n\
 \n\
 POPFRAME \n\
 RETURN\n\
 \n\
 # number div\n\
 LABEL safediv_number\n\
-JUMPIFEQ safediv_div_zero TF@j float@0x0p+0\n\
-DIV TF@result TF@i TF@j\n\
-PUSHS TF@result\n\
+JUMPIFEQ safediv_div_zero gf@&regB float@0x0p+0\n\
+DIV gf@&regC gf@&regA gf@&regB\n\
+PUSHS gf@&regC\n\
 \n\
 POPFRAME \n\
 RETURN\n\

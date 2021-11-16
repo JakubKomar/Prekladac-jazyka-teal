@@ -311,41 +311,29 @@ RETURN
 # OUR FUNCTIONS
 
 LABEL safediv
-# function safediv (i: integer, j: integer) : integer
-# function safediv (i: number, j: number) : number
 
 PUSHFRAME
 CREATEFRAME
 
-DEFVAR TF@i
-DEFVAR TF@j
-
-MOVE TF@j gf@&regB
-JUMPIFEQ end_substr_error_8 TF@j nil@nil
-MOVE TF@i gf@&regA
-JUMPIFEQ end_substr_error_8 TF@i nil@nil
-
-DEFVAR TF@result
-
 DEFVAR TF@type
-TYPE TF@type TF@i
+TYPE TF@type gf@&regA
 JUMPIFEQ safediv_int TF@type string@int
 JUMPIFEQ safediv_number TF@type string@float
 
 # integer div
 LABEL safediv_int
-JUMPIFEQ safediv_div_zero TF@j int@0
-IDIV TF@result TF@i TF@j
-PUSHS TF@result
+JUMPIFEQ safediv_div_zero gf@&regB int@0
+IDIV gf@&regC gf@&regA gf@&regB
+PUSHS gf@&regC
 
 POPFRAME 
 RETURN
 
 # number div
 LABEL safediv_number
-JUMPIFEQ safediv_div_zero TF@j float@0x0p+0
-DIV TF@result TF@i TF@j
-PUSHS TF@result
+JUMPIFEQ safediv_div_zero gf@&regB float@0x0p+0
+DIV gf@&regC gf@&regA gf@&regB
+PUSHS gf@&regC
 
 POPFRAME 
 RETURN
