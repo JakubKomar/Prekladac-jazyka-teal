@@ -266,7 +266,7 @@ tokenType generateExpresion(token id1, token op ,token id2) //generating aritmet
         break;
         case T_DIV:
             type=aritmeticComCheck(id1,id2,true);
-            genInst("CALL safediv");
+            genInst("CALL safediv_num");
         break;
         case T_DIV2:
             aritmeticComCheck(id1,id2,false);
@@ -275,7 +275,7 @@ tokenType generateExpresion(token id1, token op ,token id2) //generating aritmet
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
                 errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
             type=K_INTEGER;
-            genInst("CALL safediv");
+            genInst("CALL safediv_int");
         break;
         case T_ADD:
             type=aritmeticComCheck(id1,id2,false);
