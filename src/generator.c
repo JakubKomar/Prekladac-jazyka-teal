@@ -511,35 +511,38 @@ RETURN\n\
 \n\
 # OUR FUNCTIONS\n\
 \n\
-LABEL safediv\n\
+LABEL safediv_int\n\
 \n\
 PUSHFRAME\n\
 CREATEFRAME\n\
 \n\
-DEFVAR TF@type\n\
-TYPE TF@type gf@&regA\n\
-JUMPIFEQ safediv_int TF@type string@int\n\
-JUMPIFEQ safediv_number TF@type string@float\n\
-\n\
 # integer div\n\
-LABEL safediv_int\n\
-JUMPIFEQ safediv_div_zero gf@&regB int@0\n\
+JUMPIFEQ safediv_int_div_zero gf@&regB int@0\n\
 IDIV gf@&regC gf@&regA gf@&regB\n\
 PUSHS gf@&regC\n\
 \n\
 POPFRAME \n\
 RETURN\n\
 \n\
+LABEL safediv_int_div_zero\n\
+EXIT int@9\n\
+\n\
+\n\
+\n\
+LABEL safediv_num\n\
+\n\
+PUSHFRAME\n\
+CREATEFRAME\n\
+\n\
 # number div\n\
-LABEL safediv_number\n\
-JUMPIFEQ safediv_div_zero gf@&regB float@0x0p+0\n\
+JUMPIFEQ safediv_num_div_zero gf@&regB float@0x0p+0\n\
 DIV gf@&regC gf@&regA gf@&regB\n\
 PUSHS gf@&regC\n\
 \n\
 POPFRAME \n\
 RETURN\n\
 \n\
-LABEL safediv_div_zero\n\
+LABEL safediv_num_div_zero\n\
 EXIT int@9\n\
 \n\
 \n\
