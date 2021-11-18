@@ -421,9 +421,7 @@ void LLdeclaration(systemData *d)   //neterminal for declaration of funciton/var
             {
                 printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
             }
-
-
-            
+   
         break;  
         case K_FUNCTION: 
             node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -749,8 +747,9 @@ STFuncData* LLfuncCall(systemData *d,int numOfAsigens)
     }
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();
+    
     if(!(data->funcData->paramNum<0))
-        printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
+        fprintf(stdin,"CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
     next(d);
     
     return data->funcData;
