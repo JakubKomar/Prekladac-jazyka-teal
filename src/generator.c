@@ -2,6 +2,7 @@
  * @brief   Code generator
  *
  * @authors Jakub Komárek (xkomar33)
+ * @authors Jakub Křivánek (xkriva30)
  */
 #include "generator.h"
 
@@ -20,13 +21,13 @@ void genVar(unsigned long int decor,char * id)
     if(decor==0)
         printf("gf@%s",id);
     else
-        printf("tf@%s$%ld",id,decor);
+        printf("tf@%s$%lu",id,decor);
 }
 
 void genFuncHeader(STData * data,char * id)
 {
-    printf("JUMP FCEND$%ld$%s\n",data->dekorator,id);
-    printf("LABEL FCSTART$%ld$%s\n",data->dekorator,id);
+    printf("JUMP FCEND$%lu$%s\n",data->dekorator,id);
+    printf("LABEL FCSTART$%lu$%s\n",data->dekorator,id);
     printf("PUSHFRAME\n");
     printf("CREATEFRAME\n");
 }
@@ -37,7 +38,7 @@ void genFuncFoter(STData * data,char * id)
         printf("PUSHS nil@nil\n");
     printf("POPFRAME\n");
     printf("RETURN\n");
-    printf("LABEL FCEND$%ld$%s\n",data->dekorator,id);
+    printf("LABEL FCEND$%lu$%s\n",data->dekorator,id);
 }
 
 void genReturn()
@@ -49,8 +50,8 @@ void genReturn()
 unsigned long int genIfHeader(systemData *d,tokenType expT)
 {
     printf("POPS gf@&JUMPVAR\n");
-    printf("JUMPIFEQ IFEND$%ld gf@&JUMPVAR nil@nil\n",d->dekoratorIds);
-    printf("JUMPIFEQ IFEND$%ld gf@&JUMPVAR ",d->dekoratorIds);genJumpExpresion(expT);printf("\n");
+    printf("JUMPIFEQ IFEND$%lu gf@&JUMPVAR nil@nil\n",d->dekoratorIds);
+    printf("JUMPIFEQ IFEND$%lu gf@&JUMPVAR ",d->dekoratorIds);genJumpExpresion(expT);printf("\n");
 
     d->dekoratorIds++;
     return d->dekoratorIds-1;
@@ -58,28 +59,28 @@ unsigned long int genIfHeader(systemData *d,tokenType expT)
 
 void genIfFoter(unsigned long int decor)
 {
-    printf("LABEL IFEND$%ld\n",decor);
+    printf("LABEL IFEND$%lu\n",decor);
 }
 
 void genElseHeader(unsigned long int decor)
 {
-    printf("JUMP ELSEEND$%ld\n",decor);
-    printf("LABEL IFEND$%ld\n",decor);
+    printf("JUMP ELSEEND$%lu\n",decor);
+    printf("LABEL IFEND$%lu\n",decor);
 }
 
 void genElseFoter(unsigned long int decor)
 {
-    printf("LABEL ELSEEND$%ld\n",decor);
+    printf("LABEL ELSEEND$%lu\n",decor);
 }
 
 void genWhileDecJump(systemData *d)
 {
-    printf("CALL WHILEDEC$%ld\n",d->dekoratorIds);
+    printf("CALL WHILEDEC$%lu\n",d->dekoratorIds);
 }
 
 unsigned long int genWhileSlabel(systemData *d)
 {
-    printf("LABEL WHILESTART$%ld\n",d->dekoratorIds);
+    printf("LABEL WHILESTART$%lu\n",d->dekoratorIds);
     d->dekoratorIds++;
     return d->dekoratorIds-1;
 }
@@ -87,21 +88,21 @@ unsigned long int genWhileSlabel(systemData *d)
 void genWhileHeader(unsigned long int decor,tokenType expT)
 {
     printf("POPS gf@&JUMPVAR\n");
-    printf("JUMPIFEQ WHILEEND$%ld gf@&JUMPVAR nil@nil\n",decor);
-    printf("JUMPIFEQ WHILEEND$%ld gf@&JUMPVAR ",decor);genJumpExpresion(expT);printf("\n");
+    printf("JUMPIFEQ WHILEEND$%lu gf@&JUMPVAR nil@nil\n",decor);
+    printf("JUMPIFEQ WHILEEND$%lu gf@&JUMPVAR ",decor);genJumpExpresion(expT);printf("\n");
 }
 
 void genWhileFoter(systemData *d,unsigned long int decor,bool prevInWhile)
 {
-    printf("JUMP WHILESTART$%ld\n",decor);
+    printf("JUMP WHILESTART$%lu\n",decor);
     if(!prevInWhile)
         genWhileDecFLUSH(d,decor);
-    printf("LABEL WHILEEND$%ld\n",decor);
+    printf("LABEL WHILEEND$%lu\n",decor);
 }
 
 void genWhileDecFLUSH(systemData *d,unsigned long int decor)
 {
-    printf("LABEL WHILEDEC$%ld\n",decor);
+    printf("LABEL WHILEDEC$%lu\n",decor);
 
     while (!stackEmpty(&d->pData.varDeclarationBuffer))
     {

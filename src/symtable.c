@@ -344,7 +344,7 @@ STSymbolPtr * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *c
 	{}
 	else
 	{
-		node =frameStackInsert(f,key,false);
+		node =frameStackInsert(f,key,true);
 		ptr=&(*node)->data;
 		ptr->type=ST_FUNC;
 		ptr->varData=NULL;

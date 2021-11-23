@@ -373,25 +373,35 @@ void LLdeclaration(systemData *d)   //neterminal for declaration of funciton/var
     token id=next(d); 
     if(id.type!=T_ID)   
         LLerr();
-    char *name=stringCpyToChPtr(&d->sData.fullToken);
+    char *name=stringCpyToChPtr(&d->sData.fullToken);   //copy of identificator for later use
 
     token type=next(d);     
-    if(type.type!=T_COLON)
+    if(type.type!=T_COLON)  
         LLerr();
     
     STData *ptr;
-    STSymbolPtr *node;
-    type=next(d);   //type of declaration 
-    bool checkOnly;
-    switch (d->pData.actualToken.type)
+    STSymbolPtr *node;  
+    tokenType valType=next(d).type;   //type of declaration 
+    bool checkOnly; //for funcion part - definition of function was before declaration ->only checking args/ret args
+    bool asigen;    //if after declaration  is assigen
+    switch (valType)
     {
         case K_NUMBER: 
         case K_INTEGER: 
         case K_STRING: 
         case K_NIL:
-            node =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,d->pData.actualToken.type);
+            asigen=(next(d).type==T_ASSIGEN);
+            STFuncData * Fdata;
+            if(asigen)
+            {
+                stackPush(&d->pData.expresionBuffer,(token){valType});
+                Fdata=LLexp_or_func(d,1);
+            } 
+
+
+            node =frameStackInsertVar(&d->pData.dataModel,name,pozition.type==K_GLOBAL,valType);    //insert var to data model
             ptr=&(*node)->data;
-            if(pozition.type!=K_GLOBAL)
+            if(pozition.type!=K_GLOBAL) //if is global ->must be decorated
                 decorId(d,ptr);
 
             if(pozition.type==K_GLOBAL)
@@ -402,9 +412,9 @@ void LLdeclaration(systemData *d)   //neterminal for declaration of funciton/var
                 new->decor=0;
                 if(!(new->id=strdup((*node)->id)))
                     error(100);
-                stackPush(&d->pData.GlobalVarDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});
+                stackPush(&d->pData.GlobalVarDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});   //global vars must be declared only once
             }
-            else if(d->pData.isInWhile)
+            else if(d->pData.isInWhile)//vars in cykle must be daclared only on star of while
             {
                 varId * new=malloc(sizeof(varId));
                 if(!new)
@@ -419,23 +429,18 @@ void LLdeclaration(systemData *d)   //neterminal for declaration of funciton/var
                 printf("DEFVAR ");genVar(ptr->dekorator,name);printf("\n");
             }
 
-            next(d);
-            if(d->pData.actualToken.type==T_ASSIGEN)
+
+            if(asigen)  
             {
-                stackPush(&d->pData.expresionBuffer,(token){ptr->varData->type});
-                STFuncData * Fdata=LLexp_or_func(d,1);
                 if(Fdata)
-                    assigenCompCheck(ptr->varData->type,Fdata->retTypes[0],true);               
+                    assigenCompCheck(valType,Fdata->retTypes[0],true);               
                 printf("POPS ");genVar(ptr->dekorator,name);printf("\n");
                 ptr->varData->defined=true;
             }
-            else
+            else  //implicid declaration on nil  
             {
                 printf("MOVE ");genVar(ptr->dekorator,name);genInst(" nil@nil");
-            }
-
-
-            
+            }            
         break;  
         case K_FUNCTION: 
             node =frameStackInsertFunctionDeclaration(&d->pData.dataModel,name,pozition.type==K_GLOBAL,&checkOnly);
@@ -760,11 +765,12 @@ STFuncData* LLfuncCall(systemData *d,int numOfAsigens)
         break;
     }
     if(d->pData.actualToken.type!=T_RBR)
-        LLerr();
+        LLerr();    
     if(!(data->funcData->paramNum<0))
-        printf("CALL FCSTART$%ld$%s\n",data->dekorator,(*node)->id);
+    { 
+        printf("CALL FCSTART$%lu$%s\n",data->dekorator,(*node)->id);
+    }
     next(d);
-    
     return data->funcData;
 }
 
