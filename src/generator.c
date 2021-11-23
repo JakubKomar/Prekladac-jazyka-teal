@@ -114,6 +114,20 @@ void genWhileDecFLUSH(systemData *d,unsigned long int decor)
     d->pData.isInWhile=false;
 }
 
+void genGlobalDecFLUSH(systemData *d)
+{
+    printf("EXIT int@0\nLABEL GLOBALDEC\n");
+
+    while (!stackEmpty(&d->pData.GlobalVarDeclarationBuffer))
+    {
+        token aux=stackPop(&d->pData.GlobalVarDeclarationBuffer);
+        printf("DEFVAR ");genVar(0,aux.id->id);printf("\n");
+        free(aux.id->id);
+        free(aux.id);
+    }
+    printf("RETURN\n");
+}
+
 void genJumpExpresion(tokenType expT)
 {
     switch (expT)
@@ -609,7 +623,7 @@ write string@nil\n\
 RETURN\n\
 \n\
 LABEL main\n\
-\n\
+CALL GLOBALDEC\n\
 CREATEFRAME\n\
 DEFVAR gf@&JUMPVAR\n\
 DEFVAR gf@&NULL\n\

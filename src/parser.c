@@ -15,6 +15,7 @@ void parserMain(systemData * d)
     frameStackPopFrame(&d->pData.dataModel);    //clean up
     if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))  //searching for non defined functions
         errorD(3,"k některé uživatelské funci chybí definice");
+    genGlobalDecFLUSH(d);
 }
 
 void LLprolog(systemData * d)
@@ -392,7 +393,18 @@ void LLdeclaration(systemData *d)   //neterminal for declaration of funciton/var
             ptr=&(*node)->data;
             if(pozition.type!=K_GLOBAL)
                 decorId(d,ptr);
-            if(d->pData.isInWhile)
+
+            if(pozition.type==K_GLOBAL)
+            {
+                varId * new=malloc(sizeof(varId));
+                if(!new)
+                    error(100);
+                new->decor=0;
+                if(!(new->id=strdup((*node)->id)))
+                    error(100);
+                stackPush(&d->pData.GlobalVarDeclarationBuffer,(token){O_UNIMPORTANT,O_UNIMPORTANT,new});
+            }
+            else if(d->pData.isInWhile)
             {
                 varId * new=malloc(sizeof(varId));
                 if(!new)
@@ -812,6 +824,7 @@ void initParserData(parserData * data)
     frameStack_initPreFunctions(&data->dataModel);
     stackInit(&data->expresionBuffer);
     stackInit(&data->varDeclarationBuffer);
+    stackInit(&data->GlobalVarDeclarationBuffer);
     data->isInWhile=false;
 }
 
@@ -820,6 +833,7 @@ void destructParserData(parserData * data)
     frameStackDisporse(&data->dataModel);
     stackDestruct(&data->expresionBuffer);
     stackDestruct(&data->varDeclarationBuffer);
+    stackDestruct(&data->GlobalVarDeclarationBuffer);
 }
 
 void systemDataInit(systemData * data)

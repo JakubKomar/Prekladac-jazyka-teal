@@ -1,0 +1,452 @@
+.IFJcode21
+#
+# @brief Built in functions and operators
+#
+# @authors Jakub Křivánek (xkriva30)
+#
+JUMP main
+
+# BUILT IN FUNCTIONS
+
+LABEL FCSTART$0$reads
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@string
+READ TF@string string
+
+PUSHS TF@string
+POPFRAME
+RETURN
+
+
+
+LABEL FCSTART$0$readi
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@string
+READ TF@string int
+
+PUSHS TF@string
+POPFRAME
+RETURN
+
+
+
+LABEL FCSTART$0$readn
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@string
+READ TF@string float
+
+PUSHS TF@string
+POPFRAME
+RETURN
+
+
+LABEL FCSTART$0$tointeger
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@f
+POPS TF@f
+
+JUMPIFEQ end_tointeger_nil TF@f nil@nil
+
+DEFVAR TF@i
+FLOAT2INT TF@i TF@f
+PUSHS TF@i
+POPFRAME
+RETURN
+
+LABEL end_tointeger_nil
+PUSHS nil@nil
+POPFRAME
+RETURN
+
+
+
+LABEL FCSTART$0$substr
+# uses hastag operator
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@s
+DEFVAR TF@i
+DEFVAR TF@j
+
+
+POPS TF@j
+POPS TF@i
+POPS TF@s
+
+# checks if any parameter is nil
+DEFVAR TF@nil_check
+EQ TF@nil_check TF@s nil@nil
+JUMPIFEQ end_substr_error_8 TF@nil_check bool@true
+EQ TF@nil_check TF@i nil@nil
+JUMPIFEQ end_substr_error_8 TF@nil_check bool@true
+EQ TF@nil_check TF@j nil@nil
+JUMPIFEQ end_substr_error_8 TF@nil_check bool@true
+
+# checks if j < i
+DEFVAR TF@jlti
+LT TF@jlti TF@j TF@i
+JUMPIFEQ end_substr_empty TF@jlti bool@true
+
+# check if i and j arent out of bounds 1 to #s
+DEFVAR TF@out_of_bounds
+DEFVAR TF@len
+PUSHS TF@s
+CALL hashtag
+POPS TF@len
+JUMPIFEQ end_substr_error_8 TF@len nil@nil
+LT TF@out_of_bounds TF@i int@1
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+LT TF@out_of_bounds TF@j int@1
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@i TF@len
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@j TF@len
+JUMPIFEQ end_substr_empty TF@out_of_bounds bool@true
+
+# sub i,j to be have the index from 0
+SUB TF@i TF@i int@1
+
+DEFVAR TF@ret
+MOVE TF@ret string@
+DEFVAR TF@aux
+
+DEFVAR TF@jumpvar
+MOVE TF@jumpvar TF@i
+
+    label cykleStart
+    LT TF@jumpvar TF@i TF@j
+    JUMPIFEQ cykleEnd TF@jumpvar bool@false
+    GETCHAR TF@aux TF@s TF@i
+    CONCAT TF@ret TF@ret TF@aux
+    ADD TF@i TF@i int@1
+    JUMP cykleStart
+    label cykleEnd
+
+PUSHS TF@ret
+POPFRAME
+RETURN
+
+LABEL end_substr_empty
+DEFVAR TF@empty_str
+MOVE TF@empty_str string@
+PUSHS TF@empty_str
+POPFRAME
+RETURN
+
+LABEL end_substr_error_8
+EXIT int@8
+
+
+LABEL FCSTART$0$ord
+# uses hashtag operator and substr
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@s
+DEFVAR TF@i
+
+POPS TF@i
+POPS TF@s
+
+# checks if any parameter is nil
+DEFVAR TF@nil_check
+EQ TF@nil_check TF@s nil@nil
+JUMPIFEQ end_ord_error_8 TF@nil_check bool@true
+EQ TF@nil_check TF@i nil@nil
+JUMPIFEQ end_ord_error_8 TF@nil_check bool@true
+
+# check if i isnt out of bounds 1 to #s
+DEFVAR TF@out_of_bounds
+DEFVAR TF@len
+PUSHS TF@s
+CALL hashtag
+POPS TF@len
+LT TF@out_of_bounds TF@i int@1
+JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@i TF@len
+JUMPIFEQ end_ord_nil TF@out_of_bounds bool@true
+
+PUSHS TF@s
+PUSHS TF@i
+PUSHS TF@i
+CALL FCSTART$0$substr
+POPS TF@s
+
+DEFVAR TF@ord
+STRI2INT TF@ord TF@s int@0
+PUSHS TF@ord
+POPFRAME
+RETURN
+
+
+LABEL end_ord_nil
+PUSHS nil@nil
+POPFRAME
+RETURN
+
+LABEL end_ord_error_8
+EXIT int@8
+
+
+
+LABEL FCSTART$0$chr
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@i
+POPS TF@i
+
+# checks if i isnt nil
+JUMPIFEQ end_chr_error_8 TF@i nil@nil
+DEFVAR TF@out_of_bounds
+
+# checks if i isnt out of bounds
+LT TF@out_of_bounds TF@i int@0
+JUMPIFEQ end_chr_nil TF@out_of_bounds bool@true
+GT TF@out_of_bounds TF@i int@255
+JUMPIFEQ end_chr_nil TF@out_of_bounds bool@true
+
+DEFVAR TF@c
+INT2CHAR TF@c TF@i
+PUSHS TF@c
+POPFRAME
+RETURN
+
+LABEL end_chr_nil
+PUSHS nil@nil
+POPFRAME
+RETURN
+
+LABEL end_chr_error_8
+EXIT int@8
+
+
+
+# OPERATORS
+
+LABEL hashtag
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@str
+POPS TF@str
+JUMPIFEQ end_substr_error_8 TF@str nil@nil
+DEFVAR TF@len
+STRLEN TF@len TF@str
+DEFVAR TF@escaped_len
+MOVE TF@escaped_len TF@len
+
+DEFVAR TF@last_escaped
+MOVE TF@last_escaped bool@false
+
+DEFVAR TF@i
+MOVE TF@i int@0
+DEFVAR TF@c
+
+# loops throught the string and subs lenght for every escape sequence
+LABEL hashtag_loop
+JUMPIFEQ end_hashtag TF@i TF@len
+
+GETCHAR TF@c TF@str TF@i
+ADD TF@i TF@i int@1
+
+JUMPIFEQ hastag_not_escaped TF@last_escaped bool@false
+MOVE TF@last_escaped bool@false
+JUMP hashtag_loop
+
+LABEL hastag_not_escaped
+JUMPIFNEQ hashtag_loop TF@c string@\092
+SUB TF@escaped_len TF@escaped_len int@1
+MOVE TF@last_escaped bool@true
+JUMP hashtag_loop
+
+
+LABEL end_hashtag
+
+PUSHS TF@escaped_len
+POPFRAME
+RETURN
+
+
+
+LABEL concatenation
+
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@str1
+DEFVAR TF@str2
+
+POPS TF@str2
+JUMPIFEQ end_substr_error_8 TF@str2 nil@nil
+POPS TF@str1
+JUMPIFEQ end_substr_error_8 TF@str1 nil@nil
+DEFVAR TF@con
+
+CONCAT TF@con TF@str1 TF@str2
+PUSHS TF@con
+
+POPFRAME
+RETURN
+
+
+
+# OUR FUNCTIONS
+
+LABEL safediv_int
+
+PUSHFRAME
+CREATEFRAME
+
+# integer div
+JUMPIFEQ safediv_int_div_zero gf@&regB int@0
+IDIV gf@&regC gf@&regA gf@&regB
+PUSHS gf@&regC
+
+POPFRAME 
+RETURN
+
+LABEL safediv_int_div_zero
+EXIT int@9
+
+
+
+LABEL safediv_num
+
+PUSHFRAME
+CREATEFRAME
+
+# number div
+JUMPIFEQ safediv_num_div_zero gf@&regB float@0x0p+0
+DIV gf@&regC gf@&regA gf@&regB
+PUSHS gf@&regC
+
+POPFRAME 
+RETURN
+
+LABEL safediv_num_div_zero
+EXIT int@9
+
+
+
+LABEL neg
+# function neg (i: integer,) : integer
+# function neg (i: number) : number
+PUSHFRAME
+CREATEFRAME
+
+DEFVAR TF@i
+
+POPS TF@i
+JUMPIFEQ end_substr_error_8 TF@i nil@nil
+
+DEFVAR TF@type
+TYPE TF@type TF@i
+JUMPIFEQ neg_int TF@type string@int
+JUMPIFEQ neg_number TF@type string@float
+
+LABEL neg_int
+sub TF@i int@0 TF@i 
+PUSHS TF@i
+POPFRAME
+RETURN
+
+# number div
+LABEL neg_number
+sub TF@i float@0x0p+0 TF@i 
+PUSHS TF@i
+POPFRAME
+RETURN
+
+# 
+LABEL pairPrepTN
+POPS gf@&regB
+JUMPIFEQ end_substr_error_8 gf@&regB nil@nil
+POPS gf@&regA
+JUMPIFEQ end_substr_error_8 gf@&regA nil@nil
+RETURN
+
+LABEL pairPrep
+POPS gf@&regB
+POPS gf@&regA
+RETURN
+
+LABEL sefeIntToFloat
+POPS gf@&regC
+JUMPIFEQ sefeIntToFloatJ gf@&regC nil@nil
+INT2FLOAT gf@&regC gf@&regC
+PUSHS  gf@&regC
+RETURN
+LABEL sefeIntToFloatJ
+PUSHS  gf@&regC
+RETURN
+
+LABEL write
+POPS gf@&regA
+JUMPIFEQ writeNil gf@&regA nil@nil
+write gf@&regA
+RETURN
+LABEL writeNil
+write string@nil
+RETURN
+
+LABEL main
+CALL GLOBALDEC
+CREATEFRAME
+DEFVAR gf@&JUMPVAR
+DEFVAR gf@&NULL
+DEFVAR gf@&regA
+DEFVAR gf@&regB
+DEFVAR gf@&regC
+PUSHS string@Hello\032
+POPS gf@i
+PUSHS string@world\010
+POPS gf@j
+PUSHS gf@i
+PUSHS gf@j
+CALL concatenation
+CALL hashtag
+CALL sefeIntToFloat
+POPS gf@k
+PUSHS gf@i
+CALL hashtag
+PUSHS gf@j
+CALL hashtag
+CALL pairPrepTN
+ADD gf@&regC gf@&regA gf@&regB
+PUSHS  gf@&regC
+CALL sefeIntToFloat
+POPS gf@l
+PUSHS gf@k
+CALL write
+PUSHS string@\032
+CALL write
+PUSHS gf@l
+CALL write
+PUSHS string@\010
+CALL write
+CLEARS
+EXIT int@0
+LABEL GLOBALDEC
+DEFVAR gf@l
+DEFVAR gf@k
+DEFVAR gf@j
+DEFVAR gf@i
+RETURN

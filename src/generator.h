@@ -95,6 +95,12 @@ void genWhileDecJump(systemData *d);
 void genWhileDecFLUSH(systemData *d,unsigned long int decor);
 
 /**
+ * @brief genereting delcaration for global vars
+ * @param *d system data
+ */
+void genGlobalDecFLUSH(systemData *d);
+
+/**
  * @brief genereting calculation of jumping epresion
  * @param expT type which will be compered
  */
