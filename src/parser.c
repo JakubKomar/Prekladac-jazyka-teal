@@ -15,7 +15,7 @@ void parserMain(systemData * d)
     frameStackPopFrame(&d->pData.dataModel);    //clean up
     if(searchForNonDefinedFunction(&d->pData.dataModel.globalF.bTree))  //searching for non defined functions
         errorD(3,"k některé uživatelské funci chybí definice");
-    genGlobalDecFLUSH(d);
+    genGlobalDecFLUSH(d);   //global vars define part
 }
 
 void LLprolog(systemData * d)
@@ -167,7 +167,7 @@ void LLfuncArg(systemData *d,bool checkOnly,int argNum,STData * Fdata)  //neterm
     token id=d->pData.actualToken;
     if(id.type!=T_ID)
         LLerr();
-    char *key=stringCpyToChPtr(&d->sData.fullToken);  
+    char *key=stringCpyToChPtr(&d->sData.fullToken);  //copy of identificator for use in data model
 
     token type=next(d);
     if(type.type!=T_COLON)
@@ -767,9 +767,7 @@ STFuncData* LLfuncCall(systemData *d,int numOfAsigens)
     if(d->pData.actualToken.type!=T_RBR)
         LLerr();    
     if(!(data->funcData->paramNum<0))
-    { 
         printf("CALL FCSTART$%lu$%s\n",data->dekorator,(*node)->id);
-    }
     next(d);
     return data->funcData;
 }

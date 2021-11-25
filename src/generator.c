@@ -1,8 +1,8 @@
 /**
  * @brief   Code generator
  *
- * @authors Jakub Komárek (xkomar33)
  * @authors Jakub Křivánek (xkriva30)
+ * @authors Jakub Komárek (xkomar33)
  */
 #include "generator.h"
 
@@ -420,8 +420,8 @@ EXIT int@8\n\
 \n\
 \n\
 \n\
-LABEL FCSTART$0$chr\n\
-\n\
+LABEL FCSTART$0$chr");
+printf("\n\
 PUSHFRAME\n\
 CREATEFRAME\n\
 \n\
