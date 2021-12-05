@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief  basic declaration for all part of program + error handeling functions
  *
  * @authors Jakub Komárek (xkomar33)

@@ -1,7 +1,7 @@
 -- bad expresion 0
 require "ifj21"
 
-function a(integer:a)
+function a(a:integer)
     write(a)
 end
 

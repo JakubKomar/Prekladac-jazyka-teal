@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief  error handeling functions
  *
  * @authors Jakub Komárek (xkomar33)

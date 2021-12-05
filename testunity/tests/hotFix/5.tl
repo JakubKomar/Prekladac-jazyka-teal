@@ -1,4 +1,4 @@
---  expresion 8
+--  expresion 6
 require "ifj21"
 
 local  a:integer

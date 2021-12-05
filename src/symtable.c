@@ -1,6 +1,6 @@
-/** @file symtable.c
- * 
- * IFJ21 compiler
+/** 
+ * Implementace překladače imperativního jazyka IFJ21
+ * @file symtable.c
  * 
  * @brief Symbol table implementation as binary tree.
  *
