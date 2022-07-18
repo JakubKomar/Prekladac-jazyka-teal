@@ -17,7 +17,7 @@ Rozšíření: FUNEXP
 
 
 
-### autoři:
+### Autoři:
 - Jakub Komárek (xkomar33) 
 - Křivánek Jakub (xkriva30) 
 - Matušík Adrián (xmatus35) 
