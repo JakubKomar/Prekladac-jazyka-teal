@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   Expresion parsing
  *
  * @authors Jakub Komárek (xkomar33)
@@ -12,7 +13,7 @@ const char precTable[10][10] =
     {'<'	,'>'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// *,/
 	{'<'	,'<'	,'>'	,'>'	,'>'	,'<'	,'>'	,'<'	,'>'},// +,-
 	{'<'	,'<'	,'<'	,'<'	,'>'	,'<'	,'>'	,'<'	,'>'},// ..
-	{'<'	,'<'	,'<'	,'<'	,'>'	,'<'	,'>'	,'<'	,'>'},// >, <, <=, >=, ==, !=
+	{'<'	,'<'	,'<'	,'<'	,' '	,'<'	,'>'	,'<'	,'>'},// >, <, <=, >=, ==, !=
 	{'<'	,'<'	,'<'	,'<'	,'<'	,'<'	,'='	,'<'	,' '},// (	
 	{'>'	,'>'	,'>'	,'>'	,'>'	,' '	,'>'    ,' '	,'>'},// )
 	{' '	,'>'	,'>'	,'>'	,'>'	,' '	,'>'	,' '	,'>'},// i
@@ -43,13 +44,13 @@ tokenType expresionParse(systemData *sData)
                 reduction(stack);
                 break;
             case ' ':
-                if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right acket can end the fuction call-no lexical error
+                if(stackTop(stack).type==O_DOLAR&&actual.type==T_RBR)//right bracket can end the fuction call-no lexical error
                     return stackHead(stack).typeOfValue;
                 else
-                    errorD(2,"syntax error in expresion");
+                    errorD(2,"syntaktická chyba ve výrazu");
                 break;
             default:
-                errorD(99,"precedence table error");
+                errorD(99,"chyba precedenční tabulky");
                 break;
         }
     }
@@ -81,7 +82,8 @@ token nextTokenExpParser(bool * separatorF,systemData * sData,bool firstT)
         else if(varData->type!=ST_VAR)
             errorD(3,"Proměnná ve výrazu je typu funkce");
         else if(!varData->varData->defined)
-            errorD(3,"Proměnná ve výrazu je typu funkce");
+            fprintf(stderr,"\033[36mWarning L%dC%d:\033[0m Proměnná ve výrazu není definována\n",sData->sData.line,sData->sData.colum);
+        
         printf("PUSHS ");genVar(varData->dekorator,(*ptr)->id);printf("\n");
         return (token){new,varData->varData->type};
     }
@@ -138,15 +140,15 @@ void reduction(stack *s)
         case T_RBR:
             aux=stackPop(s);
             if(aux.type!=NE_EXP)
-                errorD(2,"expresion in bracked err");
+                errorD(2,"špatná posloupnost závorek ve výrazu");
             if(stackPop(s).type!=T_LBR)
-                errorD(2,"expresion in bracked err");
+                errorD(2,"špatná posloupnost závorek ve výrazu");
             stackRemoveHande(s);
             stackPush(s,(token){NE_EXP,aux.typeOfValue});    
             return;
         break;
         default:
-            errorD(2,"sa reduction err");
+            errorD(2,"chyba při redukci ve výrazu");
     }
 
     aux=stackPop(s);
@@ -162,7 +164,7 @@ void reduction(stack *s)
             if(isOperator(aux.type))
                 op=aux;
             else
-                errorD(2,"sa reduction err");
+                errorD(2,"chyba při redukci ve výrazu");
     }
 
     if(stackHead(s).type==O_HANDLE)
@@ -177,7 +179,7 @@ void reduction(stack *s)
             stackPush(s,(token){NE_EXP,id2.typeOfValue});
         }
         else
-            errorD(2,"sa reduction err");
+            errorD(2,"chyba při redukci ve výrazu");
         return;
     }
     
@@ -191,11 +193,11 @@ void reduction(stack *s)
             return;
         break;
         default:
-            errorD(2,"sa reduction err");
+            errorD(2,"chyba při redukci ve výrazu");
     }
 }
 
-tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
+tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)  //type check in aritmetic expresions
 {
     genInst("CALL pairPrepTN");
     if(id1.typeOfValue==K_NIL||id2.typeOfValue==K_NIL)
@@ -208,12 +210,12 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     {
         if(id1.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOAT gf@&regA gf@&regA");
+            genInst("INT2FLOAT gf@&regA gf@&regA");     //retype if needed
             id1.typeOfValue=K_NUMBER;
         }
         if(id2.typeOfValue!=K_NUMBER)
         {
-            genInst("INT2FLOAT gf@&regB gf@&regB");
+            genInst("INT2FLOAT gf@&regB gf@&regB");     //retype if needed
             id2.typeOfValue=K_NUMBER;
         }
         return K_NUMBER;
@@ -221,7 +223,7 @@ tokenType aritmeticComCheck(token id1,token id2,bool forcedNumber)
     return K_INTEGER;
 }
 
-tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
+tokenType comperzionComCheck(token id1,token id2,bool nillEnable)   //type check in comparzion 
 {
     if(nillEnable)
         genInst("CALL pairPrep");
@@ -238,12 +240,12 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
         {
             if(id1.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOAT gf@&regA gf@&regA");
+                genInst("INT2FLOAT gf@&regA gf@&regA"); //retype if needed
                 id1.typeOfValue=K_NUMBER;
             }
             if(id2.typeOfValue!=K_NUMBER)
             {
-                genInst("INT2FLOAT gf@&regB gf@&regB");
+                genInst("INT2FLOAT gf@&regB gf@&regB");//retype if needed
                 id2.typeOfValue=K_NUMBER;
             }
         }
@@ -254,7 +256,7 @@ tokenType comperzionComCheck(token id1,token id2,bool nillEnable)
 }
 
 
-tokenType generateExpresion(token id1, token op ,token id2)
+tokenType generateExpresion(token id1, token op ,token id2) //generating aritmetic expresion + type check
 {
     tokenType type;
     switch (op.type)
@@ -266,7 +268,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
         break;
         case T_DIV:
             type=aritmeticComCheck(id1,id2,true);
-            genInst("CALL safediv");
+            genInst("CALL safediv_num");
         break;
         case T_DIV2:
             aritmeticComCheck(id1,id2,false);
@@ -275,7 +277,7 @@ tokenType generateExpresion(token id1, token op ,token id2)
             if(id1.typeOfValue!=K_INTEGER||id2.typeOfValue!=K_INTEGER)
                 errorD(6,"celočíselné dělení lze provádět pouze s operandy typu integer");
             type=K_INTEGER;
-            genInst("CALL safediv");
+            genInst("CALL safediv_int");
         break;
         case T_ADD:
             type=aritmeticComCheck(id1,id2,false);

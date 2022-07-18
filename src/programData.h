@@ -1,9 +1,9 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   data structures for mains part of program
  *
  * @authors Jakub Komárek (xkomar33)
  */
-
 
 #pragma once
 #include "baseDeclarations.h"
@@ -16,7 +16,8 @@ typedef struct {
     token actualToken;          
     frameStack dataModel;       
     stack expresionBuffer;          
-    stack varDeclarationBuffer;     
+    stack varDeclarationBuffer;   
+    stack GlobalVarDeclarationBuffer;  
     bool isInWhile;
 }parserData;
 

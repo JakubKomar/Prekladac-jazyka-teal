@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   Dynamic string 
  *
  * @authors Jakub Komárek (xkomar33)
@@ -10,7 +11,7 @@ void stringInit(string *s)
    s->capacity=STRING_BASE_SIZE;
    s->str=malloc(sizeof(char)*s->capacity);
    if(!s->str)
-      errorD(100,"Dynamic string alocation error");
+      errorD(100,"Chyba alokace paměti ve stringu");
    stringClear(s);
 }
 
@@ -39,7 +40,7 @@ void stringRealoc(string *s)
    s->capacity=s->capacity*2;
    s->str=realloc(s->str,sizeof(char)*s->capacity);
    if(!s->str)
-      errorD(100,"Dynamic string realocation error");
+      errorD(100,"Chyba realokace paměti ve stringu");
 }
 
 void stringRealocToSize(string *s,int newSize)
@@ -47,7 +48,7 @@ void stringRealocToSize(string *s,int newSize)
    s->capacity=newSize;
    s->str=realloc(s->str,sizeof(char)*s->capacity);
    if(!s->str)
-      errorD(100,"Dynamic string realocation error");
+      errorD(100,"Chyba realokace paměti ve stringu");
 }
 
 void stringCopy(string *s1, string *s2)
@@ -81,7 +82,7 @@ char* strdup (const char* s)
    size_t slen = strlen(s);
    char* result = malloc(slen + 1);
    if(result == NULL)
-      errorD(100,"Malloc error-cpy string");
+      errorD(100,"Chyba alokace paměti ve stringu");
    strcpy(result,s);
 
    return result;

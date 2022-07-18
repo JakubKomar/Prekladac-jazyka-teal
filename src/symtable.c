@@ -1,6 +1,6 @@
-/** @file symtable.c
- * 
- * IFJ21 compiler
+/** 
+ * Implementace překladače imperativního jazyka IFJ21
+ * @file symtable.c
  * 
  * @brief Symbol table implementation as binary tree.
  *
@@ -33,7 +33,7 @@ STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id)
 	if((*RootPtr) == NULL)
 	{
 		if(!((*RootPtr) = malloc(sizeof(STSymbol))))
-			errorD(100,"btree maloc error\n");
+			errorD(100,"chyba binárního stromu - maloc error\n");
 
 		(*RootPtr)->id = id;
 		(*RootPtr)->lPtr = NULL;
@@ -49,7 +49,7 @@ STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id)
 	if(strcmp((*RootPtr)->id, id) == 0)
 	{
 		free(id);
-		errorD(3,"The symbol already exists in the symbol table.");
+		errorD(3,"Záznam již existuje v paměťovém modelu.");
 		return NULL;
 	}
 
@@ -58,73 +58,7 @@ STSymbolPtr* symtableInsertData (STSymbolPtr* RootPtr, char *id)
 	else
 		return symtableInsertData(&(*RootPtr)->rPtr, id);
 }
-/*
-void ReplaceByRightmost (STSymbolPtr PtrReplaced, STSymbolPtr* RootPtr) 
-{
-	if((*RootPtr)->rPtr == NULL){
-		PtrReplaced->id = (*RootPtr)->id;
-		PtrReplaced->data = (*RootPtr)->data;
-		STSymbol *tmp = (*RootPtr);
-		(*RootPtr) = (*RootPtr)->lPtr;
-		free (tmp->data.funcData.paramTypes);
-		free (tmp->data.funcData.retTypes);
-		free (tmp->id);
-		free (tmp);
-		return;
-	}
 
-	ReplaceByRightmost(PtrReplaced, &(*RootPtr)->rPtr);
-}
-
-void symtableDelete (STSymbolPtr* RootPtr, char *id) 
-{
-	if((*RootPtr) == NULL)
-		return;
-
-	if(strcmp((*RootPtr)->id, id) > 0){
-		symtableDelete(&(*RootPtr)->lPtr, id);
-		return;
-	}
-
-	if(strcmp((*RootPtr)->id, id) < 0){
-		symtableDelete(&(*RootPtr)->rPtr, id);
-		return;
-	}
-
-
-	if(((*RootPtr)->lPtr == NULL) && ((*RootPtr)->rPtr == NULL)){
-		free ((*RootPtr)->data.funcData.paramTypes);
-		free ((*RootPtr)->data.funcData.retTypes);
-		free ((*RootPtr)->id);
-		free ((*RootPtr));
-		(*RootPtr) = NULL;
-		return;
-	}
-
-	STSymbol *tmp = (*RootPtr);
-
-	if((*RootPtr)->lPtr == NULL){
-		(*RootPtr) = (*RootPtr)->rPtr;
-		free (tmp->data.funcData.paramTypes);
-		free (tmp->data.funcData.retTypes);
-		free (tmp->id);
-		free (tmp);
-		return;
-	}
-
-	if((*RootPtr)->rPtr == NULL){
-		(*RootPtr) = (*RootPtr)->lPtr;
-		free (tmp->data.funcData.paramTypes);
-		free (tmp->data.funcData.retTypes);
-		free (tmp->id);
-		free (tmp);
-		return;
-	}
-
-	ReplaceByRightmost((*RootPtr), &(*RootPtr)->lPtr);
-	return;
-}
-*/
 void symtableDispose (STSymbolPtr* RootPtr) 
 {
 	if((*RootPtr) != NULL)
@@ -190,7 +124,7 @@ void frameStackInit(frameStack * s)
 
 	s->localF=malloc(sizeof(frame)*s->capacity);
 	if(s->localF==NULL)
-		errorD(100,"frameStack malloc error");
+		errorD(100,"chyba zásobníku - malloc error");
 
 	frameInit(&s->globalF,true);
 	frameStackPushFrame(s,true);
@@ -215,7 +149,7 @@ void frameStackRealoc(frameStack * s)
 	s->capacity=s->capacity*2;
 	s->localF=realloc(s->localF,sizeof(frame)*s->capacity);
 	if(s->localF==NULL)
-		errorD(100,"frameStack realoc error");
+		errorD(100,"chyba zásobníku -  realoc error");
 }
 
 void frameStackDisporse(frameStack * s)
@@ -262,7 +196,7 @@ void frameInit(frame *f,bool wedge)
 	symtableInit(&f->bTree);
 }
 
-STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)
+STSymbolPtr * frameStackSearchVar(frameStack *f,char * key)	
 {
 	STSymbolPtr *data=NULL;
 	for(int i=f->last;i>=0;--i)
@@ -303,7 +237,7 @@ STSymbolPtr * frameStackInsert(frameStack *f,char *key,bool isGlobal)
 	else if(f->last>=0)
 		return symtableInsertData(&f->localF[f->last].bTree,key);
 	else
-		errorD(99,"cant insert into noexisting frame\n");
+		errorD(99,"nelze vkládat do neexistujícího rámce");
 	return NULL;
 }
 
@@ -330,7 +264,7 @@ STSymbolPtr * frameStackInsertFunctionDeclaration(frameStack *f,char *key,bool i
 
 		ptr->funcData=malloc(sizeof(STFuncData));
 		if(!ptr->funcData)
-			errorD(100,"function sym table insert malloc error");
+			errorD(100,"chyba při vkládání do paměťového modelu - malloc error");
 
 		ptr->funcData->paramNum=0;
 		ptr->funcData->retNum=0;
@@ -367,7 +301,7 @@ void frameStack_initPreFunction(frameStack * f,char *key,tokenType *params,int p
 
 	ptr->funcData=malloc(sizeof(STFuncData));
 	if(!ptr->funcData)
-		errorD(100,"function sym table insert malloc error");
+		errorD(100,"chyba při vkládání do paměťového modelu - malloc error");
 
 	ptr->funcData->paramNum=parN;
 	ptr->funcData->retNum=retN;
@@ -410,14 +344,14 @@ STSymbolPtr * frameStackInsertFunctionDefinition(frameStack *f,char *key,bool *c
 	{}
 	else
 	{
-		node =frameStackInsert(f,key,false);
+		node =frameStackInsert(f,key,true);
 		ptr=&(*node)->data;
 		ptr->type=ST_FUNC;
 		ptr->varData=NULL;
 
 		ptr->funcData=malloc(sizeof(STFuncData));
 		if(!ptr->funcData)
-			errorD(100,"function sym table insert malloc error");
+			errorD(100,"chyba při vkládání do paměťového modelu - malloc error");
 
 		ptr->funcData->paramNum=0;
 		ptr->funcData->retNum=0;
@@ -449,7 +383,7 @@ STSymbolPtr * frameStackInsertVar(frameStack *f,char *key,bool isGlobal,tokenTyp
 	ptr->funcData=NULL;
 	ptr->varData=malloc(sizeof(STVarData));	
 	if(!ptr->varData)
-		errorD(100,"var sym table insert malloc error");
+		errorD(100,"chyba při vkládání proměnné do paměťového modelu - malloc error");
 	ptr->varData->type=Ttype;
 	ptr->varData->defined=false;
 	ptr->dekorator=0;

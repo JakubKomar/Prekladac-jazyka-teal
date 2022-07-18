@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   Code generator
  *
  * @authors Jakub Komárek (xkomar33)
@@ -95,6 +96,12 @@ void genWhileDecJump(systemData *d);
 void genWhileDecFLUSH(systemData *d,unsigned long int decor);
 
 /**
+ * @brief genereting delcaration for global vars
+ * @param *d system data
+ */
+void genGlobalDecFLUSH(systemData *d);
+
+/**
  * @brief genereting calculation of jumping epresion
  * @param expT type which will be compered
  */
@@ -129,3 +136,8 @@ void genEscapeSec(char * string,int *i);
  * @brief genereting write "function"
  */
 void genWrite();
+
+/**
+ * @brief genereting predefineted functions
+ */
+void buildInFuction();

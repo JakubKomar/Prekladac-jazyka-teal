@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   scaner
  *
  * @authors Jakub Komárek (xkomar33)
@@ -13,8 +14,7 @@ token getNextUsefullToken(scanerData * data)
        tType=getNextToken(data);
     } while (tType==O_UNIMPORTANT||tType==O_ERR);
     
-    token next={tType};
-    
+    token next={tType};  
     return next;
 }
 
@@ -66,8 +66,6 @@ tokenType checkKeywords(scanerData *data,tokenType type)
         token=K_LOCAL;
     else if(!strcmp(s,"nil"))
         token=K_NIL;
-    else if(!strcmp(s,"read"))
-        token=K_READ;
     else if(!strcmp(s,"require"))
         token=K_REQUIRE;
     else if(!strcmp(s,"return"))
@@ -87,8 +85,17 @@ tokenType checkKeywords(scanerData *data,tokenType type)
 
     if(type==T_FUNC_CALL&&token!=T_ID)
     {
-        errorD(3,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
-        return O_ERR;
+        if(token==K_IF||token==K_WHILE||token==K_RETURN)
+        {
+            ungetc(data->curentSymbol,stdin);
+            data->curentSymbol='(';
+            return token;
+        }
+        else
+        {
+            errorD(3,"Klíčové slovo se nesmí vyskytovat v názvu funkce");
+            return O_ERR;
+        }
     }
     else if(type==T_FUNC_CALL&&token==T_ID)
         return T_FUNC_CALL;
@@ -173,7 +180,6 @@ tokenType getTokenFromState(state state)
         token=T_STR;
     break;
     case S_INT:
-    case S_INT0:
         token=T_INT;
     break;   
     case S_DOUBLE2:
@@ -233,29 +239,27 @@ state nextState(scanerData*data, state curentState)
                 next=S_SPACE; 
             else if(sym=='\"')
                 next=S_STR1; 
-            else if(sym>='1'&&sym<='9')
+            else if(isDecimal(sym))
                 next=S_INT; 
-            else if(sym=='0')
-                next=S_INT0;
         break;
         case S_DOT1:
             if(sym=='.')
                 next=S_DOT2;
         break;
         case S_ID:
-            if(isLetter(sym)||isdigit(sym)||sym=='_')
+            if(isLetter(sym)||isDecimal(sym)||sym=='_')
                 next=S_ID;
             else 
             {   
                 if(sym=='(')
                     next=S_FUNC_CALL;
-                else if(sym==' ')
+                else if(sym==' '||sym=='\n')
                     next=S_IDS;
                 data->write=false;
             }
         break;
         case S_IDS:
-            if(sym==' ')
+            if(sym==' '||sym=='\n')
                 next=S_IDS;
             else if(sym=='(')
                 next=S_FUNC_CALL;
@@ -358,14 +362,6 @@ state nextState(scanerData*data, state curentState)
             else if(isDecimal(sym))
                 next=S_INT;
         break;
-        case S_INT0:
-            if(isDecimal(sym))
-                next=S_TRAP;
-            else if(sym=='e'||sym=='E')
-                next=S_EXP1;
-            else if(sym=='.')
-                next=S_DOUBLE1;
-        break;
         case S_DOUBLE1:
             if(isDecimal(sym))
                 next=S_DOUBLE2;
@@ -441,5 +437,5 @@ void loadChar(scanerData * data)
 
 void errorVisualization(scanerData * data)
 {
-    fprintf(stderr,"\nIn input: L:%d C:%d :\n%s \033[35m<-\033[31mERROR\033[0m is near by\n",data->line,data->colum,data->fullLine.str);
+    fprintf(stderr,"\nNa vstupu: L:%d C:%d :\n%s \033[35m<-\033[31mChyba\033[0m poblíž\n",data->line,data->colum,data->fullLine.str);
 }

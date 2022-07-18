@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   parser
  *
  * @authors Jakub Komárek (xkomar33)
@@ -12,7 +13,6 @@
 #include "symtable.h"
 #include "programData.h"
 #include "generator.h"
-#include <string.h>
 
 
 /**

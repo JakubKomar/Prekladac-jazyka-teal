@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   scaner
  *
  * @authors Jakub Komárek (xkomar33)
@@ -57,8 +58,6 @@ typedef enum{
     S_ESC4,
     S_ESC5,
     S_INT,
-    S_INT0,
-    S_TRAP,
     S_DOUBLE1,
     S_DOUBLE2,
     S_EXP1,

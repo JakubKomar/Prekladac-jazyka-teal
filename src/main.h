@@ -1,4 +1,5 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief   main
  *
  * @authors Jakub Komárek (xkomar33)

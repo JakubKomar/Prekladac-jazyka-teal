@@ -1,6 +1,7 @@
-/** @file symtable.h
- * 
- * IFJ21 compiler
+/**
+ * Implementace překladače imperativního jazyka IFJ21
+ *  
+ * @file symtable.h
  * 
  * @brief Symbol table enums and structures definition, and function declaration for binary tree.
  *

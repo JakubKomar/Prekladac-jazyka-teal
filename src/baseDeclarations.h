@@ -1,26 +1,18 @@
 /**
+ * Implementace překladače imperativního jazyka IFJ21
  * @brief  basic declaration for all part of program + error handeling functions
  *
  * @authors Jakub Komárek (xkomar33)
  */
 #pragma once
-#include <ctype.h>
-#include <stdio.h>
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include <malloc.h>
 #include <string.h>
 #include <setjmp.h>
-#include <stdarg.h>
 
-FILE *fp;
-#ifdef VCODE
-#define INPUT fp
-#define FORM_FILE 1
-#else
 #define INPUT stdin
-#define FORM_FILE 0
-#endif
 
 jmp_buf errorHandelingJump; /** jump for error handeling-part of simulated try catch block **/
 

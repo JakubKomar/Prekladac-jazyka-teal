@@ -1,4 +1,4 @@
--- Bad int 1
+-- Bad int 0
 require "ifj21"
 function main() -- uzivatelska funkce bez parametru
     local a : integer = 00
